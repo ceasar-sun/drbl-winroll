@@ -1,0 +1,90 @@
+******* DRBL-winRoll Translation How To Document ********
+
+    NCHC Free Software Labs, NCHC ,Taiwan
+    Date	:	2007/3/2
+    License	:	GPL      
+    Author	:	Ceasar Sun
+
+*********************************************************
+
+The guide is for how to translate drbl-winroll into your language, include translate 4 
+ files and how to test with your language patch.
+
+Let me know if any problem. And lots of thanks for your great help !!!
+Contact with us if any problem.
+
+	Ceasar <ceasar at nchc.org.tw>, Steven <steven at nchc.org.tw>
+
+--------------------------------------------------------------------------------------------------------------------------------------------
+* Phase 1: Translate files
+NOTE:
+    ** Please use system default values in your transartion files
+    ** Only the streams between "[" "]" is what you need to modify/translate
+    ** DO NOT use unix new-line in batch script !! 
+
+Start to translate :
+For installation:
+*** Edit ~/drbl-winroll/winRoll-setup.bat
+1. Below "REM # identify your OS language " session, add a new line as :
+set [YOUR_LANG]_OS_PATH=%USERPROFILE%\[your_desktop_path]
+
+2.  In ":SET_LANGUAGE" sub-function , find out the lines as  the follow:
+REM #####################################
+REM # Sub function
+REM #####################################
+:SET_LANGUAGE
+
+Add several  lines as the follow format :
+  IF EXIST "%[YOUR_LANG]_OS_PATH%" (
+    set LANG=[your_lang]
+  )
+
+*** Rename language file: ~/drbl-winroll/lang/[your_lang].cmd
+set NIC_NAME=[your environment of "Local Area Connection"] 
+set STARTMENU_PATH=[your system path for "%ALLUSERSPROFILE%\Start Menu\Programs\Cygwin"]
+set ADMIN=[you system account of Administrator]
+
+For others, please translate them in your language properly
+NOTE: Keep empty value if it has nothing in original script, ex:
+set ROOT_PASSWORD=
+
+*** Rename FAQ file: ~/drbl-winroll/doc/FAQ.[your_lang].cmd
+Please translate its content for easy to read . And don't forget leave your name in document header if you want .
+...
+   [Your_lang] Translation   :       [your-name , contact ...]
+....
+
+
+--------------------------------------------------------------------------------------------------------------------------------------------
+* Phase 2: Test your language patch
+
+Step 1. Copy the 4 files into the original drbl-winroll folder , 
+NOTE: Suggest to make a copy for winRoll-setup.bat and drbl_winroll-uninstall.bat
+
+Step 2: Install in a non-contaminative environment  
+Check it works with your language description during installation.
+
+Step 3: Check any files lost during installation
+* "drbl_winroll-uninstall.bat" and "drbl_winroll-uninstall-path.cmd" should be stored in "%APPDATA%\"
+* "drbl_winroll-uninstall-path.cmd" should contain lines as the follow:
+-------------
+@echo off
+set STARTMENU_PATH=[cygwin start menu path for all users]
+set SYSTEM_ADMIN=[your Administrator acccount for your environemnt]
+------------- End of file
+
+* all links should be stored in "%ALUSERSPROFILE%\[all_users_start_menu_path]" , screenshot should be like
+http://drbl.nchc.org.tw/screenshot/?op=show&filepath=album//02_DRBL-winRoll/c00_drbl-winRoll_at_Startmeun.JPG
+
+Step 4: Uninstall by use "Uninstal drbl-winrolll" link from program start-menu
+* All the links under "cygwin" in program menu should be cleaned.
+* "C:\cygwin" folder should be remove 
+
+--------------------------------------------------------------------------------------------------------------------------------------------
+
+
+*********************************************************
+ 	NCHC Free Software Labs  , NCHC ,Taiwan
+	License: GPL
+*********************************************************
+

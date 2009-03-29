@@ -1,0 +1,19 @@
+############################################################## 
+#                                                            # 
+# This script is created by winRoll-setup.bat                # 
+#                                                            # 
+# Author: Chen-kai Sun <ceasar@nchc.org.tw>                  # 
+# License: GPL                                               # 
+# NCHC Free Software Labs  , NCHC ,Taiwan                    # 
+#                                                            # 
+############################################################## 
+
+#
+# Additionally, comments (such as these) may be inserted on individual
+# lines or following the machine name denoted by a '#' symbol.
+#
+# For example:
+#
+#	192-168-001-001 = IP-01			# Hostname by IP
+#	000C294E4F52	= PC-52		# Hostname by MAC
+#

@@ -1,0 +1,132 @@
+******** Welcome to drbl-winRoll FAQ  ******************
+
+    NCHC Free Software Labs, NCHC ,Taiwan
+    License	:	GPL      
+    Author	:	ceasar@nchc.org.tw, steven@nchc.org.tw
+
+*********************************************************
+
+FAQ:
+
+1. What does drbl-winRoll solve?
+- 1.1 Support windows clients can accept commands from DRBL server
+- 1.2 Solve windows hostname duplication problem for using clone tool to distribute  Win-OS in one local LAN. 
+- 1.3 Auto rename Windows "Workgroup" name via netmask and network domain
+- 1.4 Auto renew Windows SID
+
+2. Which steps does drbl-winRoll installation do ?
+The steps includes to install needed software and configure related registry in windows, the detail as the follow:
+- 2.1 Automatic cygwin installation
+- 2.2 Install hostname check service, workgroup name check service and set the local LAN as DHCP
+- 2.3 Install Windows SID check service.
+- 2.4 Setup sshd service and open a listening port 22 if need (For XP or later version)
+
+3. How does drbl-winRoll implement ?
+- 3.1 sshd service provide by cygwin 
+- 3.2 MS Windows configuration: modify windows register , net , netsh , regedit ..etc command
+- 3.3 Hostname check, workgroup name check : autohostname.sh, wsname.exe. Set as a service by cygwin and execute autohostname.sh to modify 
+- 3.4 Sid check : autonewsid.sh ,newsid.exe. Set it as a service by cygwin and execute autonewsid.sh to renew sid 
+
+4. How to Windows hostname be assigned by drbl-winRoll 
+Default to use the last 6 numbers for IP and combine with prefix "PC" as its hostname, ex:
+Its IP is 192.168.1.52, then its hostname would be : PC-001-052
+Manager can follow the steps to change hostname format as you like:
+¡yPrograms¡z->¡yCygwin¡z-> ¡ydrbl_winRoll-config¡z¡Ato edit  "winRoll.txt" , find the line¡G
+HN_WSNAME_PARAM = xxxx 
+
+The guide is the follow:
+
+# 	HN_WSNAME_PARAM = /N:PC-$MAC			PC-"Mac Address" ¡Aex¡GPC-000C294EEF53
+# 	HN_WSNAME_PARAM = /N:PC-$MAC[+8]		PC-"Mac Address the last 8  characters"¡Aex¡GPC-000C294E
+# 	HN_WSNAME_PARAM = /N:PC-$IP			PC-"IP address"¡A¦p¡G PC-192-168-001-052
+# 	HN_WSNAME_PARAM = /N:PC-$IP[3+]		PC-" IP the first 3 characters"¡Aex¡G PC-192
+
+Moreover, hostname can be assigned by local file, edit "HN_WSNAME_PARAM = xxxx " as the follow:
+HN_WSNAME_PARAM = /RDF:C:\cygwin\drbl_winRoll-config\hosts.txt /DFK:$MAC
+/RDF define the path of local file¡A/DFK define the field for searching key
+
+A sample for hosts file: "IP or MAc Address" = "hostname" ¡Aex¡G
+000C294EEF53 = Student-01		(Assign "Student-01" as hostname if its MAC address is 000C294EEF53 )
+192-168-001-012 = Student-02	(Assign "Student-02" as hostname if its IP address is 192.168.1.12 )
+
+if use /DFK:$MAC ¡Ait would be assigned as "Student-01"¡A/DFK:$IP it would be "Student-02"
+
+By this way, Manager can define hostname freely , but we suggest to collect all of MAC address and write down in
+the template machine. The other cloned machines would be assigned hostname by their own attribute 
+
+PS¡Gdrbl-winRoll use wsname tool to change hostname¡Aso we supported format of hostname is full consistently with wsname tool.
+
+5. How to assign Windows workgroup name ?
+It can be assigned by three parameters
+	-1. fix string , ex: WG
+	-2. By IP/Netmask, ex: GROUP-$NM
+		ip:192.168.20.2	NM:255.255.255.0 => Workgroup: GROUP-020
+		ip:172.18.1.5	NM:255.255.0.0 => Workgroup: GROUP-018-001
+	-3. By DNS suffix , ex :WG-$DNS_SUFFIX
+		DNS Suffix Search List. . . . . . : my..org.domain  => WG-my-org
+It use fix string "WG" as default parameters.
+
+6. How to decide to re-assign Windows SID ? 
+It would check the NIC mac address if the same with system logged before , if not, program would re-assign SID at run time.
+For security reason, SID must be assigned randomly, and the recorded of mac address would be encode with md5sum.
+
+7. Any steps need to do after install ?
+If you want to your windows clients can accept the commands from DRBL server, please follow 
+the step:
+	-0. Switch to root, check if there're id_rsa, id_rsa.pub in /root/.ssh folder.If not, keep go no next step. If they exist, please jump to step 3 to install ssh key.
+
+	-1. Create teh root's ssh keys (private and public key) , and press [Enter] during ask "passphrase " in this process.
+
+	$ ssh-keygen
+	Generating public/private rsa key pair.
+	Enter file in which to save the key (/root/.ssh/id_rsa):
+	Enter passphrase (empty for no passphrase):
+	Enter same passphrase again:
+	Your identification has been saved in /root/.ssh/id_rsa.
+	Your public key has been saved in /root/.ssh/id_rsa.pub.
+	The key fingerprint is:
+	fe:56:XX:XX:XX:XX:XX:XX:XX:XX:83:ff:42 root@drbl-client
+
+	-2. It would create the root' ssh keys: id_rsa id_rsa.pub , as the follow:
+
+	$  ls -al /root/.ssh
+	$  id_rsa  id_rsa.pub
+
+	-3. Transmit the file "id_rsa.pub" to the directory (c:\cygwin\home\administrator\.ssh) in windows and save the file as "authorized_keys"
+
+	copy [path of id_rsa.pub] c:\cygwin\home\administrator\.ssh\authorized_keys
+
+
+	-4. After all, you can send a command to clients from DRBL server, ex:
+
+	$ ssh  administrator@[win-client-ip]  ipconfig
+
+8. After clone my MS Windows clients, how can it change its serial number and Security key when it boot next time, even it re-configure its hardware by itself ?
+Please MS Windows web page as the follow:
+" How to use the Sysprep tool to automate successful deployment of Windows XP "
+http://support.microsoft.com/default.aspx?scid=kb;en-us;302577&sd=tech 
+or 
+http://support.microsoft.com/?scid=kb;zh-tw;302577
+
+9. Is it necessary to use drbl-winRoll under DRBL environment ?
+Not really. It would still need the service to provide NAT function to let Windows clients use Internet.
+Of course, DRBL server provide NAT, DHCP function, and clients can be centralized managed .
+
+10. Can drbl-winRoll be wored with other clone tool ?
+Sure, it can work with any clone tool to solve the clone system issue , ex: Clonezilla¡BGhost¡BAcronis True Image... tec.
+drbl-winRoll has no any involvement with other software licence. The development of drbl-winRoll use GPL to release.
+
+
+Other ...
+
+
+
+Ceasar Sun
+
+Contact with us if any problem.
+Email¡Gceasar at nchc.org.tw, steven at nchc.org.tw
+
+*********************************************************
+ 	NCHC Free Software Labs  , NCHC ,Taiwan
+	License: GPL
+*********************************************************

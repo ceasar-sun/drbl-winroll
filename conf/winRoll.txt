@@ -1,0 +1,41 @@
+############################################################## 
+#                                                            # 
+# This script is created by winRoll-setup.bat                # 
+#                                                            # 
+# License: GPL                                               # 
+# NCHC Free Software Labs  , NCHC ,Taiwan                    # 
+#                                                            # 
+############################################################## 
+
+drbl-winRoll.VERSION = 200707.1
+cygwin.dll.VERSION = 1.5.21-1
+wsname.VERSION = 2.75g
+newsid.VERSION = 4.10
+
+# HN_WSNAME_DEF_PARAM :	Define default wsname parementer, assigned by winRoll-set.bat
+HN_WSNAME_DEF_PARAM = /N:$MAC
+IF_NEWSID_DEF_PARAM = 0
+
+###############################################################
+# HN_WSNAME_PARAM :	Define custermized wsname parementer, assigned by user.
+#					The follow is several suggested format
+# 	HN_WSNAME_PARAM = /RDF:[C:\path_of_hosts.conf_file] /DFK:$MAC
+# 	Ex: HN_WSNAME_PARAM = /RDF:C:\cygwin\drbl_winRoll-config\hosts.txt /DFK:$MAC
+#
+#	Other format:
+# 	HN_WSNAME_PARAM = /N:PC-$MAC
+# 	HN_WSNAME_PARAM = /N:PC-$MAC[6+]
+# 	HN_WSNAME_PARAM = /N:PC-$IP
+# 	HN_WSNAME_PARAM = /N:PC-$IP[3+]
+#
+# WG_WSNAME_PARAM :	Define custermized workgroup parementer, assigned by user.
+#			The follow is several suggested format
+#			No action if empty parementer
+# 	$NM:	use IP/Netmask
+# 	$DNS_SUFFIX:	use DNS suffix
+#
+#	Other example:
+# 	WG_WSNAME_PARAM = GROUP-$NM
+# 	WG_WSNAME_PARAM = WG-$DNS_SUFFIX
+#	
+###############################################################

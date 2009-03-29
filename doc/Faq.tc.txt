@@ -1,0 +1,145 @@
+
+
+******** 歡迎閱讀 drbl-winRoll FAQ  ******************
+
+     國網中心自由軟體實驗室  , NCHC ,Taiwan
+     License	:	GPL      
+     Author	:	ceasar@nchc.org.tw, steven@nchc.org.tw
+
+*********************************************************
+
+FAQ:
+1. drbl-winRoll  要解決什麼事？
+1.1 提供 Windows 的客戶端在 drbl 的環境下，可接受 drbl 主機命令之環境
+1.2 解決利用 image clone 軟體在大量還原 win-like OS 時，主機名稱在區域網路中重複之問題
+1.3 利用網域層級自動更新Windows 工作群組
+1.4 解決還原 win-like OS 時，Windows SID 相同之安全問題
+1.5 提供後續開發延伸應用工具之管理平台
+
+2. drbl-winRoll  程式做了哪些事 ?
+包含的必要的軟體安裝與 Windows 系統參數設定，細述如下：
+2.1 cygwin 自動安裝
+2.2 安裝 hostname , work group 檢查服務並配置區域連線為 DHCP
+2.3 安裝SID 檢查功能
+2.4 配置 sshd 服預並啟動，開啟防火牆 TCP port 22 (For XP)
+
+3. drbl-winRoll  是如何實做？
+3.1 在 MS windows 上提供sshd 服務是由 cygwin 完成
+3.2 MS Windows 配置部份：修改 windows register，使用 netsh 、 net、regedit
+等指令
+3.3 主機名稱與工作群組名稱修改：autohostname.sh、wsname.exe，並由 cygwin 配置為 service 來
+執行autohostname.sh 進行主機名稱檢查與修改
+3.4 SID 名稱修改：autonewsid.sh、newsid.exe，並由 cygwin 配置為 service 來
+執行autonewsid.sh 進行SID 檢查與修改
+
+4. Windows 的主機名稱是如何命名？
+目前預設以 windows 上所配到的 IP 後6 碼，另加上前置字元 "PC-" 當為主機名稱，如：
+IP 為 192.168.1.52 ，則主機名稱為：PC-001-052
+管理者可依下列步驟自行修改所需格式：
+『程式集』->『Cygwin』-> 『drbl_winRoll-config』，開啟 "winRoll.txt" 找到如下行：
+HN_WSNAME_PARAM = xxxx 置換即可。
+以下簡述幾種常用格式：
+
+# 	HN_WSNAME_PARAM = /N:PC-$MAC			PC-"Mac Adress" ，如：PC-000C294EEF53
+# 	HN_WSNAME_PARAM = /N:PC-$MAC[+8]		PC-"Mac Adress 最左側 8 碼"，如：PC-000C294E
+# 	HN_WSNAME_PARAM = /N:PC-$IP			PC-"IP 位置"，如： PC-192-168-001-052
+# 	HN_WSNAME_PARAM = /N:PC-$IP[3+]		PC-" IP 最右側 3 碼"，如： PC-052
+
+此外，也可用檔案來規範 hostname ；開啟 "winRoll.txt" 找到 "HN_WSNAME_PARAM = xxxx " ，置換為
+HN_WSNAME_PARAM = /RDF:C:\cygwin\drbl_winRoll-config\hosts.txt /DFK:$MAC
+/RDF 規範名稱檔的路徑，/DFK 規範以何種屬性尋找主機名稱
+
+hosts.txt 規範如右："IP or MAc Address" = "hostname" ，如：
+000C294EEF53 = Student-01		(此 MAc Address 的分配主機名稱為 Student-01	)
+192-168-001-012 = Student-02	(此 IP 的分配主機名稱為 Student-02)
+
+所以 /DFK:$MAC ，則會被指派為 Student-01，/DFK:$IP 則會被指派為 Student-02
+
+此方式管理者可自由定義主機名稱，但建議先將所有 Mac Address 收集起來寫在範本機器中，複製之後的機器
+即會依據各自的屬性來指定主機名稱。
+
+PS：drbl-winRoll 中以 wsname tool 來進行主機名稱修改，所以支援格式與 wsname tool 參數完全相容，
+
+5. Windows 的群組名稱是如何命名？
+目前可用三種變數指定:
+	-1. 固定字串 , ex: WG
+	-2. 由 IP/Netmask 決定, ex: GROUP-$NM
+		ip:192.168.20.2	NM:255.255.255.0 => Workgroup: GROUP-020
+		ip:172.18.1.5	NM:255.255.0.0 => Workgroup: GROUP-018-001
+	-3. 由 DNS suffix 決定 , ex :WG-$DNS_SUFFIX
+		DNS Suffix Search List. . . . . . : my..org.domain  => WG-my-org
+目前預設以固定字串 "WG" 當為主機名稱
+i
+5. How to assign Windows workgroup name ?
+It can be assigned by three parameters
+	-1. fix string , ex: WG
+	-2. By IP/Netmask, ex: GROUP-$NM
+		ip:192.168.20.2	NM:255.255.255.0 => Workgroup: GROUP-020
+		ip:172.18.1.5	NM:255.255.0.0 => Workgroup: GROUP-018-001
+	-3. By DNS suffix , ex :WG-$DNS_SUFFIX
+		DNS Suffix Search List. . . . . . : my..org.domain  => WG-my-org
+
+
+6. 重新分配 SID 的依據是？
+只要判斷與先前紀錄之網卡MAC Addr不同，即重新指派 SID ，當然 SID 必需是隨機給定。
+為安全考量，先前紀錄之網卡MAC Addr 需經 md5sum 編碼。
+
+7. drbl-winRoll 安裝完成後還有其他步驟嗎？
+如果您要讓您的 windows 能接受 drbl server 的命令，請至您的 drbl 主機完成下
+列步驟：
+	-0. 切換成 root, 先確定 /root/.ssh/ 下有沒有 id_rsa 和 id_rsa.pub 這兩個檔案. 如果沒有則繼續下面步驟; 如果已經產生過,請跳至第 3步驟,進行 ssh key 的安裝.
+	-1. 在DRBL server產生root的ssh key ，過程中詢問密碼時直接按 [Enter](表示不詢問)
+ 		$  ssh-keygen
+		Generating public/private rsa key pair.
+		Enter file in which to save the key (/root/.ssh/id_rsa):
+		Enter passphrase (empty for no passphrase):
+		Enter same passphrase again:
+		Your identification has been saved in /root/.ssh/id_rsa.
+		Your public key has been saved in /root/.ssh/id_rsa.pub.
+		The key fingerprint is:
+		fe:56:XX:XX:XX:XX:XX:XX:XX:XX:83:ff:42 root@drbl-server
+
+	-2. 然後就會在~root/.ssh下產生兩個檔 id_rsa id_rsa.pub，如下：
+		$  ls  /root/.ssh
+		id_rsa  id_rsa.pub
+
+	-3. 然後將id_rsa.pub 叢 server 上傳到 windows 機器中管理者在 cygwin中 的家目錄下
+		的.ssh 目錄，存成 authorized_keys ,
+		如：
+		copy [path-of-ir_dsa.pub] c:\cygwin\home\administrator\.ssh\authorized_keys
+ 
+	-4. 完成後，可在 drb server 上測試下命令給 win-client，如果正確安裝是不會詢問密碼，
+		如：
+		$ ssh  administrator@[win-client-ip]  ipconfig
+
+	-5. 之後，您便可利用 /opt/drbl/sbin/dcs 來讓 MS Windows clients 統一開、關機
+
+8. 如果我需要自動重新抓硬體資訊 ?
+請參考MS的網頁:
+如何使用Sysprep 工具自動實現Windows XP 的成功部署
+http://support.microsoft.com/?scid=kb;zh-tw;302577
+或是
+http://support.microsoft.com/default.aspx?scid=kb;en-us;302577&sd=tech 
+
+9. 配置 drbl-winRoll 的機器是否一定需要在 DRBL 的環境下？
+不一定需要。但如果你要讓你的 Windo w s client 可以使用 Internet ，還是需要有主機或設備做 NAT的功能。
+ 而 DRBL server 即具有 NAT、DHCP 等網路功能，且可由 server 端進行集中式管理。
+
+10. 可以搭配其他的硬碟複製工具使用 drbl-winRoll 嗎？
+是的，您可以使用任何的複製工具下(如：Clonezilla、Ghost、Acronis True Image...等)，利用 drbl-winRoll 來解決複製時相關問題。
+drbl-winRoll 不牽涉您所使用複製工具的版權問題；drbl-winRoll 開發部份以 GPL 方式授權。
+
+
+	
+*** 其他...
+
+
+Ceasar Sun
+
+如有任何問題請與我們連繫
+Email：ceasar@nchc.org.tw, steven@nchc.org.tw
+
+*********************************************************
+     國網中心自由軟體實驗室  , NCHC ,Taiwan
+    License: GPL
+*********************************************************
