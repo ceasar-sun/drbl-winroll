@@ -60,9 +60,11 @@ set ERR_DIR_DONT_EXIST=ERROR: Local repository does not exists:
 set ERR_REP_DONT_EXIST=ERROR: Invalid local repository. Missing directory:
 set ERR_FIL_DONT_EXIST=ERROR: Invalid local repository. Missing file:
 set ERR_CYGWIN_SETUP_DONT_EXIST=ERROR: Could not find Cygwin setup.exe in the cygwin_mirror\ directory of the local repository:
+set INSTALL_WINROLL_SERVICE=安裝 drbl-winroll 主服務
 
 set INSTALL_AUTOHOSTNAME_SERVICE=安裝主機名稱檢查服務
 set SETUP_AUTOHOSTNAME_SERVICE=配置主機名稱檢查服務
+set REMOV_WINROLL_SERVICE=移除 drbl-winroll 主服務
 set REMOV_AUTOHOSTNAME_SERVICE=移除主機名稱檢查服務
 set IF_INSTALL_AUTOHOSTNAME=是否安裝『自動主機名稱』服務
 set SELECT_HOSTNAME_FORMAT%=請選擇您想要主機名稱樣式
@@ -133,3 +135,10 @@ set WARNING=警告
 set SERVICES=相關服務
 set ANY_KEY_TO_EXIT=任意鍵離開
 
+REM # Add form v1.2.0-2, 20090715
+set SETUP_NETWORK_MODE=設定網路模式
+set SELECT_NETWORK_MODE=選擇網路模式
+set BY_FILE=由本地端檔案決定
+set SKIP=skip
+set DO_NOTHIMG_FOR_NETWORK=Do nothing for network configuration
+set USE_NETWORK_MODE_IS=network mode is

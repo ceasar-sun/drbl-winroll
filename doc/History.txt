@@ -4,6 +4,13 @@ Author: Ceasar Sun <ceasar at nchc org tw>
 ---------------------------------------------------------------------------------------------------
 Change log:
 
+version 200805.1:
+	1. 
+	
+	[English]
+	1. 
+	
+
 version 200707.1:
 	1. 修正 autonewsid 後, sshd service 啟動失敗
 	2. 在移除服務或程式過程中刪除 sshd_server

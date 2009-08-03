@@ -13,9 +13,11 @@
 ###########################################################################
 
 WINROLL_CONF_ROOT="/drbl_winRoll-config"
-WINROLL_TMP="/tmp"
-WINROLL_CONFIG="$WINROLL_CONF_ROOT/winRoll.txt"
-WINROLL_LOG="$WINROLL_TMP/winroll-service.log"
+WINROLL_TMP="/var/log"
+WINROLL_CONFIG="$WINROLL_CONF_ROOT/winroll.conf"
+WINROLL_LOG="$WINROLL_TMP/winrollsrv.log"
+TEMP="/var/log"
+TMP="/var/log"
 
 waiting_to_reboot(){
 	while [ $(ls $WINROLL_TMP/winroll-*.lock | wc -l) -gt 0 ]

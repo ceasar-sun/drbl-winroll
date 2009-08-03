@@ -135,3 +135,14 @@ set SURE_TO=Etes-vous s–r de
 set WARNING=ATTENTION
 set SERVICES=Services
 set ANY_KEY_TO_EXIT=N'importe quelle touche pour sortir
+
+set INSTALL_WINROLL_SERVICE=Install drbl-winroll master service
+set REMOV_WINROLL_SERVICE=Remove drbl-winroll master service
+
+REM # Add form v1.2.0-2, 20090715
+set SETUP_NETWORK_MODE=Setup network mode
+set SELECT_NETWORK_MODE=Select network mode
+set BY_FILE=By local file
+set SKIP=skip
+set DO_NOTHIMG_FOR_NETWORK=Do nothing for network configuration
+set USE_NETWORK_MODE_IS=network mode is

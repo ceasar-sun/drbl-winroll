@@ -33,6 +33,7 @@ set CYGWIN_ROOT=
 set SERVICE_ACCOUNT_NAME=LocalSystem
 set SERVICE_ACCOUNT_PW=
 set OS_VERSION=
+set WINROLL_SERVICE=winrollsrv
 set AUTOHOSTNAME_SERVICE=autohostname
 set AUTONEWSID_SERVICE=autonewsid
 set IF_NEWSID_SERVICE=n
@@ -50,8 +51,9 @@ set NEWSID_DOWNLOAD_URL=http://drbl.nchc.org.tw/drbl-winroll/download/newsid-dow
 
 set CYGWIN_ROOT=%SystemDrive%\cygwin
 set LOCAL_REPOSITORY=%SOURCE_DIR%
-set INIT_CONFIG_FILE=%INIT_CONF%\winRoll.txt
+set INIT_CONFIG_FILE=%INIT_CONF%\winroll.conf
 set INIT_HOSTS_FILE=%INIT_CONF%\hosts.txt
+set INIT_CLIENT_MAC_NETWORK_FILE=%INIT_CONF%\client-mac-network.conf
 set INIT_FUNCTIONS_FILE=%INIT_CONF%\winroll-functions.sh
 set INIT_DOC_FOLDER=doc
 
@@ -68,9 +70,10 @@ call :CHECK_IF_WINADMIN
 REM call :CHECK_CYGWIN_ARGUMENTS
 
 set WINROLL_CONFIG_FOLDER=%CYGWIN_ROOT%\drbl_winRoll-config
-set WINROLL_CONFIG_FILE=%WINROLL_CONFIG_FOLDER%\winRoll.txt
+set WINROLL_CONFIG_FILE=%WINROLL_CONFIG_FOLDER%\winroll.conf
 set WINROLL_FUNCTIONS_FILE=%WINROLL_CONFIG_FOLDER%\winroll-functions.sh
 set WINROLL_HOSTS_FILE=%WINROLL_CONFIG_FOLDER%\hosts.txt
+set WINROLL_CLIENT_MAC_NETWORK_FILE=%WINROLL_CONFIG_FOLDER%\client-mac-network.conf
 set WINROLL_DOC_FOLDER=%CYGWIN_ROOT%\drbl_winRoll-doc
 set WINROLL_UNINSTALL_FOLDER=%WINROLL_CONFIG_FOLDER%\uninstall
 set WINROLL_UNINSTALL_PARA=drbl_winroll-uninstall-para.cmd
@@ -299,6 +302,8 @@ goto :EOF
 	mkdir "%WINROLL_CONFIG_FOLDER%" "%WINROLL_DOC_FOLDER%" "%WINROLL_UNINSTALL_FOLDER%"
 	copy "%INIT_CONFIG_FILE%" "%WINROLL_CONFIG_FOLDER%"
 	copy "%INIT_HOSTS_FILE%" "%WINROLL_CONFIG_FOLDER%"
+	copy "%INIT_CLIENT_MAC_NETWORK_FILE%" "%WINROLL_CONFIG_FOLDER%"
+
 	copy "%INIT_FUNCTIONS_FILE%" "%WINROLL_CONFIG_FOLDER%"
 	copy "%INIT_DOC_FOLDER%" "%WINROLL_DOC_FOLDER%"
 	copy ".\sbin\*.*" "%CYGWIN_ROOT%\bin"
@@ -314,6 +319,9 @@ goto :EOF
 
 	REM Add cygwin binary path into current path
 	set PATH=%CYGWIN_ROOT%\bin;%PATH%
+	
+	echo ... %INSTALL_WINROLL_SERVICE% ...
+	"%CYGWIN_ROOT%\bin\cygrunsrv.exe" -I "%WINROLL_SERVICE%" -d "DRBL-winroll auto-config service" -p "%CYGWIN_ROOT%\bin\winrollsrv.sh" -e "CYGWIN=${_cygwin}" -i
 goto :EOF
 
 :CYGWIN_UNINSTALL
@@ -328,6 +336,10 @@ goto :EOF
 	echo CYGWIN %INSTALL%%DIRECTORY% ='%CYGWIN_ROOT%'
 	echo %LOCAL_REPOSITORY_DIRECTORY%='%LOCAL_REPOSITORY%'
 
+	echo ... %REMOV_WINROLL_SERVICE% ...
+	%CYGWIN_ROOT%\bin\cygrunsrv.exe -E %WINROLL_SERVICE%
+	%CYGWIN_ROOT%\bin\cygrunsrv.exe -R %WINROLL_SERVICE%
+	
 	echo %REMOVE_REGISTRY%
 	regedit.exe /s .\%INIT_CONF%\UninstallCygwin.reg
 
@@ -359,7 +371,10 @@ goto :EOF
 	echo [3]%BY_HOSTS_FILE% :%MORE_DETAIIL_TO_REFER% '%WINROLL_HOSTS_FILE%'
 	set /P ANSWER="[1] "
 	rem echo Hostname format is : %ANSWER%
-
+	rem if not "%ANSWER%" == "2" ( if not "%ANSWER%" == "3"  echo =[1]: %BY_IP%  )
+	rem if "%ANSWER%" == "2" ( echo =[2]: %BY_MAC% )
+	rem if "%ANSWER%" == "3" ( echo =[3]: %BY_HOSTS_FILE% )
+	
 	if "%ANSWER%" == "3" (
 		goto :SKIP_HN_PREFIX
 	)
@@ -394,6 +409,7 @@ goto :EOF
 
 	rem set WG_PREFIX=$(nbtstat.exe -n | grep -E "<00>.+GROUP" | sed -r "s/\s+/ /g" | cut -d " " -f 2)
 	set WG_PREFIX=WG
+	set WG_PARA=
 	if "%WG_PREFIX%" == "" (
 		set WG_PREFIX=WG
 	)
@@ -404,21 +420,29 @@ goto :EOF
 	echo [2]: IP/NETMASK: [%WG_PREFIX%-XXX]
 	echo [3]: %DNS_SUFFIX%
 	set /P ANSWER="[1] "
+
+	rem if not "%ANSWER%" == "2" ( if not "%ANSWER%" == "3" ( set ANSWER=1  ) )
+	rem if "%ANSWER%" == "1" ( echo =[1]: %FIXED% )
+	rem if "%ANSWER%" == "2" ( echo =[2]: IP/NETMASK )
+	rem if "%ANSWER%" == "3" ( echo =[3]: %DNS_SUFFIX% )
 	
 	if "%ANSWER%" == "3" (
 		goto :SKIP_WG_PREFIX
 	)
+
 	echo %SET_WG_PREFIX%
-	set /P ANSWER_WG_PREFIX="[%WG_PREFIX% ] "
+	set /P ANSWER_WG_PREFIX="[%WG_PREFIX%] "
 	if not "%ANSWER_WG_PREFIX%" == "" (
 		set WG_PREFIX=%ANSWER_WG_PREFIX%
 	)
 	:SKIP_WG_PREFIX
 
 	echo .
+	REM if "%ANSWER%" == "1" ( set WG_PARA=%WG_PREFIX% )
 	if "%ANSWER%" == "1" ( set WG_PARA=%WG_PREFIX% )
 	if "%ANSWER%" == "2" ( set WG_PARA=%WG_PREFIX%-$NM )
 	if "%ANSWER%" == "3" ( set WG_PARA=$DNS_SUFFIX )
+
 	echo ** %SHOW_WORKGROUP_FORMAT% : %WG_PARA%
 	
 	:END_OF_AUTOGROUP_SETUP
@@ -427,18 +451,11 @@ goto :EOF
 	
 	set IF_AUTOHOSTNAME_SERVICE=y
 	echo .
-	echo ... %INSTALL_AUTOHOSTNAME_SERVICE% ...
-	"%CYGWIN_ROOT%\bin\cygrunsrv.exe" -I "%AUTOHOSTNAME_SERVICE%" -d "Auto Hostname Checker" -p "%CYGWIN_ROOT%\bin\autohostname.sh" -e "CYGWIN=${_cygwin}" -u "LocalSystem" -w ""
-	echo IF_AUTOHOSTNAME_SERVICE=%IF_AUTOHOSTNAME_SERVICE%>>%WINROLL_CONFIG_FILE%
-	echo IF_AUTOHOSTNAME_SERVICE=%IF_AUTOHOSTNAME_SERVICE%>>%WINROLL_SETUP_LOG%
-
-
-	echo .
-	echo ... %FORCE_TO_NIC_AS_DHCP% ...
-	echo .
-	REM pause
-	netsh -c interface ip set address name="%NIC_NAME%" source=dhcp
-
+	rem  20080520 後用 winrollsrv 取代
+	rem echo ... %INSTALL_AUTOHOSTNAME_SERVICE% ...
+	rem "%CYGWIN_ROOT%\bin\cygrunsrv.exe" -I "%AUTOHOSTNAME_SERVICE%" -d "Auto Hostname Checker" -p "%CYGWIN_ROOT%\bin\autohostname.sh" -e "CYGWIN=${_cygwin}" -u "LocalSystem" -w ""
+	echo IF_AUTOHOSTNAME_SERVICE = %IF_AUTOHOSTNAME_SERVICE%>>%WINROLL_CONFIG_FILE%
+	echo IF_AUTOHOSTNAME_SERVICE = %IF_AUTOHOSTNAME_SERVICE%>>%WINROLL_SETUP_LOG%
 	:END_OF_AUTOHOSTNAME_SETUP
 	goto :EOF
 
@@ -453,10 +470,49 @@ goto :EOF
 	del /F /Q %CYGWIN_ROOT%\bin\autohostname.sh
 	del /F /Q %CYGWIN_ROOT%\bin\wsname.exe
 	
-	echo .
-	echo ... %REMOV_AUTOHOSTNAME_SERVICE% ...
-	%CYGWIN_ROOT%\bin\cygrunsrv.exe -E %AUTOHOSTNAME_SERVICE%
-	%CYGWIN_ROOT%\bin\cygrunsrv.exe -R %AUTOHOSTNAME_SERVICE%
+	rem echo .
+	rem  echo ... %REMOV_AUTOHOSTNAME_SERVICE% ...
+	rem %CYGWIN_ROOT%\bin\cygrunsrv.exe -E %AUTOHOSTNAME_SERVICE%
+	rem %CYGWIN_ROOT%\bin\cygrunsrv.exe -R %AUTOHOSTNAME_SERVICE%
+		
+goto :EOF
+
+:NETWORK_MODE_SETUP
+	rem echo ... %FORCE_TO_NIC_AS_DHCP% ...
+	rem netsh -c interface ip set address name="%NIC_NAME%" source=dhcp
+
+	echo %HR%
+	echo %NEXT_STEP% : %SETUP_NETWORK_MODE%
+	echo %HR%
+		
+	set ANSWER=1
+	set NETWORK_MODE=dhcp
+	echo %SELECT_NETWORK_MODE%
+	echo [1]DHCP
+	echo [2]%BY_FILE% : %MORE_DETAIIL_TO_REFER% '%WINROLL_CLIENT_MAC_NETWORK_FILE%'
+	echo [3]%SKIP% (%DO_NOTHIMG_FOR_NETWORK%) 
+	set /P ANSWER="[1] "
+
+	if "%ANSWER%" == "2" ( set NETWORK_MODE=by_file "$WINROLL_CONF_ROOT/client-mac-network.conf" )
+	if "%ANSWER%" == "3" ( set NETWORK_MODE=none )
+
+	echo ** %USE_NETWORK_MODE_IS% : %NETWORK_MODE% 
+	echo CONFIG_NETWORK_MODE = %NETWORK_MODE%>>%WINROLL_CONFIG_FILE%
+	if  "%NETWORK_MODE%" == "dhcp" (
+		echo . 
+		echo ... %FORCE_TO_NIC_AS_DHCP% ...
+		echo .
+		REM pause
+		netsh interface ip set address "%NIC_NAME%" source=dhcp
+	)
+pause
+	:END_OF_NETWORK_MODE_SETUP
+goto :EOF
+
+:NETWORK_MODE_REMOVE
+
+	REM echo Do nothing
+	REM netsh interface ip set address "%NIC_NAME%" source=dhcp
 		
 goto :EOF
 
@@ -511,7 +567,9 @@ goto :EOF
 
 	REM # use -y to assigen what service must be started before the new service
 	REM # 200612.0 的版本中在被拿掉,原因會造成 autonewsid 一直 autohostname 被中斷
-	"%CYGWIN_ROOT%\bin\cygrunsrv.exe" -I "%AUTONEWSID_SERVICE%" -d "Auto New SID" -p "%CYGWIN_ROOT%\bin\autonewsid.sh" -e "CYGWIN=${_cygwin}" -i %DEPEND_SERVICE%
+
+	rem  20080520 後用 winrollsrv 取代
+	rem "%CYGWIN_ROOT%\bin\cygrunsrv.exe" -I "%AUTONEWSID_SERVICE%" -d "Auto New SID" -p "%CYGWIN_ROOT%\bin\autonewsid.sh" -e "CYGWIN=${_cygwin}" -i %DEPEND_SERVICE%
 	
 	:END_OF_AUTONEWSID_SETUP
 goto :EOF
@@ -527,10 +585,10 @@ goto :EOF
 	del /F /Q %CYGWIN_ROOT%\bin\autonewsid.sh
 	del /F /Q %CYGWIN_ROOT%\bin\newsid.exe
 
-	echo .
-	echo ... %REMOV_AUTONEWSID_SERVICE% ...
-	%CYGWIN_ROOT%\bin\cygrunsrv.exe -E %AUTONEWSID_SERVICE%
-	%CYGWIN_ROOT%\bin\cygrunsrv.exe -R %AUTONEWSID_SERVICE%
+	rem echo .
+	rem echo ... %REMOV_AUTONEWSID_SERVICE% ...
+	rem %CYGWIN_ROOT%\bin\cygrunsrv.exe -E %AUTONEWSID_SERVICE%
+	rem %CYGWIN_ROOT%\bin\cygrunsrv.exe -R %AUTONEWSID_SERVICE%
 		
 goto :EOF
 
@@ -609,6 +667,7 @@ goto :EOF
 
 		netsh firewall delete portopening TCP 22
 	)
+	rem delete "sshd" and "sshd_server" account
 	net user sshd /DELETE 1> /dev/null 2>&1
 	net user sshd_server /DELETE 1> /dev/null 2>&1
 
@@ -621,6 +680,7 @@ goto :EOF
 	pause
 	call :CYGWIN_INSTALL
 	call :AUTOHOSTNAME_SETUP
+	call :NETWORK_MODE_SETUP
 	call :AUTONEWSID_SETUP
 	call :SSHD_SETUP
 	
@@ -648,8 +708,8 @@ goto :EOF
 	echo .
 	echo %FIRST_USE_NEWSID% %ACCEPT_LICENCE%
 	pause 
-	%CYGWIN_ROOT%\bin\cygrunsrv.exe -S %AUTONEWSID_SERVICE%
-	echo --- Start %AUTONEWSID_SERVICE% service right now>>%WINROLL_SETUP_LOG%
+	%CYGWIN_ROOT%\bin\cygrunsrv.exe -S %WINROLL_SERVICE%
+	echo --- Start %WINROLL_SERVICE% service right now>>%WINROLL_SETUP_LOG%
 	copy %WINROLL_SETUP_LOG% %CYGWIN_ROOT%
 	echo .
 	echo %HR%
@@ -678,6 +738,7 @@ goto :EOF
 	
 		call :SSHD_REMOVE
 		call :AUTONEWSID_REMOVE
+		call :NETWORK_MODE_REMOVE
 		call :AUTOHOSTNAME_REMOVE
 		call :CYGWIN_UNINSTALL
 	

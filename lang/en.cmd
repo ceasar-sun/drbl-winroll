@@ -60,6 +60,7 @@ set ERR_DIR_DONT_EXIST=ERROR: Local repository does not exists:
 set ERR_REP_DONT_EXIST=ERROR: Invalid local repository. Missing directory:
 set ERR_FIL_DONT_EXIST=ERROR: Invalid local repository. Missing file:
 set ERR_CYGWIN_SETUP_DONT_EXIST=ERROR: Could not find Cygwin setup.exe in the cygwin_mirror\ directory of the local repository:
+set INSTALL_WINROLL_SERVICE=Install drbl-winroll master service
 
 set IF_INSTALL_AUTOHOSTNAME=If intall auto-hostname function
 set SELECT_HOSTNAME_FORMAT%=Select the hostname format as you want
@@ -91,6 +92,7 @@ set ACCEPT_LICENCE=Please accept the licence when the service be started, and sy
 set NO_ANY_ATTENDED=You don't need to do anything during installing
 set SETUP_AUTOHOSTNAME_SERVICE=Setup Hostname-check service
 set REMOV_AUTOHOSTNAME_SERVICE=Remove Hostname-check service
+set REMOV_WINROLL_SERVICE=Remove drbl-winroll master service
 set REMOVE_REGISTRY=Delete Windows registry
 set COPY_NEEDED_FILES=Copy need files
 set REMOVE_NEEDED_FILES=Remove need files
@@ -133,3 +135,10 @@ set WARNING=WARNING
 set SERVICES=services
 set ANY_KEY_TO_EXIT=Any key to exit
 
+REM # Add form v1.2.0-2, 20090715
+set SETUP_NETWORK_MODE=Setup network mode
+set SELECT_NETWORK_MODE=Select network mode
+set BY_FILE=By local file
+set SKIP=skip
+set DO_NOTHIMG_FOR_NETWORK=Do nothing for network configuration
+set USE_NETWORK_MODE_IS=network mode is

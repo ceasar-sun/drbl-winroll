@@ -1,261 +1,276 @@
 #!/bin/sh
 
 ###########################################################################
-# Unattended drbl-winRoll installation
+#  drbl-winRoll service
 #
 # License: GPL
 # Author	: Ceasar Sun Chen-kai <ceasar@nchc.org.tw> , Steven steven@nchc.org.tw
-# Purpose	: Solve windows hostname duplication problem for using clone tool to distribute  Win-OS in one local LAN. 
-# Date		: 2005/03/14
+# Purpose	: Main service for drbl-winroll, refer winroll.conf(winroll.txt) to run auto-config for windows
+# Date	: 2008/05/20
 #
 # Usage:  %CYGWIN_ROOT%\bin\autohostname.sh -e "CYGWIN=${_cygwin}"
 #
 ###########################################################################
-
-#Golbal paremeter for drbl-winroll
+#WINROLL_CONFIG="/drbl_winRoll-config/winRoll.txt"
 WINROLL_FUNCTIONS="/drbl_winRoll-config/winroll-functions.sh"
 . $WINROLL_FUNCTIONS
 
 # Local service paremeter 
-declare CYGWIN_ROOT='c:\cygwin\'
-declare WINROLL_LOCAL_BACKUP=$HOMEPATH/drbl-winroll.bak
-declare WINROOT=Administrator
-declare SSHD_SNAME='sshd'
-declare AUTOHN_SNAME='autohostname'
-declare AUTOSID_SNAME='autonewsid'
-declare action="c"
-declare NEED_TO_RUN_SID=0
-declare NEED_TO_RUN_SID=0
-declare SSHD_SERVER_PW=1qaz2wsx
-		
-declare SYSINT_LINCESE_URL="http://drbl.nchc.org.tw/drbl-winroll/download/newsid-licence.php"
-declare NEWSID_DOWNLOAD_URL="http://drbl.nchc.org.tw/drbl-winroll/download/newsid-download.php"
+SERVICE_NAME='winrollsrv'
+LOCKFILE=winrollsrv.lock
+REBOOT_FLAG=winrollsrv.reboot
 
-
-config_sshd(){
-	ssh-host-config -y -c ntsec -w $SSHD_SERVER_PW
-	cygrunsrv -S $SSHD_SNAME
-	
-	netsh firewall add portopening TCP 22 sshd 1>/dev/null 2>&1
-	[ -d "/home/$WINROOT/.ssh" ] || mkdir /home/$WINROOT/.ssh
-	
-	if [ -f "$WINROLL_LOCAL_BACKUP\.ssh\authorized_keys" ]; then
-		echo "Import $WINROLL_LOCAL_BACKUP\.ssh ?" 
-		ANSWER_IF_GO=y
-		read -p "[Y/n] " ANSWER_IF_GO junk
-
-		if [ "$ANSWER_IF_GO" != "n" ]; then
-			cp -af "$WINROLL_LOCAL_BACKUP\.ssh" "/home/$WINROOT/"
-			echo "Import backuped ssh key : $WINROLL_LOCAL_BACKUP\.ssh\authorized_keys "
-		fi
-	fi
-}
-config_autohostname(){
-	HOSTNAME_PREFIX=PC
-	HN_WSNAME_PARAM=$(sed -e "s/\s*=\s*/=/g" $WINROLL_CONFIG | grep -e "^HN_WSNAME_PARAM=" | sed -e "s/^HN_WSNAME_PARAM=//" -e "s/(\s! )//g")
-	WG_WSNAME_PARAM=$(sed -e "s/\s*=\s*/=/g" $WINROLL_CONFIG | grep -e "^WG_WSNAME_PARAM=" | sed -e "s/^WG_WSNAME_PARAM=//" -e "s/(\s! )//g" )
-
-	if [ -z "$HN_WSNAME_PARAM" ]; then
-		WINROLL_HOSTS_FILE="$CYGWIN_ROOT\drbl_winRoll-config\hosts.txt"
-		echo "Please select hostname format:"
-		echo .
-		echo "[1] by IP"
-		echo "[2] by MAC"
-		echo "[3] by_file, more detail to refrer $WINROLL_HOSTS_FILE"
-		read -p "[1] " ANSWER junk
-	
-		echo "Set hostname perfix:"
-		read -p "[$HOSTNAME_PREFIX] " ANSWER_HOSTNAME_PREFIX junk
-		[ -n "$ANSWER_HOSTNAME_PREFIX" ] && HOSTNAME_PREFIX=$ANSWER_HOSTNAME_PREFIX
-	
-		WS_PARA="/N:$HOSTNAME_PREFIX-\$IP[7+]"
-		if [ "$ANSWER" = "2" ]; then
-			WS_PARA="/N:$HOSTNAME_PREFIX-\$MAC"
-		fi
-		if [ "$ANSWER" = "3" ]; then
-			WS_PARA="/RDF:$WINROLL_HOSTS_FILE /DFK:\$MAC"
-		fi
-		echo "Set hostname format :$WS_PARA"
-		echo "HN_WSNAME_PARAM = $WS_PARA" >> $WINROLL_CONFIG
-	else
-		echo "Use current hostname format :$HN_WSNAME_PARAM"
-		read -p "[$HN_WSNAME_PARAM] " ANSWER_HN_WSNAME_PARAM junk
-		[ -n "$ANSWER_HN_WSNAME_PARAM" ] && HN_WSNAME_PARAM=$ANSWER_HN_WSNAME_PARAM
-		
-		cp -f $WINROLL_CONFIG $WINROLL_CONFIG.bak
-		grep -v -e "^HN_WSNAME_PARAM =" $WINROLL_CONFIG > $WINROLL_CONFIG.new
-		echo "HN_WSNAME_PARAM = $HN_WSNAME_PARAM" >> $WINROLL_CONFIG.new
-		mv -f $WINROLL_CONFIG.new $WINROLL_CONFIG
-	fi
-	
-	if [ -z "$WG_WSNAME_PARAM" ]; then
-		WG_PREFIX="WG"
-		# WG_PREFIX=$(nbtstat.exe -n | grep -E "<00>.+GROUP" | sed -r "s/\s+/ /g" | cut -d " " -f 2)
-		
-		echo "Please selet workgroup format:"
-		echo .
-		echo "[1]: Fixed: [$WG_PREFIX]"
-		echo "[2]: By IP/NETMASK: [$WG_PREFIX-XXX]"
-		echo "[3]: By DNS SUFFIX"
-
-		read -p"[1] " ANSWER junk
-		
-		if [ "$ANSWER" != "3" ]; then
-			echo "Set workgroup prefix:"
-			read -p "[$WG_PREFIX] " ANSWER_WG_PREFIX junk
-			[ -n "$ANSWER_WG_PREFIX" ] && WG_PREFIX=$ANSWER_WG_PREFIX
-		fi
-		
-		echo .
-		WG_WSNAME_PARAM="$WG_PREFIX"
-		[ "$ANSWER" = "2" ] && WG_WSNAME_PARAM="$WG_PREFIX-\$NM"
-		[ "$ANSWER" = "3" ] && WG_WSNAME_PARAM="\$DNS_SUFFIX"
-		echo "Set workgroup format as $WG_WSNAME_PARAM"
-		echo "WG_WSNAME_PARAM = $WG_WSNAME_PARAM" >> $WINROLL_CONFIG
-	
-	else
-		echo "Use current workgroup format :$WG_WSNAME_PARAM"
-		read -p "[$WG_WSNAME_PARAM] " ANSWER_WG_WSNAME_PARAM junk
-		[ -n "$ANSWER_WG_WSNAME_PARAM" ] && WG_WSNAME_PARAM=$ANSWER_WG_WSNAME_PARAM
-		
-		cp -f $WINROLL_CONFIG $WINROLL_CONFIG.bak
-		grep -v -e "^WG_WSNAME_PARAM =" $WINROLL_CONFIG > $WINROLL_CONFIG.new
-		echo "WG_WSNAME_PARAM = $WG_WSNAME_PARAM" >> $WINROLL_CONFIG.new
-		mv -f $WINROLL_CONFIG.new $WINROLL_CONFIG
-	fi
-	unix2dos $WINROLL_CONFIG
-	[ -z "`cygrunsrv -Q $AUTOHN_SNAME 2>/dev/null `" ] && cygrunsrv -I "$AUTOHN_SNAME" -d "Auto Hostname Checker" -p "$CYGWIN_ROOT\bin\autohostname.sh" -e "CYGWIN=${_cygwin}" -i
-
-}
-config_autonewsid(){
-	if [ ! -x "`which newsid 2>/dev/null`" ]; then
-		NEED_TO_RUN_SID="1"
-		IF_AGREE=y
-		echo "Please view the license, accept or not ?"
-		explorer $SYSINT_LINCESE_URL
-		echo .
-		read -p "[Y/n]" IF_AGREE junk
-		if [ "$IF_AGREE" = "n" ]; then 
-			echo "Please accept it if you need to use the toolkit !!"
-			return
-		fi
-		
-		rm.exe -rf $TMP/NewSid.zip $TMP/newsid.exe $TMP/Eula.txt
-		wget.exe $NEWSID_DOWNLOAD_URL -P $TMP
-		unzip.exe $TMP/NewSid.zip -d $TMP
-		mv.exe $TMP/newsid.exe /usr/bin
-		chmod.exe +x /usr/bin/newsid.exe
-		
-		rm.exe -rf $TMP/NewSid.zip $TMP/newsid.exe $TMP/Eula.txt
-	fi
-	[ -z "`cygrunsrv -Q $AUTOSID_SNAME 2>/dev/null `" ] && cygrunsrv -I "$AUTOSID_SNAME" -d "Auto New SID" -p "$CYGWIN_ROOT\bin\autonewsid.sh" -e "CYGWIN=${_cygwin}" -i
-}
-
-remove_sshd(){
-	echo "Remove $SSHD_SNAME service ..."
-	cygrunsrv.exe -E $SSHD_SNAME 1> /dev/null 2>&1
-	cygrunsrv.exe -R $SSHD_SNAME 1> /dev/null 2>&1
-	echo "Delet open port TCP 22 if need ..."
-	netsh firewall delete portopening TCP 22 1> /dev/null 2>&1
-	echo "Delete user 'sshd', 'sshd_server' ..."
-	net user sshd /DELETE 1> /dev/null 2>&1
-	net user sshd_server /DELETE 1> /dev/null 2>&1
-	
-	if [ -f "/home/$WINROOT/.ssh/authorized_keys" ];then
-		mkdir -p "$WINROLL_LOCAL_BACKUP"
-		echo "Find exist ssh key and backup to : $WINROLL_LOCAL_BACKUP/.ssh"
-		cp -af  "/home/$WINROOT/.ssh" "$WINROLL_LOCAL_BACKUP/"
-	fi
-}
-remove_autohostname(){
-	echo "Remove $AUTOHN_SNAME service ..."	
-	cygrunsrv.exe -E $AUTOHN_SNAME 1> /dev/null 2>&1
-	cygrunsrv.exe -R $AUTOHN_SNAME 1> /dev/null 2>&1
-}
-remove_autonewsid(){
-	echo "Remove $AUTOSID_SNAME service ..."	
-	cygrunsrv.exe -E $AUTOSID_SNAME 1> /dev/null 2>&1
-	cygrunsrv.exe -R $AUTOSID_SNAME 1> /dev/null 2>&1
-}
-list_winroll_service(){
-	declare -a srv_name
-	declare -a srv_stat
-	
-	srv_name[1]=$AUTOHN_SNAME; srv_stat[1]=off
-	srv_name[2]=$AUTOSID_SNAME; srv_stat[2]=off
-	srv_name[3]=$SSHD_SNAME; srv_stat[3]=off
-	
-	for (( i=1; i<=3; i=i+1)); do
-		#[ -n "`cygrunsrv -Q $AUTOHN_SNAME 2>/dev/null `" ] && AUTOHN_STAT=on
-		[ -n "`cygrunsrv -Q ${srv_name[$i]} 2>/dev/null `" ] && srv_stat[$i]=on
-	done
-	
-	echo "********************************************"
-	echo "**  Welcome to use drbl-winroll Controler **"
-	echo "********************************************"
-	echo "Which service want to edit?"
-	echo "[1] ${srv_name[1]} ....... [${srv_stat[1]}]"
-	echo "[2] ${srv_name[2]} ....... [${srv_stat[2]}]"
-	echo "[3] ${srv_name[3]} ....... [${srv_stat[3]}]"
-	echo "[x] Quit"
-	echo "============================================"
-	read -p "[x]" ANS_NUM junk
-	
-	if [ "$ANS_NUM" = "1" ]; then
-		if [ -z "`cygrunsrv -Q ${srv_name[$ANS_NUM]} 2>/dev/null `" ]; then
-			config_autohostname
-		else
-			echo "re-Config or remove service ?"
-			read -p "[C|r]" ANS_ACT junk
-			[ "$ANS_ACT" = "r" ] && remove_autohostname || config_autohostname
-		fi
-	elif [ "$ANS_NUM" = "2" ]; then
-		[ -z "`cygrunsrv -Q ${srv_name[$ANS_NUM]} 2>/dev/null `" ] && config_autonewsid ||remove_autonewsid
-	elif [  "$ANS_NUM" = "3" ]; then
-		[ -z "`cygrunsrv -Q ${srv_name[$ANS_NUM]} 2>/dev/null `" ] && config_sshd || remove_sshd
-	else
-		echo "Bye !! "
-		sleep 2;
-		exit
-	fi
-	
-}
-# Main 
-check_if_root
-while [ $# -gt 0 ]; do
-	case "$1" in
-		-r|--remove)
-			shift; action="r"
-		;;
-		-c|--config)
-	    		shift; action="c"
-		;;
-		-s|--start)
-			shift; action="s"
-		;;
-		-h|--help)
-			Usage; exit 1;
-	  	;;
-		*)
-			Usage; exit 1;
-		;;
-	esac
-done
-
-if [ "$action" = "r" ]; then
-	[ -n "`cygrunsrv -Q $AUTOHN_SNAME 2>/dev/null `" ] && remove_autohostname
-	[ -n "`cygrunsrv -Q $AUTOSID_SNAME 2>/dev/null `" ] && remove_autonewsid
-	[ -n "`cygrunsrv -Q $SSHD_SNAME 2>/dev/null `" ] && remove_sshd
-elif [ "$action" = "s" ]; then 
-	[ -z "`cygrunsrv -Q $AUTOHN_SNAME 2>/dev/null `" ] && config_autohostname
-	[ -z "`cygrunsrv -Q $AUTOSID_SNAME 2>/dev/null `" ] && config_autonewsid
-	[ -z "`cygrunsrv -Q $SSHD_SNAME 2>/dev/null `" ] && config_sshd
-
-else
-	while [ "1" = "1" ]
-	do
-		clear;
-		list_winroll_service
-	done
+# For lock service 
+rm -rf $WINROLL_TMP/$REBOOT_FLAG;
+if [ $(ls $WINROLL_TMP/winroll-*.reboot | wc -l) -gt 0 ]; then
+	echo `date` "$SERVICE_NAME:reboot flag:" `ls $WINROLL_TMP/winroll-*.reboot | wc -l`
+	exit;
 fi
-exit 0
+touch $WINROLL_TMP/$LOCKFILE;
+echo `date` "$SERVICE_NAME: start lock:" 
+
+NEED_TO_REBOOT=0
+
+#######################
+# Sun function
+#######################
+do_config_network(){
+	SERVICE_NAME="CONFIG_NETWORK"
+	CLIENT_MAC_NETWORK="$WINROLL_CONF_ROOT/client-mac-network.conf"
+
+	[ ! -f "$CLIENT_MAC_NETWORK" ] && echo "$SERVICE_NAME: no config file : $CLIENT_MAC_NETWORK" 
+
+	# a sample for config
+	# # 00-0C-29-xx-xx-xx = 10.0.0.15::10.0.0.254		# assign ip, use default netmask , assign appropriate gateway
+	for macaddr in "$(ipconfig /all | grep "Physical Address" | cut -d":" -f2)"; do
+		thisconfig="$(grep $macaddr $CLIENT_MAC_NETWORK | cut -d"=" -f2 | sed -e "s/\s//g" )";
+
+	done
+
+	echo $NICMAC_ADDR_MD5 
+
+}
+do_autohostname(){
+
+	# wsname.exe 的 log file 不能改，不然無法取得 return code
+	export WSNAME_LOG="$TEMP/wsname.log"
+	NEED_TO_CHANGE=0
+	IF_IPRENEW=0
+
+	# get necessary parameters form winroll.conf
+	HNAME=$(hostname | sed -e "s/\s//g")
+	HN_WSNAME_DEF_PARAM=$(sed -e "s/\s*=\s*/=/g" $WINROLL_CONFIG | grep -e "^HN_WSNAME_DEF_PARAM=" | sed -e "s/^HN_WSNAME_DEF_PARAM=//" -e "s/\s//g")
+	HN_WSNAME_PARAM=$(sed -e "s/\s*=\s*/=/g" $WINROLL_CONFIG | grep -e "^HN_WSNAME_PARAM=" | sed -e "s/^HN_WSNAME_PARAM=//" -e "s/(\s! )//g")
+	
+	[ ! -f "$WSNAME_LOG" ] && touch $WSNAME_LOG;
+	if [ -z "$HN_WSNAME_PARAM" ] ; then	HN_WSNAME_PARAM=$HN_WSNAME_DEF_PARAM; fi
+	echo "" > $WSNAME_LOG		# Clean advanced log
+	echo "'$HN_WSNAME_DEF_PARAM','$WSNAME_LOG','$HN_WSNAME_PARAM','$HNAME'" | tee -a  $WINROLL_LOG
+	wsname.exe $HN_WSNAME_PARAM	# use /TEST to pre-test the hostname assigned by wsname
+
+	#2006/4/14 上午 12:21:32 : Could not determine local IP address. - Rename request aborted!
+	#2006/4/14 上午 12:21:32 : Terminate                 : Exit code 4
+
+	#2006/4/12 下午 05:48:22 : Computer is already named NEW-55. - Rename request aborted!
+	#2006/4/12 下午 05:48:22 : Terminate                 : Exit code 7
+
+	#2006/4/12 下午 05:51:06 : Search Key not found in Data File - Rename request aborted!
+	#2006/4/12 下午 05:51:06 : Terminate                 : Exit code 14
+
+	#2006/4/12 下午 05:51:32 : Can't find data file "C:\\cygwin\\drbl-config\\hostssss.conf" - Rename request aborted!
+	#2006/4/12 下午 05:51:32 : Terminate                 : Exit code 13
+
+	#2006/4/12 下午 05:52:44 : Rename Method             : SetComputerNameEx
+	#2006/4/12 下午 05:52:44 : Rename Successful - reboot required to take effect
+
+	#2006/4/12 下午 06:36:07 : New name validity check   : Failed - Rename request aborted!
+	#2006/4/12 下午 06:36:07 : Terminate                 : Exit code 8
+
+	#2006/4/12 下午 06:34:46 : Command Line              : C:\cygwin\bin\wsname.exe /DFGHHJ
+	#2006/4/12 下午 06:34:58 : Termination               : WSName closed normally from the GUI
+
+	WS_RETURN_CODE=$(tail -n 1 $WSNAME_LOG )
+
+	#Assign a new hostname and rebooot to active
+	if [ -n "$(echo $WS_RETURN_CODE | grep -e 'Rename Successful - reboot ' 2> /dev/null )" ] ; then
+		NEED_TO_CHANGE=1
+	# No ip release 
+	elif [ -n "$(echo $WS_RETURN_CODE | grep -e 'Exit code 4' 2> /dev/null )" ] ; then
+		NEED_TO_CHANGE=0
+		echo "No ip release ,Please check $HN_WSNAME_PARAM for more detail !!";
+	# Hostname is already correct
+	elif [ -n "$(echo $WS_RETURN_CODE | grep -e 'Exit code 7' 2> /dev/null )" ] ; then
+		NEED_TO_CHANGE=0
+		echo "Hostname is already correct. - Rename request aborted !!";
+	# Other case : Exit code 8 : New name validity check  ,13 :Can't find data file , 14:Search Key not found in Data File
+	else 
+		#  If configuration error or other reason to setup hostname fial , use default parameter 
+		echo "Error:$WS_RETURN_CODE Use default parameter !!"
+		#if [ -n "$(echo $HN_WSNAME_DEF_PARAM | grep -e '$IP' 2> /dev/null)" ] ; then
+		#	ipconfig /renew; ipconfig /release; ipconfig /renew
+		#	IF_IPRENEW=1
+		#fi
+		NEED_TO_CHANGE=0
+		wsname.exe $HN_WSNAME_DEF_PARAM
+		WS_RETURN_CODE=$(tail -n 1 $WSNAME_LOG | tr -d "\n")
+		# if use $IP as default, but client can't get a release IP .!! It's a special case
+		if [ -n "$(echo $WS_RETURN_CODE | grep -e 'Exit code 4' 2> /dev/null )" ] ; then
+			NEED_TO_CHANGE=0
+			echo "No ip release ,Please check $HN_WSNAME_PARAM for more detail !!";
+			# use other format as default, and active ti change
+		elif [ -z "$(echo $WS_RETURN_CODE | grep -e 'Exit code 7' 2> /dev/null )" ] ; then
+			NEED_TO_CHANGE=1
+		fi
+	fi
+	echo "'$WS_RETURN_CODE','$NEED_TO_CHANGE'"
+	# done for hostname
+
+	# For workgroup
+	WG_STR=
+	WG_WSNAME_PARAM=$(sed -e "s/\s*=\s*/=/g" $WINROLL_CONFIG | grep -e "^WG_WSNAME_PARAM=" | sed -e "s/^WG_WSNAME_PARAM=//" -e "s/(\s)//g" )
+	echo WG_WSNAME_PARAM="$WG_WSNAME_PARAM"
+
+	if [ -n "$WG_WSNAME_PARAM" ] ;then
+		#if [ "$IF_IPRENEW" != "1" ] ; then
+		#	ipconfig /renew; ipconfig /release; ipconfig /renew
+		#fi
+		
+		NM="$(ipconfig | grep "Subnet Mask" | head -n 1 | cut -d ":" -f 2 | sed -e "s/\s*//g" )"
+		IP="$(ipconfig | grep "IP Address" | head -n 1 | cut -d ":" -f 2 | sed -e "s/\s*//g" |awk -F. '{print $1+1000"-"$2+1000"-"$3+1000"-"$4+1000 }' | sed -e 's/^1//' -e 's/\-1/-/g' )"
+		DNS_SUFF="$(ipconfig /all | grep 'DNS Suffix Search List' 2>/dev/null |head -n 1 | cut -d ":" -f 2 | cut -d "." -f 1,2 |sed -e "s/\./-/g" -e "s/\s*//g" )"
+
+		if [ "$NM" = "255.255.0.0" ] ;then
+			NM_STR=$(echo $IP| cut -d "-" -f 2,3)
+		else
+			NM_STR=$(echo $IP| cut -d "-" -f 3)
+		fi
+		
+		WG_STR=$(echo $WG_WSNAME_PARAM | sed -e "s/\$DNS_SUFFIX/$DNS_SUFF/g" -e "s/\$NM/$NM_STR/g" -e 's/\s//g')
+
+		echo WG_STR="$WG_STR"
+		
+		if [ -n "$WG_STR" ] && [ "${#WG_STR}" -le 15 ] ; then
+			wsname.exe /N /WG:$WG_STR
+			WS_RETURN_CODE=$(tail -n 1 $WSNAME_LOG )
+			if [ -n "$(echo $WS_RETURN_CODE | grep -e 'Workgroup Name set successfully' 2> /dev/null )" ] ; then
+				# reset workgroup, need to reboot
+				echo "reset workgroup, need to reboot"
+				NEED_TO_CHANGE=1
+			elif [ -n "$(echo $WS_RETURN_CODE | grep -e 'Workgroup and is already set to' 2> /dev/null )" ] ; then
+				# workgroup is already correct
+				echo "workgroup is already correct"
+			else 
+				#  If configuration error or other reason to setup hostname fial , use default parameter 
+				echo "Not define !!"
+			fi
+		else 
+			echo "Bad workgroup string lenght :'$WG_STR'"
+		fi
+	fi
+	# done for workgroup
+	if [ "$NEED_TO_CHANGE" = "1" ] ; then
+		NEED_TO_REBOOT=1
+		echo `date` "AUTOHOSTNAME need to reboot :" 
+	fi
+}
+fix_usersid_restart_sshd(){
+	mkpasswd -l >/etc/passwd
+	mkgroup -l >/etc/group
+	
+	cygrunsrv -Q sshd 
+	if [ "$?" -eq "0" ]; then
+		chmod 644 /var/log/sshd.log
+		chmod 644 /etc/ssh_host*_key.pub
+		chmod 600 /etc/ssh_host*_key
+		chmod 750 /etc/ssh_config
+		chmod 644 /etc/sshd_config
+		echo "Restart sshd service ..."
+		cygrunsrv -E sshd
+		sleep 5
+		cygrunsrv -S sshd
+		echo "do fix_usersid_restart_sshd" 
+	fi
+	rm -rf "$WINROLL_TMP/$FIX_SSHD_LOCKFILE"
+}
+
+do_autonewsid(){
+
+	SID_MD5CHK_FILE="$WINROLL_CONF_ROOT/sid.md5"
+	NICMAC_ADDR_MD5=""
+	NEED_TO_CHANGE=0
+
+	[ ! -f "$SID_MD5CHK_FILE" ] && touch $SID_MD5CHK_FILE;
+
+	NICMAC_ADDR_MD5="$(ipconfig /all | grep "Physical Address" | head -n 1 | cut -d ":" -f 2 | sed -e "s/\s*//g" | md5sum | cut -d ' ' -f 1)"
+	NEED_TO_CHANGE=0
+
+	echo $NICMAC_ADDR_MD5 
+
+	if [ "$(cat $SID_MD5CHK_FILE)" != "$NICMAC_ADDR_MD5" ] ; then
+		echo "Renew sid for: $NICMAC_ADDR_MD5 " 
+		rm -rf $SID_MD5CHK_FILE;
+		NEED_TO_CHANGE=1
+		mv -f /etc/passwd /etc/passwd.old
+		mv -f /etc/group /etc/group.old
+		
+		newsid.exe /a /n;
+		while [ $(ps au| grep newsid | wc -l) -gt 0 ]
+		do
+			echo "Waiting for renew sid ..."
+			sleep 10;
+		done
+		echo "$NICMAC_ADDR_MD5" > $SID_MD5CHK_FILE
+		touch "$WINROLL_TMP/$FIX_SSHD_LOCKFILE"
+	fi
+	if [ "$NEED_TO_CHANGE" = "1" ] ; then
+		NEED_TO_REBOOT=1
+		echo `date` "AUTONEWSID need to reboot :" 
+	fi
+
+}
+#######################
+# Main function
+#######################
+FIX_SSHD_LOCKFILE=fixsshd.lock
+
+# for fix sshd service 
+[ -f "$WINROLL_TMP/$FIX_SSHD_LOCKFILE" ] && fix_usersid_restart_sshd
+
+# CONFIG_NETWORK_MODE = none ; do nothing
+# CONFIG_NETWORK_MODE = dhcp ; do dhcp
+# CONFIG_NETWORK_MODE = by_file "$WINROLL_CONF_ROOT/client-mac-network.conf" ; config by file 
+
+CONFIG_NETWORK_MODE="$(sed -e "s/\s*=\s*/=/g" $WINROLL_CONFIG | grep -e "^CONFIG_NETWORK_MODE=" | sed -e "s/^CONFIG_NETWORK_MODE=//" -e "s/(\s! )//g")"
+if [ "$CONFIG_NETWORK_MODE" = "none" ] || [ -z "$CONFIG_NETWORK_MODE" ] ; then
+	echo "CONFIG_NETWORK_MODE : none" 
+elif [ "$CONFIG_NETWORK_MODE" = "dhcp" ] ; then
+	ipconfig /renew; ipconfig /release; ipconfig /renew
+	IF_IPRENEW=1
+	echo "CONFIG_NETWORK_MODE : dhcp" 
+elif [ -n "$(echo $CONFIG_NETWORK_MODE | grep -e 'by_file' 2> /dev/null )" ] ; then
+	do_config_network;
+else 
+	echo "CONFIG_NETWORK_MODE :$CONFIG_NETWORK_MODE ?? " 
+fi
+
+IF_AUTOHOSTNAME_SERVICE="$(sed -e "s/\s*=\s*/=/g" $WINROLL_CONFIG | grep -e "^IF_AUTOHOSTNAME_SERVICE=" | sed -e "s/^IF_AUTOHOSTNAME_SERVICE=//" -e "s/(\s! )//g")"
+[ "$IF_AUTOHOSTNAME_SERVICE" = "y" ] && do_autohostname;
+
+IF_NEWSID_SERVICE=$(sed -e "s/\s*=\s*/=/g" $WINROLL_CONFIG | grep -e "^IF_NEWSID_SERVICE=" | sed -e "s/^IF_NEWSID_SERVICE=//" -e "s/(\s! )//g")
+[ "$IF_NEWSID_SERVICE" = "y" ] && do_autonewsid;
+
+
+#Unlock the service
+rm -rf  $WINROLL_TMP/$LOCKFILE;
+echo `date` "$SERVICE_NAME: unlock:" 
+
+# Check if any service be lock, perpare to reboot, 
+if [ "$NEED_TO_REBOOT" = "1" ]; then
+	# touch $WINROLL_TMP/$REBOOT_FLAG;
+	echo `date` "$SERVICE_NAME: set rboot flag:" 
+	#waiting_to_reboot;
+	reboot -r 10;
+	echo `date` "$SERVICE_NAME: do reboot:" 
+fi
+
+
