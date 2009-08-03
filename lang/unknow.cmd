@@ -97,7 +97,7 @@ set REMOVE_REGISTRY=Delete Windows registry
 set COPY_NEEDED_FILES=Copy need files
 set REMOVE_NEEDED_FILES=Remove need files
 set INSTALL_AUTOHOSTNAME_SERVICE=Install Hostname-check service
-set FORCE_TO_NIC_AS_DHCP=Program will set as DHCP for your NIC(%NIC_NAME%)
+set FORCE_TO_NIC_AS_DHCP=Program will set as DHCP for your NIC
 
 set IF_INSTALL_SSH_SERVICE=If install sshd service
 set SETUP_SSHD_SERVICE=Setup sshd service and start it right away
@@ -142,3 +142,4 @@ set BY_FILE=By local file
 set SKIP=skip
 set DO_NOTHIMG_FOR_NETWORK=Do nothing for network configuration
 set USE_NETWORK_MODE_IS=network mode is
+set FORCE_INSTALL=Install over(For that cygwin environment installed already, but maybe affect the original)

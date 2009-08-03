@@ -94,7 +94,7 @@ set REMOVE_REGISTRY=Verwijderen van het Windows register
 set COPY_NEEDED_FILES=Kopieren van benodigde bestanden
 set REMOVE_NEEDED_FILES=Verwijderen van benodigde bestanden
 set INSTALL_AUTOHOSTNAME_SERVICE=Installeren van Computernaam-Controleer service
-set FORCE_TO_NIC_AS_DHCP=Het programma zal DHCP voor uw Netwerkkaart instellen(%NIC_NAME%)
+set FORCE_TO_NIC_AS_DHCP=Het programma zal DHCP voor uw Netwerkkaart instellen
 
 set IF_INSTALL_SSH_SERVICE=Installeren van sshd service
 set SETUP_SSHD_SERVICE=Setup sshd service en de service direct starten
@@ -142,3 +142,4 @@ set BY_FILE=By local file
 set SKIP=skip
 set DO_NOTHIMG_FOR_NETWORK=Do nothing for network configuration
 set USE_NETWORK_MODE_IS=network mode is
+set FORCE_INSTALL=Install over(For that cygwin environment installed already, but maybe affect the original)

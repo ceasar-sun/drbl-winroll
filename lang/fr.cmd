@@ -86,7 +86,7 @@ set REMOVE_REGISTRY=Suppression de la base de registre Windows
 set COPY_NEEDED_FILES=Copie des fichiers requis
 set REMOVE_NEEDED_FILES=Suppression des fichiers requis
 set INSTALL_AUTOHOSTNAME_SERVICE=Installation du service de v‚rification du nom de machine
-set FORCE_TO_NIC_AS_DHCP=Le programme va r‚gler votre carte r‚seau (%NIC_NAME%) sur DHCP
+set FORCE_TO_NIC_AS_DHCP=Le programme va r‚gler votre carte r‚seau  sur DHCP
 
 set IF_INSTALL_SSH_SERVICE=Installation du service sshd ?
 set SETUP_SSHD_SERVICE=Configuration et d‚marrage imm‚diat du service sshd
@@ -146,3 +146,4 @@ set BY_FILE=By local file
 set SKIP=skip
 set DO_NOTHIMG_FOR_NETWORK=Do nothing for network configuration
 set USE_NETWORK_MODE_IS=network mode is
+set FORCE_INSTALL=Install over(For that cygwin environment installed already, but maybe affect the original)

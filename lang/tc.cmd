@@ -97,7 +97,7 @@ set NO_ANY_ATTENDED=過程中您無需做任何動作
 set REMOVE_REGISTRY=刪除註冊機碼
 set COPY_NEEDED_FILES=複製所需檔案
 set REMOVE_NEEDED_FILES=移除所需檔案
-set FORCE_TO_NIC_AS_DHCP=程式強制將您的網路卡(%NIC_NAME%)設定為 DHCP
+set FORCE_TO_NIC_AS_DHCP=程式強制將您的網路卡設定為 DHCP
 
 set IF_INSTALL_SSH_SERVICE=是否配置 sshd 服務
 set SETUP_SSHD_SERVICE=安裝 sshd 服務並立即啟動
@@ -139,6 +139,7 @@ REM # Add form v1.2.0-2, 20090715
 set SETUP_NETWORK_MODE=設定網路模式
 set SELECT_NETWORK_MODE=選擇網路模式
 set BY_FILE=由本地端檔案決定
-set SKIP=skip
-set DO_NOTHIMG_FOR_NETWORK=Do nothing for network configuration
-set USE_NETWORK_MODE_IS=network mode is
+set SKIP=忽略
+set DO_NOTHIMG_FOR_NETWORK=不處理網路設定
+set USE_NETWORK_MODE_IS=網路設定模式為
+set FORCE_INSTALL=強制安裝(適合原先已有需要之 cygwin 環境, 但可能破壞原有之設定)

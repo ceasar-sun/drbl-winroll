@@ -69,12 +69,12 @@ call :CHECK_IF_WINADMIN
 
 REM call :CHECK_CYGWIN_ARGUMENTS
 
-set WINROLL_CONFIG_FOLDER=%CYGWIN_ROOT%\drbl_winRoll-config
+set WINROLL_CONFIG_FOLDER=%CYGWIN_ROOT%\drbl_winroll-config
 set WINROLL_CONFIG_FILE=%WINROLL_CONFIG_FOLDER%\winroll.conf
 set WINROLL_FUNCTIONS_FILE=%WINROLL_CONFIG_FOLDER%\winroll-functions.sh
 set WINROLL_HOSTS_FILE=%WINROLL_CONFIG_FOLDER%\hosts.txt
 set WINROLL_CLIENT_MAC_NETWORK_FILE=%WINROLL_CONFIG_FOLDER%\client-mac-network.conf
-set WINROLL_DOC_FOLDER=%CYGWIN_ROOT%\drbl_winRoll-doc
+set WINROLL_DOC_FOLDER=%CYGWIN_ROOT%\drbl_winroll-doc
 set WINROLL_UNINSTALL_FOLDER=%WINROLL_CONFIG_FOLDER%\uninstall
 set WINROLL_UNINSTALL_PARA=drbl_winroll-uninstall-para.cmd
 set WINROLL_SETUP_LOG=winroll-setup.log
@@ -92,6 +92,10 @@ IF EXIST "%CYGWIN_ROOT%" (
 call :CREAT_SETUP_LOG
 
 if "%ACTION%" == "i" (
+	call :DRBL-WINROLL_INSTALL
+	call .\doc\Faq.%LANG%.txt
+)
+if "%ACTION%" == "f" (
 	call :DRBL-WINROLL_INSTALL
 	call .\doc\Faq.%LANG%.txt
 )
@@ -218,16 +222,21 @@ goto :EOF
 :CHECK_ACTION
 	echo .
 	echo ... DRBL-winRoll %INSTALLED% %PLZ_CHOOSE% ...
+	
+	set ACTION=u
 	echo [r]: %REINSTALL%
 	echo [u]: %UNINSTALL%
-	echo [u]
-	set /P ACTION=
+	echo [f]: %FORCE_INSTALL%
+	set /P ANSWER="[u] "
 
-	if "%ACTION%" == "r" (
+	if "%ANSWER%" == "r" (
 		set ACTION=r
-	) ELSE (
-		set ACTION=u
 	)
+	if "%ANSWER%" == "f" (
+		set ACTION=f
+	
+	)
+
 goto :EOF
 
 :CYGWIN_INSTALL
@@ -496,16 +505,15 @@ goto :EOF
 	if "%ANSWER%" == "2" ( set NETWORK_MODE=by_file "$WINROLL_CONF_ROOT/client-mac-network.conf" )
 	if "%ANSWER%" == "3" ( set NETWORK_MODE=none )
 
-	echo ** %USE_NETWORK_MODE_IS% : %NETWORK_MODE% 
+	echo ** %USE_NETWORK_MODE_IS% : %NETWORK_MODE%
 	echo CONFIG_NETWORK_MODE = %NETWORK_MODE%>>%WINROLL_CONFIG_FILE%
-	if  "%NETWORK_MODE%" == "dhcp" (
+	
+	if "%NETWORK_MODE%" == "dhcp" (
 		echo . 
 		echo ... %FORCE_TO_NIC_AS_DHCP% ...
 		echo .
-		REM pause
 		netsh interface ip set address "%NIC_NAME%" source=dhcp
 	)
-pause
 	:END_OF_NETWORK_MODE_SETUP
 goto :EOF
 
