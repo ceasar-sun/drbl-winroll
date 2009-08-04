@@ -89,7 +89,7 @@ do_autohostname(){
 	#2006/4/12 ¤U¤È 06:34:46 : Command Line              : C:\cygwin\bin\wsname.exe /DFGHHJ
 	#2006/4/12 ¤U¤È 06:34:58 : Termination               : WSName closed normally from the GUI
 
-	WS_RETURN_CODE=$(tail -n 1 $WSNAME_LOG | tr -d "\n")
+	WS_RETURN_CODE=$(tail -n 1 $WSNAME_LOG | tr -d "\r")
 
 	#Assign a new hostname and rebooot to active
 	if [ -n "$(echo $WS_RETURN_CODE | grep -e 'Rename Successful - reboot ' 2> /dev/null )" ] ; then
@@ -268,7 +268,8 @@ echo `date` "$SERVICE_NAME: unlock:"
 if [ "$NEED_TO_REBOOT" = "1" ]; then
 	# touch $WINROLL_TMP/$REBOOT_FLAG;
 	echo `date` "$SERVICE_NAME: set rboot flag:" 
-	ls -al `which reboot`
+	#ls -al `which reboot`
+	#ls -al `which shutdown`
 	#waiting_to_reboot;
 	reboot -r 10;
 	echo `date` "$SERVICE_NAME: do reboot:" 
