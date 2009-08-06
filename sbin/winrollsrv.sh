@@ -22,7 +22,7 @@ REBOOT_FLAG=winrollsrv.reboot
 
 # For lock service 
 rm -rf $WINROLL_TMP/$REBOOT_FLAG;
-if [ $(ls $WINROLL_TMP/winroll-*.reboot | wc -l) -gt 0 ]; then
+if [ $(ls $WINROLL_TMP/winroll-*.reboot 2>/dev/null | wc -l) -gt 0 ]; then
 	echo `date` "$SERVICE_NAME:reboot flag:" `ls $WINROLL_TMP/winroll-*.reboot | wc -l`
 	exit;
 fi
@@ -65,7 +65,7 @@ do_autohostname(){
 	[ ! -f "$WSNAME_LOG" ] && touch $WSNAME_LOG;
 	if [ -z "$HN_WSNAME_PARAM" ] ; then	HN_WSNAME_PARAM=$HN_WSNAME_DEF_PARAM; fi
 	echo "" > $WSNAME_LOG		# Clean advanced log
-	echo "'$HN_WSNAME_DEF_PARAM','$WSNAME_LOG','$HN_WSNAME_PARAM','$HNAME'" | tee -a  $WINROLL_LOG
+	echo "'$HN_WSNAME_DEF_PARAM','$WSNAME_LOG','$HN_WSNAME_PARAM','$HNAME'" #| tee -a  $WINROLL_LOG
 	wsname.exe $HN_WSNAME_PARAM	# use /TEST to pre-test the hostname assigned by wsname
 
 	#2006/4/14 ¤W¤È 12:21:32 : Could not determine local IP address. - Rename request aborted!
@@ -246,7 +246,7 @@ CONFIG_NETWORK_MODE="$(sed -e "s/\s*=\s*/=/g" $WINROLL_CONFIG | grep -e "^CONFIG
 if [ "$CONFIG_NETWORK_MODE" = "none" ] || [ -z "$CONFIG_NETWORK_MODE" ] ; then
 	echo "CONFIG_NETWORK_MODE : none" 
 elif [ "$CONFIG_NETWORK_MODE" = "dhcp" ] ; then
-	ipconfig /renew; ipconfig /release; ipconfig /renew
+	ipconfig /renew >/dev/null ; ipconfig /release >/dev/null; ipconfig /renew >/dev/null
 	IF_IPRENEW=1
 	echo "CONFIG_NETWORK_MODE : dhcp" 
 elif [ -n "$(echo $CONFIG_NETWORK_MODE | grep -e 'by_file' 2> /dev/null )" ] ; then
