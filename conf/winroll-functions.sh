@@ -28,6 +28,7 @@ waiting_to_reboot(){
 }
 
 check_if_root_and_envi(){
+	echo `whoami`, `id`
 	if [ ! -n "$(id| grep '(Administrators)')" ]; then
 		echo "You have no privilege to change, abort !!!"
 		read
