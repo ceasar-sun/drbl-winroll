@@ -52,7 +52,7 @@ set NEWSID_DOWNLOAD_URL=http://drbl.nchc.org.tw/drbl-winroll/download/newsid-dow
 set CYGWIN_ROOT=%SystemDrive%\cygwin
 set LOCAL_REPOSITORY=%SOURCE_DIR%
 set INIT_CONFIG_FILE=%INIT_CONF%\winroll.conf
-set INIT_HOSTS_FILE=%INIT_CONF%\hosts.txt
+set INIT_HOSTS_FILE=%INIT_CONF%\hosts.conf
 set INIT_CLIENT_MAC_NETWORK_FILE=%INIT_CONF%\client-mac-network.conf
 set INIT_FUNCTIONS_FILE=%INIT_CONF%\winroll-functions.sh
 set INIT_DOC_FOLDER=doc
@@ -72,7 +72,7 @@ REM call :CHECK_CYGWIN_ARGUMENTS
 set WINROLL_CONFIG_FOLDER=%CYGWIN_ROOT%\drbl_winroll-config
 set WINROLL_CONFIG_FILE=%WINROLL_CONFIG_FOLDER%\winroll.conf
 set WINROLL_FUNCTIONS_FILE=%WINROLL_CONFIG_FOLDER%\winroll-functions.sh
-set WINROLL_HOSTS_FILE=%WINROLL_CONFIG_FOLDER%\hosts.txt
+set WINROLL_HOSTS_FILE=%WINROLL_CONFIG_FOLDER%\hosts.conf
 set WINROLL_CLIENT_MAC_NETWORK_FILE=%WINROLL_CONFIG_FOLDER%\client-mac-network.conf
 set WINROLL_DOC_FOLDER=%CYGWIN_ROOT%\drbl_winroll-doc
 set WINROLL_UNINSTALL_FOLDER=%WINROLL_CONFIG_FOLDER%\uninstall
