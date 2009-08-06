@@ -27,12 +27,15 @@ waiting_to_reboot(){
 	done
 }
 
-check_if_root(){
-	if [ ! -w  "$WINROLL_CONFIG" ]; then
+check_if_root_and_envi(){
+	if [ ! -n "$(id| grep '(Administrators)')" ]; then
 		echo "You have no privilege to change, abort !!!"
 		read
 		exit 1
 	fi
+	
+	chown -R .Administrators $WINROLL_CONF_ROOT
+	chmod g+w $WINROLL_CONF_ROOT/*.conf
 	#username=`whoami`
 	#if [ ! "$username" = "Administrator" ]; then
 	#	echo "[$username] , You aren't Administrtor, keep go on ?";

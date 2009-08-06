@@ -241,7 +241,7 @@ list_winroll_service(){
 	
 }
 # Main 
-check_if_root
+check_if_root_and_envi
 while [ $# -gt 0 ]; do
 	case "$1" in
 		-r|--remove)
