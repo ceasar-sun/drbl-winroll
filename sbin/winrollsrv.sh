@@ -89,7 +89,7 @@ do_autohostname(){
 	#2006/4/12 ¤U¤È 06:34:46 : Command Line              : C:\cygwin\bin\wsname.exe /DFGHHJ
 	#2006/4/12 ¤U¤È 06:34:58 : Termination               : WSName closed normally from the GUI
 
-	WS_RETURN_CODE=$(tail -n 1 $WSNAME_LOG | tr -d "\n")
+	WS_RETURN_CODE=$(tail -n 1 $WSNAME_LOG | tr -d "\r")
 
 	#Assign a new hostname and rebooot to active
 	if [ -n "$(echo $WS_RETURN_CODE | grep -e 'Rename Successful - reboot ' 2> /dev/null )" ] ; then
@@ -112,7 +112,7 @@ do_autohostname(){
 		#fi
 		NEED_TO_CHANGE=0
 		wsname.exe $HN_WSNAME_DEF_PARAM
-		WS_RETURN_CODE=$(tail -n 1 $WSNAME_LOG | tr -d "\n")
+		WS_RETURN_CODE=$(tail -n 1 $WSNAME_LOG | tr -d "\r")
 		# if use $IP as default, but client can't get a release IP .!! It's a special case
 		if [ -n "$(echo $WS_RETURN_CODE | grep -e 'Exit code 4' 2> /dev/null )" ] ; then
 			NEED_TO_CHANGE=0
