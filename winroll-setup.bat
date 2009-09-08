@@ -612,6 +612,8 @@ goto :EOF
 	if "%ANSWER_IF_GO%" == "n" (
 		goto :END_OF_SSHD_SETUP
 	)
+	%CYGWIN_ROOT%\bin\chmod.exe +r %CYGWIN_ROOT%\etc\passwd %CYGWIN_ROOT%\etc\group
+	%CYGWIN_ROOT%\bin\chmod.exe +x %CYGWIN_ROOT%\var
 	%CYGWIN_ROOT%\bin\bash.exe --login -c "ssh-host-config -y -c ntsec -w %SSHD_SERVER_PW%"
 	%CYGWIN_ROOT%\bin\cygrunsrv.exe -S %SSHD_SERVICE%
 	
