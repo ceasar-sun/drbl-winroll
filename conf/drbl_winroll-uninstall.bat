@@ -42,9 +42,14 @@ echo .
 echo .. %START_TO% %UNINSTALL% ...
 
 echo .
+echo *** %REMOVE% %RUNSHELL%:
+echo %CYGWIN_ROOT%\bin\skill.exe -KILL -c bash
+%CYGWIN_ROOT%\bin\skill.exe -KILL -c bash
+
 echo *** %REMOVE% %SERVICES%:
 echo %CYGWIN_ROOT%\bin\bash.exe --login -i "%WINROLL_SRV% -r"
 %CYGWIN_ROOT%\bin\bash.exe --login -i "%WINROLL_SRV%" -r 
+
 
 echo *** %REMOVE% /var/cron:
 %CYGWIN_ROOT%\bin\bash.exe --login -c "rm -rf /var/cron" 
