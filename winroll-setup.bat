@@ -49,7 +49,8 @@ set SYSINT_LINCESE_URL=http://www.sysinternals.com/Licensing.html
 set SYSINT_LINCESE_URL=http://drbl.nchc.org.tw/drbl-winroll/download/newsid-licence.php
 set NEWSID_DOWNLOAD_URL=http://drbl.nchc.org.tw/drbl-winroll/download/newsid-download.php
 
-set CYGWIN_ROOT=%SystemDrive%\cygwin
+set CYGWIN_ROOT=%SystemDrive%\drbl-winroll
+set CYGWIN_LOCAL_MIRROR=
 set LOCAL_REPOSITORY=%SOURCE_DIR%
 set INIT_CONFIG_FILE=%INIT_CONF%\winroll.conf
 set INIT_HOSTS_FILE=%INIT_CONF%\hosts.conf
@@ -300,11 +301,11 @@ goto :EOF
 	REM - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - -
 	echo .
 	echo %START_TO% CYGWIN %AUTO_INSTALL% , %NO_ANY_ATTENDED% !!
-	echo To run  %CYGWIN_SETUP% -q -d -R "%CYGWIN_ROOT%"
+	echo To run  %CYGWIN_SETUP% -q -d -L -l "%LOCAL_REPOSITORY%\cygwin_mirror" -R "%CYGWIN_ROOT%"
 	echo .
 	pause
 
-	"%CYGWIN_SETUP%" -q -d -R "%CYGWIN_ROOT%"
+	"%CYGWIN_SETUP%" -q -d -L -l "%LOCAL_REPOSITORY%\cygwin_mirror" -R "%CYGWIN_ROOT%"
 	
 	echo %CREATE_WINROLL_CONFIG%
 	copy "%INIT_CONF%\*.lnk" "%STARTMENU_PATH%"
@@ -325,6 +326,8 @@ goto :EOF
 	REM echo @echo off>"%APPDATA%\%WINROLL_UNINSTALL_PARA%"
 	REM echo set STARTMENU_PATH=%STARTMENU_PATH%>>"%APPDATA%\%WINROLL_UNINSTALL_PARA%"
 	REM echo set SYSTEM_ADMIN=%ADMIN%>>"%APPDATA%\%WINROLL_UNINSTALL_PARA%"
+	echo. >>"%APPDATA%\%WINROLL_UNINSTALL_PARA%"
+	echo set CYGWIN_ROOT=%CYGWIN_ROOT%>>"%APPDATA%\%WINROLL_UNINSTALL_PARA%"
 
 	REM Add cygwin binary path into current path
 	set PATH=%CYGWIN_ROOT%\bin;%PATH%
