@@ -29,7 +29,7 @@ echo ============================================
 echo *** %UNINSTALL% drbl-winroll
 echo ============================================
 echo !!!
-echo !!! %WARNING% : %SURE_TO% %UNINSTALL% drbl-winroll ?
+echo !!! %WARNING% : %SURE_TO% %UNINSTALL% drbl-winroll (%CYGWIN_ROOT%) ?
 set ANS=n
 set /P ANS="[y/N]"
 if NOT "%ANS%" == "y" (
