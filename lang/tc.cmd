@@ -135,7 +135,7 @@ set WARNING=警告
 set SERVICES=相關服務
 set ANY_KEY_TO_EXIT=任意鍵離開
 
-REM # Add form v1.2.0-2, 20090715
+REM # Add form v1.2.0-2, 20090909
 set SETUP_NETWORK_MODE=設定網路模式
 set SELECT_NETWORK_MODE=選擇網路模式
 set BY_FILE=由本地端檔案決定
@@ -143,3 +143,4 @@ set SKIP=忽略
 set DO_NOTHIMG_FOR_NETWORK=不處理網路設定
 set USE_NETWORK_MODE_IS=網路設定模式為
 set FORCE_INSTALL=強制安裝(適合原先已有需要之 cygwin 環境, 但可能破壞原有之設定)
+set RUNSHELL=有在執行中的程序

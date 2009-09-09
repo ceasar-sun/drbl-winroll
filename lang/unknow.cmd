@@ -135,7 +135,7 @@ set WARNING=WARNING
 set SERVICES=services
 set ANY_KEY_TO_EXIT=Any key to exit
 
-REM # Add form v1.2.0-2, 20090715
+REM # Add form v1.2.0-2, 20090909
 set SETUP_NETWORK_MODE=Setup network mode
 set SELECT_NETWORK_MODE=Select network mode
 set BY_FILE=By local file
@@ -143,3 +143,4 @@ set SKIP=skip
 set DO_NOTHIMG_FOR_NETWORK=Do nothing for network configuration
 set USE_NETWORK_MODE_IS=network mode is
 set FORCE_INSTALL=Install over(For that cygwin environment installed already, but maybe affect the original)
+set RUNSHELL=running cygwin shell
