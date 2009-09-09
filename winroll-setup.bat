@@ -304,11 +304,17 @@ goto :EOF
 	echo To run  %CYGWIN_SETUP% -q -d -L -l "%LOCAL_REPOSITORY%\cygwin_mirror" -R "%CYGWIN_ROOT%"
 	echo .
 	pause
-
+	REM real do cygwin installation
 	"%CYGWIN_SETUP%" -q -d -L -l "%LOCAL_REPOSITORY%\cygwin_mirror" -R "%CYGWIN_ROOT%"
 	
+	REM Create link files for cygwin program menu
+	copy "%INIT_CONF%\Uninstall drbl-winroll.lnk" "%STARTMENU_PATH%"
+	"%CYGWIN_ROOT%\bin\ln.exe" -s "%CYGWIN_ROOT%\drbl_winroll-config" "%STARTMENU_PATH%"
+	"%CYGWIN_ROOT%\bin\ln.exe" -s "%CYGWIN_ROOT%\drbl_winroll-doc" "%STARTMENU_PATH%"
+	echo %CYGWIN_ROOT%\bin\bash.exe --login -i %CYGWIN_ROOT%\bin\winrollsrv-controllor.sh > "%STARTMENU_PATH%\winrollsrv-controllor.bat"
+	REM "%CYGWIN_ROOT%\bin\ln.exe" -s "%CYGWIN_ROOT%\bin\winrollsrv-controllor.bat" "%STARTMENU_PATH%"
+	
 	echo %CREATE_WINROLL_CONFIG%
-	copy "%INIT_CONF%\*.lnk" "%STARTMENU_PATH%"
 	mkdir "%WINROLL_CONFIG_FOLDER%" "%WINROLL_DOC_FOLDER%" "%WINROLL_UNINSTALL_FOLDER%"
 	copy "%INIT_CONFIG_FILE%" "%WINROLL_CONFIG_FOLDER%"
 	copy "%INIT_HOSTS_FILE%" "%WINROLL_CONFIG_FOLDER%"
