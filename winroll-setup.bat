@@ -49,7 +49,7 @@ set SYSINT_LINCESE_URL=http://www.sysinternals.com/Licensing.html
 set SYSINT_LINCESE_URL=http://drbl.nchc.org.tw/drbl-winroll/download/newsid-licence.php
 set NEWSID_DOWNLOAD_URL=http://drbl.nchc.org.tw/drbl-winroll/download/newsid-download.php
 
-set CYGWIN_ROOT=%SystemDrive%\drbl-winroll
+set CYGWIN_ROOT=%SystemDrive%\cygwin
 set CYGWIN_LOCAL_MIRROR=
 set LOCAL_REPOSITORY=%SOURCE_DIR%
 set INIT_CONFIG_FILE=%INIT_CONF%\winroll.conf
