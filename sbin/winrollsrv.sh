@@ -36,18 +36,87 @@ NEED_TO_REBOOT=0
 #######################
 do_config_network(){
 	SERVICE_NAME="CONFIG_NETWORK"
-	CLIENT_MAC_NETWORK="$WINROLL_CONF_ROOT/client-mac-network.conf"
+	DEFAULT_CLIENT_MAC_NETWORK="$WINROLL_CONF_ROOT/client-mac-network.conf"
+	
+	# CONFIG_NETWORK_MODE = none ; do nothing
+	# CONFIG_NETWORK_MODE = dhcp ; do dhcp
+	# CONFIG_NETWORK_MODE = /RDF:/drbl_winroll-config/client-mac-network.conf  ; config by file 
+	 
+	CONFIG_NETWORK_MODE="$(sed -e "s/\s*=\s*/=/g" $WINROLL_CONFIG | grep -e "^CONFIG_NETWORK_MODE=" | sed -e "s/^CONFIG_NETWORK_MODE=//" -e "s/(\s! )//g")"
+	if [ "$CONFIG_NETWORK_MODE" = "none" ] || [ -z "$CONFIG_NETWORK_MODE" ] ; then
+		echo "CONFIG_NETWORK_MODE : none"
+		return 3;
+	elif [ "$CONFIG_NETWORK_MODE" = "dhcp" ] ; then
+		ipconfig /renew >/dev/null ; ipconfig /release >/dev/null; ipconfig /renew >/dev/null
+		IF_IPRENEW=1
+		echo "CONFIG_NETWORK_MODE : dhcp"
+		return 2;
+	elif [ -n "$(echo $CONFIG_NETWORK_MODE | grep -e '/RDF' 2> /dev/null )" ] ; then
+		CLIENT_MAC_NETWORK="$(echo $CONFIG_NETWORK_MODE | awk -F ':' '{print $2}' )"
+		[ -e "$CLIENT_MAC_NETWORK" ] || ( echo "No CLIENT_MAC_NETWORK file : $CLIENT_MAC_NETWORK" ; return 11 )
+		
+		# get network default configuration
+		nw_conf_tmp=nic-conf.tmp
+		grep -e "^_DEFAULT" $CLIENT_MAC_NETWORK | sed -e "s/\s*=\s*/=/g" -e "s/\s\{1,\}/,/g" -e "s/,\{1,\}/,/g"  -e "s/\#/ #/" -e "s/^_DEFAULT_/export _DEFAULT_/g" > $WINROLL_TMP/$nw_conf_tmp
+		. $WINROLL_TMP/$nw_conf_tmp
 
-	[ ! -f "$CLIENT_MAC_NETWORK" ] && echo "$SERVICE_NAME: no config file : $CLIENT_MAC_NETWORK" 
+		# get configuration domaains
+		network_domain_list=$(grep -e "^subnet.\{1,\}[0-9]\{1,3\}.[0-9]\{1,3\}.[0-9]\{1,3\}.[0-9]\{1,3\}\/[0-9]\{1,2\}" $CLIENT_MAC_NETWORK | sed -e "s/subnet//g"| tr -d " ",{ )
 
-	# a sample for config
-	# # 00-0C-29-xx-xx-xx = 10.0.0.15::10.0.0.254		# assign ip, use default netmask , assign appropriate gateway
-	for macaddr in "$(ipconfig /all | grep "Physical Address" | cut -d":" -f2)"; do
-		thisconfig="$(grep $macaddr $CLIENT_MAC_NETWORK | cut -d"=" -f2 | sed -e "s/\s//g" )";
+		# get mac address of itself machine
+		mac_address_list=$(ipconfig /all | grep "Physical Address" | cut -d":" -f2 | sed -e "s/\s//g")
 
-	done
+		for mac in $mac_address_list ; do
+			thisdm=
+			thisip=$(grep $mac $CLIENT_MAC_NETWORK 2>/dev/null |awk -F '=' '{print $2}'| sed -e "s/\s//g" )
+			[ -z "$thisip" ] && echo "No ip for the mac :$mac" && break
+			bin_thisip=$(ipcalc $thisip | grep Address: | awk -F" " '{print $3 $4 }'| sed -e "s/\.//g")
+			dec_this_ip=$(echo "ibase=2; obase=A; $bin_thisip" | bc)
+			for dm in $network_domain_list ; do
+				bin_max_ip=$(ipcalc $dm  | grep HostMax: | awk -F" " '{print $3 $4 }'| sed -e "s/\.//g")
+				dec_max_ip=$(echo "ibase=2; obase=A; $bin_max_ip" | bc)
+				bin_min_ip=$(ipcalc $dm  | grep HostMin: | awk -F" " '{print $3 $4 }'| sed -e "s/\.//g")
+				dec_min_ip=$(echo "ibase=2; obase=A; $bin_min_ip" | bc)
+				#echo "'$dm','$dec_this_ip','$dec_max_ip','$dec_min_ip'" >> /var/log/bug.tmp
+				(( $dec_this_ip <= $dec_max_ip )) && (( $dec_this_ip >= $dec_min_ip  )) && thisdm=$dm && break;
+			done
+			echo "'$mac','$thisip','$thisdm'";
+			if [ -z "$thisdm" ] ; then 
+				bin_max_ip=$(ipcalc $_DEFAULT_NETWORK  | grep HostMax: | awk -F" " '{print $3 $4 }'| sed -e "s/\.//g")
+				dec_max_ip=$(echo "ibase=2; obase=A; $bin_max_ip" | bc)
+				bin_min_ip=$(ipcalc $_DEFAULT_NETWORK  | grep HostMin: | awk -F" " '{print $3 $4 }'| sed -e "s/\.//g")
+				dec_min_ip=$(echo "ibase=2; obase=A; $bin_min_ip" | bc)
+				echo "'$dec_this_ip','$dec_max_ip','$dec_min_ip'"
+				(( $dec_this_ip > $dec_max_ip )) || (( $dec_this_ip < $dec_min_ip  ))  && echo "no fit domain:" && return 12
 
-	echo $NICMAC_ADDR_MD5 
+			else
+				_DEFAULT_NETWORK=$thisdm
+				this_nw_conf_tmp=this-nic-conf.tmp
+				line_nm_dm_reverse=$(tac $CLIENT_MAC_NETWORK | grep -n -e "^subnet.\{1,\}$thisdm" | awk -F ":" '{print $1}' )
+				line_nm_dm_content=$(tail -n $line_nm_dm_reverse $CLIENT_MAC_NETWORK | grep -n "}" | head -n 1 | awk -F ":" '{print $1}')
+				# grep -e "^_DEFAULT" $CLIENT_MAC_NETWORK | sed -e "s/\s*=\s*/=/g" -e "s/\s\{1,\}/,/g" -e "s/,\{1,\}/,/g"  -e "s/^_DEFAULT_/export _DEFAULT_/g" > $WINROLL_TMP/$nw_conf_tmp
+				tail -n $line_nm_dm_reverse $CLIENT_MAC_NETWORK | head -n $line_nm_dm_content | grep THIS_ | sed -e "s/^\s*//g" -e "s/\s*=\s*/=/g" -e "s/\s\{1,\}/,/g" -e "s/,\{1,\}/,/g" -e "s/\#/ #/" -e "s/THIS_/export _DEFAULT_/g"  > $WINROLL_TMP/$this_nw_conf_tmp
+				. $WINROLL_TMP/$this_nw_conf_tmp
+			fi
+
+			# netsh int ip set address <nicsname> static <ipaddress> <subnetmask> <gateway> <metric>
+			# netsh -c interface  ip set address name="°Ï°ì³s½u" static 172.16.91.12 255.255.255.0 172.16.91.2 1
+			line_nm_rev=$(ipconfig /all | grep -n $mac | awk -F ":" '{print $1}')
+			devname=$(ipconfig /all | head -n $line_nm_rev | tac | grep "Ethernet adapter"| head -n 1| sed -e "s/Ethernet adapter//g" -e "s/^\s*//g" -e "s/:$//g" )
+			echo $devname
+			echo "_DEFAULT_NETWORK = $_DEFAULT_NETWORK"
+			echo "_DEFAULT_GATEWAY = $_DEFAULT_GATEWAY"
+			echo "_DEFAULT_DNS = $_DEFAULT_DNS"
+			echo "_DEFAULT_WINS = $_DEFAULT_WINS"
+			echo "_DEFAULT_DNS_SUFFIX = $_DEFAULT_DNS_SUFFIX"
+			exit
+		done
+		
+	else 
+		echo "CONFIG_NETWORK_MODE :$CONFIG_NETWORK_MODE ?? " 
+	fi
+
+
 
 }
 do_autohostname(){
@@ -238,23 +307,9 @@ FIX_SSHD_LOCKFILE=fixsshd.lock
 # for fix sshd service 
 [ -f "$WINROLL_TMP/$FIX_SSHD_LOCKFILE" ] && fix_usersid_restart_sshd
 
-# CONFIG_NETWORK_MODE = none ; do nothing
-# CONFIG_NETWORK_MODE = dhcp ; do dhcp
-# CONFIG_NETWORK_MODE = by_file "$WINROLL_CONF_ROOT/client-mac-network.conf" ; config by file 
-
-CONFIG_NETWORK_MODE="$(sed -e "s/\s*=\s*/=/g" $WINROLL_CONFIG | grep -e "^CONFIG_NETWORK_MODE=" | sed -e "s/^CONFIG_NETWORK_MODE=//" -e "s/(\s! )//g")"
-if [ "$CONFIG_NETWORK_MODE" = "none" ] || [ -z "$CONFIG_NETWORK_MODE" ] ; then
-	echo "CONFIG_NETWORK_MODE : none" 
-elif [ "$CONFIG_NETWORK_MODE" = "dhcp" ] ; then
-	ipconfig /renew >/dev/null ; ipconfig /release >/dev/null; ipconfig /renew >/dev/null
-	IF_IPRENEW=1
-	echo "CONFIG_NETWORK_MODE : dhcp" 
-elif [ -n "$(echo $CONFIG_NETWORK_MODE | grep -e 'by_file' 2> /dev/null )" ] ; then
-	do_config_network;
-else 
-	echo "CONFIG_NETWORK_MODE :$CONFIG_NETWORK_MODE ?? " 
-fi
-
+do_config_network;
+echo "done nnnn"
+exit
 IF_AUTOHOSTNAME_SERVICE="$(sed -e "s/\s*=\s*/=/g" $WINROLL_CONFIG | grep -e "^IF_AUTOHOSTNAME_SERVICE=" | sed -e "s/^IF_AUTOHOSTNAME_SERVICE=//" -e "s/(\s! )//g")"
 [ "$IF_AUTOHOSTNAME_SERVICE" = "y" ] && do_autohostname;
 

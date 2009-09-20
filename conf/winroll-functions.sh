@@ -12,7 +12,7 @@
 #
 ###########################################################################
 
-WINROLL_CONF_ROOT="/drbl_winRoll-config"
+WINROLL_CONF_ROOT="/drbl_winroll-config"
 WINROLL_TMP="/var/log"
 WINROLL_CONFIG="$WINROLL_CONF_ROOT/winroll.conf"
 WINROLL_LOG="$WINROLL_TMP/winrollsrv.log"

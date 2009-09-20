@@ -509,7 +509,7 @@ goto :EOF
 	echo [3]%SKIP% (%DO_NOTHIMG_FOR_NETWORK%) 
 	set /P ANSWER="[1] "
 
-	if "%ANSWER%" == "2" ( set NETWORK_MODE=by_file "$WINROLL_CONF_ROOT/client-mac-network.conf" )
+	if "%ANSWER%" == "2" ( set NETWORK_MODE=/RDF:"$WINROLL_CONF_ROOT/client-mac-network.conf" )
 	if "%ANSWER%" == "3" ( set NETWORK_MODE=none )
 
 	echo ** %USE_NETWORK_MODE_IS% : %NETWORK_MODE%
