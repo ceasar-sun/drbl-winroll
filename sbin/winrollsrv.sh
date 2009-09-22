@@ -118,11 +118,13 @@ do_config_network(){
 			
 			# netsh int ip set address <nicsname> static <ipaddress> <subnetmask> <gateway> <metric>
 			# netsh -c interface  ip set address name="°Ï°ì³s½u" static 172.16.91.12 255.255.255.0 172.16.91.2 1
-			netsh -c interface ip set address name=\"$_devname\" static $thisip $_nw_mask $_THIS_GATEWAY 1
+			netsh -c interface ip set address name="$_devname" static $thisip $_nw_mask $_THIS_GATEWAY 1
 			
 			# add a dns record 
-			netsh interface ip add dns %$interface_name% $dns_1
-
+			for dns in "$(echo $_THIS_DNS | tr , ' ')" ; do
+				echo $dns
+				# netsh interface ip add dns "$_devname" $dns_1
+			done
 
 		done
 		
