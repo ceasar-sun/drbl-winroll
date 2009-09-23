@@ -66,7 +66,7 @@ do_config_network(){
 		
 		# get mac address of itself machine
 		mac_address_list=$(ipconfig /all | grep "Physical Address" | cut -d":" -f2 | sed -e "s/\s//g")
-
+		
 		for mac in $mac_address_list ; do
 			thisip=$(grep $mac $CLIENT_MAC_NETWORK 2>/dev/null |awk -F '=' '{print $2}'| sed -e "s/\s//g" )
 			
@@ -83,11 +83,13 @@ do_config_network(){
 			# use "dhcp" for this mac address 
 			if [ "$thisip"  = "dhcp" ] ; then
 				echo "$_devname ,$mac => dhcp"
-				netsh interface ip set address $_devname source=dhcp >/dev/null
-				ipconfig /renew >/dev/null ; ipconfig /release >/dev/null; ipconfig /renew >/dev/null
+				netsh interface ip set address "$_devname" source=dhcp >/dev/null
+				ipconfig /release "$_devname" >/dev/null; ipconfig /renew "$_devname" >/dev/null
 				IF_IPRENEW=1
 				continue
 			fi
+			
+			[ -n "$(ipcalc $thisip | grep 'INVALID ADDRESS')" ] && echo "Illegal ip :$thisip " && continue
 			
 			_THIS_NETWORK=$_DEFAULT_NETWORK
 			_THIS_IP=$thisip
@@ -126,19 +128,30 @@ do_config_network(){
 			# netsh -c interface  ip set address name="°Ï°ì³s½u" static 172.16.91.12 255.255.255.0 172.16.91.2 1
 			netsh -c interface ip set address name="$_devname" static $_THIS_IP $_THIS_NETMASK $_THIS_GATEWAY 1
 			
+			# delete all previous dns records
+			[ -n "$_THIS_DNS" ] && netsh interface ip del dns "$_devname" all
 			# add a dns record 
-			for dns in "$(echo $_THIS_DNS | tr , ' ')" ; do
-				echo "dns = '$dns'"
-				# netsh interface ip add dns "$_devname" $dns_1
+			for dns in $(echo $_THIS_DNS | tr , ' ') ; do
+				# skip illegal ip
+				[ -n "$(ipcalc $dns | grep 'INVALID ADDRESS')" ]  && echo "Illegal dns ip :$dns" && continue
+				echo netsh interface ip add dns \"$_devname\" $dns
+				netsh interface ip add dns "$_devname" $dns
 			done
 
+			# delete all previous wins records
+			[ -n "$_THIS_WINS" ] && netsh interface ip del wins "$_devname" all
+			# add a wins record 
+			for wins in $(echo $_THIS_WINS | tr , ' ') ; do
+				# skip illegal ip
+				[ -n "$(ipcalc $wins | grep 'INVALID ADDRESS')" ]  && echo "Illegal wins ip :$wins" && continue
+				echo netsh interface ip add wins \"$_devname\" $wins
+				netsh interface ip add wins "$_devname" $wins
+			done			
 		done
 		
 	else 
 		echo "CONFIG_NETWORK_MODE :$CONFIG_NETWORK_MODE ?? " 
 	fi
-	exit
-
 
 }
 do_autohostname(){
@@ -330,8 +343,7 @@ FIX_SSHD_LOCKFILE=fixsshd.lock
 [ -f "$WINROLL_TMP/$FIX_SSHD_LOCKFILE" ] && fix_usersid_restart_sshd
 
 do_config_network;
-echo "done nnnn"
-exit
+
 IF_AUTOHOSTNAME_SERVICE="$(sed -e "s/\s*=\s*/=/g" $WINROLL_CONFIG | grep -e "^IF_AUTOHOSTNAME_SERVICE=" | sed -e "s/^IF_AUTOHOSTNAME_SERVICE=//" -e "s/(\s! )//g")"
 [ "$IF_AUTOHOSTNAME_SERVICE" = "y" ] && do_autohostname;
 
