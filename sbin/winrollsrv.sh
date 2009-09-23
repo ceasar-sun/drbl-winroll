@@ -60,69 +60,75 @@ do_config_network(){
 		grep -e "^_DEFAULT" $CLIENT_MAC_NETWORK | sed -e "s/\s*=\s*/=/g" -e "s/\s\{1,\}/,/g" -e "s/,\{1,\}/,/g"  -e "s/\#/ #/" -e "s/^_DEFAULT_/export _DEFAULT_/g" > $WINROLL_TMP/$nw_conf_tmp
 		. $WINROLL_TMP/$nw_conf_tmp
 
-		# get configuration domaains
+		# get configuration domains
 		network_domain_list=$(grep -e "^subnet.\{1,\}[0-9]\{1,3\}.[0-9]\{1,3\}.[0-9]\{1,3\}.[0-9]\{1,3\}\/[0-9]\{1,2\}" $CLIENT_MAC_NETWORK | sed -e "s/subnet//g"| tr -d " ",{ )
-
+		[ -n "$_DEFAULT_NETWORK" ] && network_domain_list="$_DEFAULT_NETWORK $network_domain_list"
+		
 		# get mac address of itself machine
 		mac_address_list=$(ipconfig /all | grep "Physical Address" | cut -d":" -f2 | sed -e "s/\s//g")
 
 		for mac in $mac_address_list ; do
-			thisdm=
 			thisip=$(grep $mac $CLIENT_MAC_NETWORK 2>/dev/null |awk -F '=' '{print $2}'| sed -e "s/\s//g" )
-			[ -z "$thisip" ] && echo "No ip for the mac :$mac" && break
-			bin_thisip=$(ipcalc $thisip | grep Address: | awk -F" " '{print $3 $4 }'| sed -e "s/\.//g")
+			
+			# To get nic device name 
+			line_nm_rev=$(ipconfig /all | grep -n $mac | awk -F ":" '{print $1}')
+			_devname=$(ipconfig /all | head -n $line_nm_rev | tac | grep "Ethernet adapter"| head -n 1| dos2unix |  sed -e "s/Ethernet adapter//g" -e "s/^\s*//g" -e "s/:$//g" )
+
+			# can't find match mac address for itself
+			[ -z "$thisip" ] && echo "No match item for '$_devname' :$mac ," && continue
+			
+			# use "none" for this mac address 
+			[ "$thisip"  = "none" ] && echo "$_devname ,$mac => none" && continue
+			
+			# use "dhcp" for this mac address 
+			if [ "$thisip"  = "dhcp" ] ; then
+				echo "$_devname ,$mac => dhcp"
+				netsh interface ip set address $_devname source=dhcp >/dev/null
+				ipconfig /renew >/dev/null ; ipconfig /release >/dev/null; ipconfig /renew >/dev/null
+				IF_IPRENEW=1
+				continue
+			fi
+			
+			_THIS_NETWORK=$_DEFAULT_NETWORK
+			_THIS_IP=$thisip
+			_THIS_GATEWAY=$_DEFAULT_GATEWAY
+			_THIS_NETMASK=
+			_THIS_DNS=$_DEFAULT_DNS
+			_THIS_WINS=$_DEFAULT_WINS
+			_THIS_DNS_SUFFIX=$_DEFAULT_DNS_SUFFIX
+
+			bin_thisip=$(ipcalc $_THIS_IP | grep Address: | awk -F" " '{print $3 $4 }'| sed -e "s/\.//g")
 			dec_this_ip=$(echo "ibase=2; obase=A; $bin_thisip" | bc)
+
+			# calculate suitable domain
 			for dm in $network_domain_list ; do
 				bin_max_ip=$(ipcalc $dm  | grep HostMax: | awk -F" " '{print $3 $4 }'| sed -e "s/\.//g")
 				dec_max_ip=$(echo "ibase=2; obase=A; $bin_max_ip" | bc)
 				bin_min_ip=$(ipcalc $dm  | grep HostMin: | awk -F" " '{print $3 $4 }'| sed -e "s/\.//g")
 				dec_min_ip=$(echo "ibase=2; obase=A; $bin_min_ip" | bc)
-				#echo "'$dm','$dec_this_ip','$dec_max_ip','$dec_min_ip'" >> /var/log/bug.tmp
-				(( $dec_this_ip <= $dec_max_ip )) && (( $dec_this_ip >= $dec_min_ip  )) && thisdm=$dm && break;
+				#echo "'$dm','$dec_this_ip','$dec_max_ip','$dec_min_ip'"
+				(( $dec_this_ip <= $dec_max_ip )) && (( $dec_this_ip >= $dec_min_ip  )) && _THIS_NETWORK=$dm && break;
 			done
-			echo "'$mac','$thisip','$thisdm'";
-			_THIS_NETWORK=$_DEFAULT_NETWORK
-			_THIS_GATEWAY=$_DEFAULT_GATEWAY
-			_THIS_DNS=$_DEFAULT_DNS
-			_THIS_WINS=$_DEFAULT_WINS
-			_THIS_DNS_SUFFIX=$_DEFAULT_DNS_SUFFIX
-
-			if [ -z "$thisdm" ] ; then 
-				bin_max_ip=$(ipcalc $_THIS_NETWORK  | grep HostMax: | awk -F" " '{print $3 $4 }'| sed -e "s/\.//g")
-				dec_max_ip=$(echo "ibase=2; obase=A; $bin_max_ip" | bc)
-				bin_min_ip=$(ipcalc $_THIS_NETWORK  | grep HostMin: | awk -F" " '{print $3 $4 }'| sed -e "s/\.//g")
-				dec_min_ip=$(echo "ibase=2; obase=A; $bin_min_ip" | bc)
-				echo "'$dec_this_ip','$dec_max_ip','$dec_min_ip'"
-				(( $dec_this_ip > $dec_max_ip )) || (( $dec_this_ip < $dec_min_ip  ))  && echo "no fit domain:" && return 12
-
-			else
-				_THIS_NETWORK=$thisdm
+			
+			if [ "$_THIS_NETWORK" != "$_DEFAULT_NETWORK" ] ; then
 				this_nw_conf_tmp=this-nic-conf.tmp
-				line_nm_dm_reverse=$(tac $CLIENT_MAC_NETWORK | grep -n -e "^subnet.\{1,\}$thisdm" | awk -F ":" '{print $1}' )
+				line_nm_dm_reverse=$(tac $CLIENT_MAC_NETWORK | grep -n -e "^subnet.\{1,\}$_THIS_NETWORK" | awk -F ":" '{print $1}' )
 				line_nm_dm_content=$(tail -n $line_nm_dm_reverse $CLIENT_MAC_NETWORK | grep -n "}" | head -n 1 | awk -F ":" '{print $1}')
 				# grep -e "^_DEFAULT" $CLIENT_MAC_NETWORK | sed -e "s/\s*=\s*/=/g" -e "s/\s\{1,\}/,/g" -e "s/,\{1,\}/,/g"  -e "s/^_DEFAULT_/export _DEFAULT_/g" > $WINROLL_TMP/$nw_conf_tmp
 				tail -n $line_nm_dm_reverse $CLIENT_MAC_NETWORK | head -n $line_nm_dm_content | grep THIS_ | sed -e "s/^\s*//g" -e "s/\s*=\s*/=/g" -e "s/\s\{1,\}/,/g" -e "s/,\{1,\}/,/g" -e "s/\#/ #/" -e "s/THIS_/export _THIS_/g"  > $WINROLL_TMP/$this_nw_conf_tmp
 				. $WINROLL_TMP/$this_nw_conf_tmp
 			fi
-			# To get nic device name 
-			line_nm_rev=$(ipconfig /all | grep -n $mac | awk -F ":" '{print $1}')
-			_devname=$(ipconfig /all | head -n $line_nm_rev | tac | grep "Ethernet adapter"| head -n 1| dos2unix |  sed -e "s/Ethernet adapter//g" -e "s/^\s*//g" -e "s/:$//g" )
 			
-			_nw_mask=$(ipcalc $_DEFAULT_NETWORK| grep Netmask | awk -F " " '{print $2}')
-			echo "'$_devname','$_nw_mask'"
-			echo "_THIS_NETWORK = $_THIS_NETWORK"
-			echo "_THIS_GATEWAY = $_THIS_GATEWAY"
-			echo "_THIS_DNS = $_THIS_DNS"
-			echo "_THIS_WINS = $_THIS_WINS"
-			echo "_THIS_DNS_SUFFIX = $_THIS_DNS_SUFFIX"
-			
+			_THIS_NETMASK=$(ipcalc $_THIS_NETWORK| grep Netmask | awk -F " " '{print $2}')
+			echo "'$_devname','$_THIS_NETWORK','$_THIS_IP','$_THIS_NETMASK','$_THIS_GATEWAY','$_THIS_DNS','$_THIS_WINS','$_THIS_DNS_SUFFIX'"
+
 			# netsh int ip set address <nicsname> static <ipaddress> <subnetmask> <gateway> <metric>
 			# netsh -c interface  ip set address name="°Ï°ì³s½u" static 172.16.91.12 255.255.255.0 172.16.91.2 1
-			netsh -c interface ip set address name="$_devname" static $thisip $_nw_mask $_THIS_GATEWAY 1
+			netsh -c interface ip set address name="$_devname" static $_THIS_IP $_THIS_NETMASK $_THIS_GATEWAY 1
 			
 			# add a dns record 
 			for dns in "$(echo $_THIS_DNS | tr , ' ')" ; do
-				echo $dns
+				echo "dns = '$dns'"
 				# netsh interface ip add dns "$_devname" $dns_1
 			done
 
