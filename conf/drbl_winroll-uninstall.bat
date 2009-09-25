@@ -13,10 +13,12 @@ REM ####################################################################
 
 REM # Global parameter
 REM set CYGWIN_ROOT=%SystemDrive%\cygwin
-set WINROLL_SRV=%CYGWIN_ROOT%\bin\winrollsrv-controllor.sh
+set WINROLL_SRV=/bin/winrollsrv-controllor.sh
 set WINROLL_UNINSTALL_FOLDER=%CYGWIN_ROOT%\drbl_winRoll-config\uninstall
 set STARTMENU_PATH=
 set SYSTEM_ADMIN=
+
+set PATH=%PATH%;c:\cygwin\bin
 
 REM #
 REM # To identify your OS language and start menu path
