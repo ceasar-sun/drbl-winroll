@@ -18,7 +18,7 @@ set WINROLL_UNINSTALL_FOLDER=%CYGWIN_ROOT%\drbl_winRoll-config\uninstall
 set STARTMENU_PATH=
 set SYSTEM_ADMIN=
 
-set PATH=%PATH%;c:\cygwin\bin
+set PATH=%PATH%;c:\cygwin\bin;c:\cygwin\sbin;c:\cygwin\usr\sbin
 
 REM #
 REM # To identify your OS language and start menu path
@@ -45,8 +45,8 @@ echo .. %START_TO% %UNINSTALL% ...
 
 echo .
 echo *** %REMOVE% %RUNSHELL%:
-echo %CYGWIN_ROOT%\bin\skill.exe -KILL -c bash
-%CYGWIN_ROOT%\bin\skill.exe -KILL -c bash
+echo ps aux | tac | head -n -1 | sed -e "s/^I//"| gawk -F " " '{print $1}' | xargs -n 1 -r kill -9
+ps aux | tac | head -n -1 | sed -e "s/^I//"| gawk -F " " '{print $1}' | xargs -n 1 -r kill -9
 
 echo *** %REMOVE% %SERVICES%:
 echo %CYGWIN_ROOT%\bin\bash.exe --login -i "%WINROLL_SRV% -r"
