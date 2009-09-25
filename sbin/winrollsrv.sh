@@ -126,7 +126,7 @@ do_config_network(){
 
 			# netsh int ip set address <nicsname> static <ipaddress> <subnetmask> <gateway> <metric>
 			# netsh -c interface  ip set address name="°Ï°ì³s½u" static 172.16.91.12 255.255.255.0 172.16.91.2 1
-			netsh -c interface ip set address name="$_devname" static $_THIS_IP $_THIS_NETMASK $_THIS_GATEWAY 1
+			netsh -c interface ip set address name="$_devname" source=static addr=$_THIS_IP mask=$_THIS_NETMASK gateway=$_THIS_GATEWAY 1
 			
 			# delete all previous dns records
 			[ -n "$_THIS_DNS" ] && netsh interface ip del dns "$_devname" all
