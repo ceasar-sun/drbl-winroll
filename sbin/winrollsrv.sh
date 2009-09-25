@@ -327,6 +327,8 @@ do_autonewsid(){
 		touch "$WINROLL_TMP/$FIX_SSHD_LOCKFILE"
 	fi
 	if [ "$NEED_TO_CHANGE" = "1" ] ; then
+		chmod ug+rw $WINROLL_CONF_ROOT/*.conf
+		chmod ug+rx $WINROLL_FUNCTIONS
 		NEED_TO_REBOOT=1
 		echo `date` "AUTONEWSID need to reboot :" 
 	fi
@@ -359,10 +361,9 @@ echo `date` "$SERVICE_NAME: unlock:"
 if [ "$NEED_TO_REBOOT" = "1" ]; then
 	# touch $WINROLL_TMP/$REBOOT_FLAG;
 	echo `date` "$SERVICE_NAME: set rboot flag:" 
-	ls -al `which reboot`
-	#waiting_to_reboot;
-	reboot -r 10;
-	echo `date` "$SERVICE_NAME: do reboot:" 
+	chmod +x /bin/shutdown
+	/bin/shutdown -r 10;
+	[ "$?" != 0 ] && ( ls -al /bin/shutdown ; echo "reboot fail !!")
 fi
 
 
