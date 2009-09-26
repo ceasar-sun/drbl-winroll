@@ -118,11 +118,12 @@ REM #####################################
 :SET_LANGUAGE
 
   set LANG=0
-  IF EXIST "%ENG_OS_PATH%" (
-    set LANG=en
-  )
+  
   IF EXIST "%ZHTW_OS_PATH%" (
     set LANG=tc
+  )
+  IF EXIST "%ENG_OS_PATH%" (
+    set LANG=en
   )
   IF EXIST "%FR_OS_PATH%" (
     set LANG=fr
@@ -130,6 +131,12 @@ REM #####################################
   IF EXIST "%NL_OS_PATH%" (
     set LANG=nl
   )
+  
+  reg QUERY "HKEY_CURRENT_USER\Control Panel\International" /v Locale | find "00000404" > Locale.txt
+  IF "%ERRORLEVEL%" == "0" (
+    set LANG=tc
+  )
+  
   REM ### Add your language down below this line
 
   IF "%LANG%" == "0" (
@@ -199,9 +206,11 @@ goto :EOF
 		if "%SystemRoot%" == "C:\WINDOWS" (
 			set OS_VERSION=WINXP
 		)
-		if "%SystemRoot%" == "C:\Windows" (
+		reg QUERY "HKEY_LOCAL_MACHINE\SOFTWARE\Microsoft\Windows NT\CurrentVersion" /v  ProductName | find "Vista" > OS-version.txt
+		if "%ERRORLEVEL%" == "0"  (
 			set OS_VERSION=Vista
 		)
+
 		if "%OS_VERSION%" == "NON" (
 			echo .
 			echo !!! %NUKNOW_OS_VERSION% , %PROCESS_TERNIMAL% !!!
