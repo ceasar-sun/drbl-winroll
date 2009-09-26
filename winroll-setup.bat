@@ -199,6 +199,9 @@ goto :EOF
 		if "%SystemRoot%" == "C:\WINDOWS" (
 			set OS_VERSION=WINXP
 		)
+		if "%SystemRoot%" == "C:\Windows" (
+			set OS_VERSION=Vista
+		)
 		if "%OS_VERSION%" == "NON" (
 			echo .
 			echo !!! %NUKNOW_OS_VERSION% , %PROCESS_TERNIMAL% !!!
@@ -271,8 +274,8 @@ goto :EOF
 	  exit /B 1
 	)
 	REM Find Cygwin's setup.exe
-	set CYGWIN_SETUP=%LOCAL_REPOSITORY%\cygwin_mirror\setup.exe
-	IF NOT EXIST "%LOCAL_REPOSITORY%\cygwin_mirror\setup.exe" (
+	set CYGWIN_SETUP=%LOCAL_REPOSITORY%\cygwin_mirror\cyg-setup.exe
+	IF NOT EXIST "%LOCAL_REPOSITORY%\cygwin_mirror\cyg-setup.exe" (
 		echo %ERR_CYGWIN_SETUP_DONT_EXIST% %LOCAL_REPOSITORY%\cygwin_mirror\
 	    exit /B 1
 	)
