@@ -203,12 +203,29 @@ goto :EOF
 		if "%SystemRoot%" == "C:\WINNT" (
 			set OS_VERSION=WIN2000
 		)
-		if "%SystemRoot%" == "C:\WINDOWS" (
+
+		reg QUERY "HKEY_LOCAL_MACHINE\SOFTWARE\Microsoft\Windows NT\CurrentVersion" /v  ProductName | find "XP" > OS-version.txt
+		if "%ERRORLEVEL%" == "0" (
 			set OS_VERSION=WINXP
+			goto :EOF
 		)
+
 		reg QUERY "HKEY_LOCAL_MACHINE\SOFTWARE\Microsoft\Windows NT\CurrentVersion" /v  ProductName | find "Vista" > OS-version.txt
 		if "%ERRORLEVEL%" == "0"  (
 			set OS_VERSION=Vista
+			goto :EOF
+		)
+
+		reg QUERY "HKEY_LOCAL_MACHINE\SOFTWARE\Microsoft\Windows NT\CurrentVersion" /v  ProductName | find "2003" > OS-version.txt
+		if "%ERRORLEVEL%" == "0"  (
+			set OS_VERSION=WIN2003
+			goto :EOF
+		)
+
+		reg QUERY "HKEY_LOCAL_MACHINE\SOFTWARE\Microsoft\Windows NT\CurrentVersion" /v  ProductName | find "Windows 7" > OS-version.txt
+		if "%ERRORLEVEL%" == "0"  (
+			set OS_VERSION=WIN7
+			goto :EOF
 		)
 
 		if "%OS_VERSION%" == "NON" (
