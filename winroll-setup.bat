@@ -194,46 +194,45 @@ goto :EOF
 goto :EOF
 
 :CHECK_OS_VERSION
-	if NOT "%OS%" == "Windows_NT" (
-		echo .
-		echo !!! %WRONG_OS_VERSION% ,%PROGRAM_ABORTED% !!!
-		echo.
-		exit /B 1
-	) ELSE (
-		if "%SystemRoot%" == "C:\WINNT" (
-			set OS_VERSION=WIN2000
-		)
 
-		reg QUERY "HKEY_LOCAL_MACHINE\SOFTWARE\Microsoft\Windows NT\CurrentVersion" /v  ProductName | find "XP" > OS-version.txt
-		if "%ERRORLEVEL%" == "0" (
-			set OS_VERSION=WINXP
-			goto :EOF
-		)
+	set OS_VERSION=NONE
 
-		reg QUERY "HKEY_LOCAL_MACHINE\SOFTWARE\Microsoft\Windows NT\CurrentVersion" /v  ProductName | find "Vista" > OS-version.txt
-		if "%ERRORLEVEL%" == "0"  (
-			set OS_VERSION=Vista
-			goto :EOF
-		)
-
-		reg QUERY "HKEY_LOCAL_MACHINE\SOFTWARE\Microsoft\Windows NT\CurrentVersion" /v  ProductName | find "2003" > OS-version.txt
-		if "%ERRORLEVEL%" == "0"  (
-			set OS_VERSION=WIN2003
-			goto :EOF
-		)
-
-		reg QUERY "HKEY_LOCAL_MACHINE\SOFTWARE\Microsoft\Windows NT\CurrentVersion" /v  ProductName | find "Windows 7" > OS-version.txt
-		if "%ERRORLEVEL%" == "0"  (
-			set OS_VERSION=WIN7
-			goto :EOF
-		)
-
-		if "%OS_VERSION%" == "NON" (
-			echo .
-			echo !!! %NUKNOW_OS_VERSION% , %PROCESS_TERNIMAL% !!!
-			exit /B 1
-		)
+	reg QUERY "HKEY_LOCAL_MACHINE\SOFTWARE\Microsoft\Windows NT\CurrentVersion" /v  ProductName | find "2000" >OS-version.txt
+	if "%ERRORLEVEL%" == "0" (
+		set OS_VERSION=WIN2000
+		goto :END_OF_CHECK_OS_VERSION
 	)
+
+	reg QUERY "HKEY_LOCAL_MACHINE\SOFTWARE\Microsoft\Windows NT\CurrentVersion" /v  ProductName | find "XP" >OS-version.txt
+	if "%ERRORLEVEL%" == "0" (
+		set OS_VERSION=WINXP
+		goto :END_OF_CHECK_OS_VERSION
+	)
+
+	reg QUERY "HKEY_LOCAL_MACHINE\SOFTWARE\Microsoft\Windows NT\CurrentVersion" /v  ProductName | find "2003" >OS-version.txt
+	if "%ERRORLEVEL%" == "0"  (
+		set OS_VERSION=WIN2003
+		goto :END_OF_CHECK_OS_VERSION
+	)
+
+	reg QUERY "HKEY_LOCAL_MACHINE\SOFTWARE\Microsoft\Windows NT\CurrentVersion" /v  ProductName | find "Vista" >OS-version.txt
+	if "%ERRORLEVEL%" == "0"  (
+		set OS_VERSION=Vista
+		goto :END_OF_CHECK_OS_VERSION
+	)
+
+	reg QUERY "HKEY_LOCAL_MACHINE\SOFTWARE\Microsoft\Windows NT\CurrentVersion" /v  ProductName | find "Windows 7" >OS-version.txt
+	if "%ERRORLEVEL%" == "0"  (
+		set OS_VERSION=WIN7
+		goto :END_OF_CHECK_OS_VERSION
+	)
+
+	if "%OS_VERSION%" == "NONE" (
+		echo .
+		echo !!! %NUKNOW_OS_VERSION% , %PROCESS_TERNIMAL% !!!
+		exit /B 1
+	)
+:END_OF_CHECK_OS_VERSION
 goto :EOF
 
 :CHECK_IF_WINADMIN
