@@ -37,6 +37,21 @@ NEED_TO_REBOOT=0
 do_config_network(){
 	SERVICE_NAME="CONFIG_NETWORK"
 	DEFAULT_CLIENT_MAC_NETWORK="$WINROLL_CONF_ROOT/client-mac-network.conf"
+	_Physical_Address_KEYWORD="Physical Address"
+	_Ethernet_adapter_KEYWORD="Ethernet adapter"
+	
+	OS_VERSION=
+	LOCALEID=$(cat /proc/registry/HKEY_CURRENT_USER/Control\ Panel/International/Locale)
+	
+	if [ "$(cat /proc/registry/HKEY_LOCAL_MACHINE/SOFTWARE/Microsoft/Windows\ NT/CurrentVersion/ProductName | grep "Vista")" ] ; then
+		OS_VERSION=vista
+		[ -e  $WINROLL_CONF_ROOT/keyword-conf/$OS_VERSION/$LOCALEID.conf ] && . $WINROLL_CONF_ROOT/keyword-conf/$OS_VERSION/$LOCALEID.conf
+	elif [ "$(cat /proc/registry/HKEY_LOCAL_MACHINE/SOFTWARE/Microsoft/Windows\ NT/CurrentVersion/ProductName | grep "Windows 7")" ] ; then
+		OS_VERSION=win7
+		[ -e  $WINROLL_CONF_ROOT/keyword-conf/$OS_VERSION/$LOCALEID.conf ] && . $WINROLL_CONF_ROOT/keyword-conf/$OS_VERSION/$LOCALEID.conf
+	else
+		OS_VERSION=_legacy
+	fi 
 	
 	# CONFIG_NETWORK_MODE = none ; do nothing
 	# CONFIG_NETWORK_MODE = dhcp ; do dhcp
@@ -65,14 +80,14 @@ do_config_network(){
 		[ -n "$_DEFAULT_NETWORK" ] && network_domain_list="$_DEFAULT_NETWORK $network_domain_list"
 		
 		# get mac address of itself machine
-		mac_address_list=$(ipconfig /all | grep "Physical Address" | cut -d":" -f2 | sed -e "s/\s//g")
+		mac_address_list=$(ipconfig /all | grep "$_Physical_Address_KEYWORD" | cut -d":" -f2 | sed -e "s/\s//g" | grep -e "^\w\w-\w\w-\w\w-\w\w-\w\w-\w\w$")
 		
 		for mac in $mac_address_list ; do
 			thisip=$(grep $mac $CLIENT_MAC_NETWORK 2>/dev/null |awk -F '=' '{print $2}'| sed -e "s/\s//g" )
 			
 			# To get nic device name 
 			line_nm_rev=$(ipconfig /all | grep -n $mac | awk -F ":" '{print $1}')
-			_devname=$(ipconfig /all | head -n $line_nm_rev | tac | grep "Ethernet adapter"| head -n 1| dos2unix |  sed -e "s/Ethernet adapter//g" -e "s/^\s*//g" -e "s/:$//g" )
+			_devname=$(ipconfig /all | head -n $line_nm_rev | tac | grep "$_Ethernet_adapter_KEYWORD"| head -n 1| dos2unix |  sed -e "s/$_Ethernet_adapter_KEYWORD//g" -e "s/^\s*//g" -e "s/:$//g" )
 
 			# can't find match mac address for itself
 			[ -z "$thisip" ] && echo "No match item for '$_devname' :$mac ," && continue
