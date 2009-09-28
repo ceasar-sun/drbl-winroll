@@ -172,6 +172,8 @@ remove_sshd(){
 	echo "Delete user 'sshd', 'sshd_server' ..."
 	net user sshd /DELETE 1> /dev/null 2>&1
 	net user sshd_server /DELETE 1> /dev/null 2>&1
+	priv_sshd_user=$(cygrunsrv.exe -V -Q sshd | grep -e "^Account" | awk -F ":" '{print $2}' | sed -e "s/\.\\\//" -e "s/ //")
+	net user $priv_sshd_user /DELETE 1> /dev/null 2>&1
 	
 	if [ -f "/home/$WINROOT/.ssh/authorized_keys" ];then
 		mkdir -p "$WINROLL_LOCAL_BACKUP"

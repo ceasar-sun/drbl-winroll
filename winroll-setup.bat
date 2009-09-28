@@ -223,6 +223,7 @@ goto :EOF
 	reg QUERY "HKEY_LOCAL_MACHINE\SOFTWARE\Microsoft\Windows NT\CurrentVersion" /v  ProductName | find "Windows 7" >OS-version.txt
 	if "%ERRORLEVEL%" == "0"  (
 		set OS_VERSION=WIN7
+		set STARTMENU_PATH=%ALLUSERSPROFILE%\Start Menu\Programs\Cygwin
 		goto :END_OF_CHECK_OS_VERSION
 	)
 
