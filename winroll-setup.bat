@@ -56,7 +56,7 @@ set INIT_CONFIG_FILE=%INIT_CONF%\winroll.conf
 set INIT_HOSTS_FILE=%INIT_CONF%\hosts.conf
 set INIT_CLIENT_MAC_NETWORK_FILE=%INIT_CONF%\client-mac-network.conf
 set INIT_FUNCTIONS_FILE=%INIT_CONF%\winroll-functions.sh
-set INIT_KEYWORD_CONF=%INIT_CONF%\keyword-conf
+rem set INIT_KEYWORD_CONF=%INIT_CONF%\keyword-conf
 set INIT_DOC_FOLDER=doc
 
 call :SET_LANGUAGE
@@ -349,9 +349,9 @@ goto :EOF
 	REM echo %CYGWIN_ROOT%\bin\bash.exe --login -i %CYGWIN_ROOT%\bin\winrollsrv-controllor.sh > "%STARTMENU_PATH%\winrollsrv-controllor.bat"
 	
 	echo %CREATE_WINROLL_CONFIG%
-	mkdir "%WINROLL_CONFIG_FOLDER%" "%WINROLL_DOC_FOLDER%" "%WINROLL_UNINSTALL_FOLDER%"
+	mkdir "%WINROLL_CONFIG_FOLDER%" "%WINROLL_DOC_FOLDER%" "%WINROLL_UNINSTALL_FOLDER%" "%WINROLL_CONFIG_FOLDER%\keyword-conf"
 	copy "%INIT_CONFIG_FILE%" "%WINROLL_CONFIG_FOLDER%"
-	xcopy /E "%INIT_KEYWORD_CONF%" "%WINROLL_DOC_FOLDER%"
+	xcopy /E "%INIT_CONF%\keyword-conf" "%WINROLL_CONFIG_FOLDER%\keyword-conf"
 	copy "%INIT_HOSTS_FILE%" "%WINROLL_CONFIG_FOLDER%"
 	copy "%INIT_CLIENT_MAC_NETWORK_FILE%" "%WINROLL_CONFIG_FOLDER%"
 

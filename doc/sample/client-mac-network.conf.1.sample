@@ -1,4 +1,4 @@
-# This ia a simple sample 
+# This is a simple sample for one domain
 
 _DEFAULT_NETWORK	= 192.168.100.254/24
 _DEFAULT_GATEWAY	= 192.168.100.254
