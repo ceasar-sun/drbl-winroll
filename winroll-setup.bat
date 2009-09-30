@@ -218,6 +218,7 @@ goto :EOF
 	reg QUERY "HKEY_LOCAL_MACHINE\SOFTWARE\Microsoft\Windows NT\CurrentVersion" /v  ProductName | find "Vista" >OS-version.txt
 	if "%ERRORLEVEL%" == "0"  (
 		set OS_VERSION=Vista
+		set STARTMENU_PATH=%ALLUSERSPROFILE%\Start Menu\Programs\Cygwin
 		goto :END_OF_CHECK_OS_VERSION
 	)
 
@@ -368,6 +369,7 @@ goto :EOF
 	REM echo set SYSTEM_ADMIN=%ADMIN%>>"%APPDATA%\%WINROLL_UNINSTALL_PARA%"
 	echo. >>"%APPDATA%\%WINROLL_UNINSTALL_PARA%"
 	echo set CYGWIN_ROOT=%CYGWIN_ROOT%>>"%APPDATA%\%WINROLL_UNINSTALL_PARA%"
+	echo set STARTMENU_PATH=%STARTMENU_PATH%>>"%APPDATA%\%WINROLL_UNINSTALL_PARA%"
 
 	REM Add cygwin binary path into current path
 	set PATH=%CYGWIN_ROOT%\bin;%PATH%
