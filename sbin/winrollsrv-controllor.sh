@@ -165,15 +165,19 @@ config_autonewsid(){
 
 remove_sshd(){
 	echo "Remove $SSHD_SNAME service ..."
+	priv_sshd_user=$(cygrunsrv.exe -V -Q $SSHD_SNAME | grep -e "^Account" | awk -F ":" '{print $2}' | sed -e "s/\.\\\//" -e "s/ //")
+
 	cygrunsrv.exe -E $SSHD_SNAME 1> /dev/null 2>&1
 	cygrunsrv.exe -R $SSHD_SNAME 1> /dev/null 2>&1
+
 	echo "Delet open port TCP 22 if need ..."
 	netsh firewall delete portopening TCP 22 1> /dev/null 2>&1
-	echo "Delete user 'sshd', 'sshd_server' ..."
+	
+	echo "Delete user 'sshd', 'sshd_server' '$priv_sshd_user'..."
 	net user sshd /DELETE 1> /dev/null 2>&1
 	net user sshd_server /DELETE 1> /dev/null 2>&1
-	priv_sshd_user=$(cygrunsrv.exe -V -Q sshd | grep -e "^Account" | awk -F ":" '{print $2}' | sed -e "s/\.\\\//" -e "s/ //")
-	net user $priv_sshd_user /DELETE 1> /dev/null 2>&1
+	net user $priv_sshd_user 1>/devnull 2>&1
+	[ "$?" = "0" ] && net user $priv_sshd_user /DELETE 1> /dev/null 2>&1
 	
 	if [ -f "/home/$WINROOT/.ssh/authorized_keys" ];then
 		mkdir -p "$WINROLL_LOCAL_BACKUP"
@@ -275,7 +279,9 @@ if [ "$action" = "r" ]; then
 	[ "$IF_NEWSID_SERVICE" = "y" ] && remove_autonewsid
 	[ -n "`cygrunsrv -Q $SSHD_SNAME 2>/dev/null `" ] && remove_sshd
 	cygrunsrv.exe -E $WINROLLSRV_SNAME 1> /dev/null 2>&1
+	echo "stop : $WINROLLSRV_SNAME"
 	cygrunsrv.exe -R $WINROLLSRV_SNAME 1> /dev/null 2>&1
+	echo "remove : $WINROLLSRV_SNAME"
 elif [ "$action" = "s" ]; then 
 	[ "$IF_AUTOHOSTNAME_SERVICE" != "y" ] && config_autohostname
 	[ "$IF_NEWSID_SERVICE" != "y" ] && config_autonewsid
