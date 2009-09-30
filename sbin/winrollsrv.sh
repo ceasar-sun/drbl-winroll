@@ -62,6 +62,9 @@ do_config_network(){
 		echo "CONFIG_NETWORK_MODE : none"
 		return 3;
 	elif [ "$CONFIG_NETWORK_MODE" = "dhcp" ] ; then
+		netsh interface ip set address  source=dhcp
+		netsh interface ip set dns source=dhcp
+			
 		ipconfig /renew >/dev/null ; ipconfig /release >/dev/null; ipconfig /renew >/dev/null
 		IF_IPRENEW=1
 		echo "CONFIG_NETWORK_MODE : dhcp"
@@ -99,6 +102,7 @@ do_config_network(){
 			if [ "$thisip"  = "dhcp" ] ; then
 				echo "$_devname ,$mac => dhcp"
 				netsh interface ip set address "$_devname" source=dhcp >/dev/null
+				netsh interface ip set dns "$_devname" source=dhcp
 				ipconfig /release "$_devname" >/dev/null; ipconfig /renew "$_devname" >/dev/null
 				IF_IPRENEW=1
 				continue
