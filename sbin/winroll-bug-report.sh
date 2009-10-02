@@ -28,7 +28,9 @@ echo "Get pc informations by 'set' ..."
 set > $report_tmpdir/pc-info.txt
 cd `dirname $report_tmpdir`; zip -r -q `basename $report_tmpdir`.zip `basename $report_tmpdir`; mv `basename $report_tmpdir`.zip  /winroll-bug-report.`date +%Y%m%d`.zip
 rm -rf $report_tmpdir
-echo "Your bug report file is here: winroll-bug-report".`date +%Y%m%d`.".zip"
+echo "================================================="
+echo "Your bug report file is here: c:\cugwin\winroll-bug-report".`date +%Y%m%d`.".zip"
 echo "Please attach it and your problem description to ceasar@nchc.org.tw"
+echo "================================================="
 echo "Press 'Enter' to exit !!"
 read
