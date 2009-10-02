@@ -29,7 +29,7 @@ set > $report_tmpdir/pc-info.txt
 cd `dirname $report_tmpdir`; zip -r -q `basename $report_tmpdir`.zip `basename $report_tmpdir`; mv `basename $report_tmpdir`.zip  /winroll-bug-report.`date +%Y%m%d`.zip
 rm -rf $report_tmpdir
 echo "================================================="
-echo "Your bug report file is here: c:\cugwin\winroll-bug-report."`date +%Y%m%d`".zip"
+echo "Your bug report file is here: c:\cygwin\winroll-bug-report."`date +%Y%m%d`".zip"
 echo "Please attach it and your problem description to ceasar@nchc.org.tw"
 echo "================================================="
 echo "Press 'Enter' to exit !!"
