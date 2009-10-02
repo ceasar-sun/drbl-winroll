@@ -62,9 +62,12 @@ do_config_network(){
 		echo "CONFIG_NETWORK_MODE : none"
 		return 3;
 	elif [ "$CONFIG_NETWORK_MODE" = "dhcp" ] ; then
-		netsh interface ip set address  source=dhcp
-		netsh interface ip set dns source=dhcp
-			
+		_devname_list=$(ipconfig /all | grep "$_Ethernet_adapter_KEYWORD"| head -n 1| dos2unix |  sed -e "s/$_Ethernet_adapter_KEYWORD//g" -e "s/^\s*//g" -e "s/:$//g" )
+		for _devname in $_devname_list ; do	
+			netsh interface ip set address name="$_devname" source=dhcp
+			netsh interface ip set dns name="$_devname" source=dhcp
+			netsh interface ip set wins name="$_devname" source=dhcp
+		done
 		ipconfig /renew >/dev/null ; ipconfig /release >/dev/null; ipconfig /renew >/dev/null
 		IF_IPRENEW=1
 		echo "CONFIG_NETWORK_MODE : dhcp"
@@ -89,7 +92,7 @@ do_config_network(){
 			thisip=$(grep $mac $CLIENT_MAC_NETWORK 2>/dev/null |awk -F '=' '{print $2}'| sed -e "s/\s//g" )
 			
 			# To get nic device name 
-			line_nm_rev=$(ipconfig /all | grep -n $mac | awk -F ":" '{print $1}')
+			line_nm_rev=$(ipconfig /all | grep -n "$mac"| head -n 1 | awk -F ":" '{print $1}')
 			_devname=$(ipconfig /all | head -n $line_nm_rev | tac | grep "$_Ethernet_adapter_KEYWORD"| head -n 1| dos2unix |  sed -e "s/$_Ethernet_adapter_KEYWORD//g" -e "s/^\s*//g" -e "s/:$//g" )
 
 			# can't find match mac address for itself
@@ -101,8 +104,9 @@ do_config_network(){
 			# use "dhcp" for this mac address 
 			if [ "$thisip"  = "dhcp" ] ; then
 				echo "$_devname ,$mac => dhcp"
-				netsh interface ip set address "$_devname" source=dhcp >/dev/null
-				netsh interface ip set dns "$_devname" source=dhcp
+				netsh interface ip set address name="$_devname" source=dhcp >/dev/null
+				netsh interface ip set dns name="$_devname" source=dhcp
+				netsh interface ip set wins name="$_devname" source=dhcp
 				ipconfig /release "$_devname" >/dev/null; ipconfig /renew "$_devname" >/dev/null
 				IF_IPRENEW=1
 				continue

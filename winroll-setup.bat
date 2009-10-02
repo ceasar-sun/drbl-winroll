@@ -654,12 +654,23 @@ goto :EOF
 	echo %IF_INSTALL_SSH_SERVICE%
 	set /P ANSWER_IF_GO="[Y/n]"
 	
+	rem set SSHD_SERVER_PW_OPT=-w %SSHD_SERVER_PW%
+	
 	if "%ANSWER_IF_GO%" == "n" (
 		goto :END_OF_SSHD_SETUP
 	)
+	
+	if "%OS_VERSION%" == "Vista" (
+		set SSHD_SERVER_PW_OPT=
+	) else if "%OS_VERSION%" == "WIN7" (
+		set SSHD_SERVER_PW_OPT=
+	) else (
+		set SSHD_SERVER_PW_OPT=-w %SSHD_SERVER_PW%
+	)
+
 	%CYGWIN_ROOT%\bin\chmod.exe +r %CYGWIN_ROOT%\etc\passwd %CYGWIN_ROOT%\etc\group
 	%CYGWIN_ROOT%\bin\chmod.exe +x %CYGWIN_ROOT%\var
-	%CYGWIN_ROOT%\bin\bash.exe --login -c "ssh-host-config -y -c ntsec -w %SSHD_SERVER_PW%"
+	%CYGWIN_ROOT%\bin\bash.exe --login -c "ssh-host-config -y -c ntsec %SSHD_SERVER_PW_OPT%"
 	%CYGWIN_ROOT%\bin\cygrunsrv.exe -S %SSHD_SERVICE%
 	
 	if "%OS_VERSION%" == "WINXP" (
