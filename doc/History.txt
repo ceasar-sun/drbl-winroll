@@ -4,12 +4,19 @@ Author: Ceasar Sun <ceasar at nchc org tw>
 ---------------------------------------------------------------------------------------------------
 Change log:
 
-version 200805.1:
-	1. 
+version 1.2.0 :
+	1. 更新 wsname 程式至 v2.88a 以支援 x86_64 Windows 系統
+	2. 更新 cygwin 相關程式至 1.5.25-15
+	3. 改用單一服務流程以修正互斥問題
+	4. 新增 Windows Vista, Windows 7 支援(安裝時請先將 UAC 關閉)
+ 	5. 新增自動化設定網路卡配置功能(參考 http://drbl.nchc.org.tw/drbl-winroll/#config-network)
 	
 	[English]
-	1. 
-	
+	1. Update wsname.exe version 2.88a to support x86_64 system
+	2. Update cygwin environment to 1.5.25-15
+	3. Use single workflow in drbl-winroll service
+	4. Add Windows Vista, Windows 7 supports
+ 	5. Probide network configuration auto-setup function
 
 version 200707.1:
 	1. 修正 autonewsid 後, sshd service 啟動失敗
@@ -22,7 +29,6 @@ version 200707.1:
 	2. Delete account "sshd_server" during remove sshd service
 	3. Give a password for "sshd_server" during setup sshd service in Windwos 2003
 	4. Fix read-only issue of /var/cron directory during remove drbl-winroll
-	
 
 version 200703.5 stable:
 	1. 加入法文與荷蘭文翻譯語言檔
