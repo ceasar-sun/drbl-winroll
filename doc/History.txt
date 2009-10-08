@@ -11,6 +11,7 @@ version 1.2.0 :
 	4. 新增 Windows Vista, Windows 7 支援(安裝時請先將 UAC 關閉)
  	5. 新增自動化設定網路卡配置功能(參考 http://drbl.nchc.org.tw/drbl-winroll/#config-network)
 	6. 新增『強制安裝』模式，用以相容予以安裝 cygwin 環境之系統
+	7. 新增 bug-report 功能
 	
 	[English]
 	1. Update wsname.exe version 2.88a to support x86_64 system
@@ -19,6 +20,7 @@ version 1.2.0 :
 	4. Add Windows Vista, Windows 7 supports
  	5. Probide network configuration auto-setup function
 	6. Add "Force to install" mode to suit with cygwin installed already environment
+	7. Add "Bug report" function in Program menu
 
 version 200707.1:
 	1. 修正 autonewsid 後, sshd service 啟動失敗
