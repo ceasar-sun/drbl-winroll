@@ -167,7 +167,7 @@ do_config_network(){
 			for wins in $(echo $_THIS_WINS | tr , ' ') ; do
 				# skip illegal ip
 				[ -n "$(ipcalc $wins | grep 'INVALID ADDRESS')" ]  && echo "Illegal wins ip :$wins" && continue
-				echo netsh interface ip add wins \"$_devname\" $wins
+				echo "netsh interface ip add wins \"$_devname\" $wins"
 				netsh interface ip add wins "$_devname" $wins
 			done			
 		done
@@ -244,8 +244,9 @@ do_autohostname(){
 		if [ -n "$(echo $WS_RETURN_CODE | grep -e 'Exit code 4' 2> /dev/null )" ] ; then
 			NEED_TO_CHANGE=0
 			echo "No ip release ,Please check $HN_WSNAME_PARAM for more detail !!";
-			# use other format as default, and active ti change
 		elif [ -z "$(echo $WS_RETURN_CODE | grep -e 'Exit code 7' 2> /dev/null )" ] ; then
+			NEED_TO_CHANGE=0
+		elif [ -n "$(echo $WS_RETURN_CODE | grep -e 'Rename Successful - reboot ' 2> /dev/null )" ] ; then
 			NEED_TO_CHANGE=1
 		fi
 	fi
