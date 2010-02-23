@@ -73,12 +73,15 @@ do_config_network(){
 		echo "CONFIG_NETWORK_MODE : dhcp"
 		return 2;
 	elif [ -n "$(echo $CONFIG_NETWORK_MODE | grep -e '/RDF' 2> /dev/null )" ] ; then
-		CLIENT_MAC_NETWORK="$(echo $CONFIG_NETWORK_MODE | awk -F ':' '{print $2}' )"
-		[ -e "$CLIENT_MAC_NETWORK" ] || ( echo "No CLIENT_MAC_NETWORK file : $CLIENT_MAC_NETWORK" ; return 11 )
+		CLIENT_MAC_NETWORK_Winpath="$(echo $CONFIG_NETWORK_MODE | awk -F ':' '{print $2":"$3}' )"
+		CLIENT_MAC_NETWORK="$(cygpath -u $CLIENT_MAC_NETWORK_Winpath )"
+		[ ! -e "$CLIENT_MAC_NETWORK" ] &&  echo "No CLIENT_MAC_NETWORK file : $CLIENT_MAC_NETWORK" && return 1
 		
 		# get network default configuration
 		nw_conf_tmp=nic-conf.tmp
-		grep -e "^_DEFAULT" $CLIENT_MAC_NETWORK | sed -e "s/\s*=\s*/=/g" -e "s/\s\{1,\}/,/g" -e "s/,\{1,\}/,/g"  -e "s/\#/ #/" -e "s/^_DEFAULT_/export _DEFAULT_/g" > $WINROLL_TMP/$nw_conf_tmp
+		# grep -e "^_DEFAULT" $CLIENT_MAC_NETWORK | sed -e "s/\s*=\s*/=/g" -e "s/\s\{1,\}/,/g" -e "s/,\{1,\}/,/g"  -e "s/\#/ #/" -e "s/^_DEFAULT_/export _DEFAULT_/g" > $WINROLL_TMP/$nw_conf_tmp
+		# 原先使用 space 為分隔符號，後改用","
+		grep -e "^_DEFAULT" $CLIENT_MAC_NETWORK | sed -e "s/\s\{1,\}//g" -e "s/,\{1,\}/,/g"  -e "s/\#/ #/" -e "s/^_DEFAULT_/export _DEFAULT_/g" > $WINROLL_TMP/$nw_conf_tmp
 		. $WINROLL_TMP/$nw_conf_tmp
 
 		# get configuration domains
@@ -139,8 +142,7 @@ do_config_network(){
 				this_nw_conf_tmp=this-nic-conf.tmp
 				line_nm_dm_reverse=$(tac $CLIENT_MAC_NETWORK | grep -n -e "^subnet.\{1,\}$_THIS_NETWORK" | awk -F ":" '{print $1}' )
 				line_nm_dm_content=$(tail -n $line_nm_dm_reverse $CLIENT_MAC_NETWORK | grep -n "}" | head -n 1 | awk -F ":" '{print $1}')
-				# grep -e "^_DEFAULT" $CLIENT_MAC_NETWORK | sed -e "s/\s*=\s*/=/g" -e "s/\s\{1,\}/,/g" -e "s/,\{1,\}/,/g"  -e "s/^_DEFAULT_/export _DEFAULT_/g" > $WINROLL_TMP/$nw_conf_tmp
-				tail -n $line_nm_dm_reverse $CLIENT_MAC_NETWORK | head -n $line_nm_dm_content | grep THIS_ | sed -e "s/^\s*//g" -e "s/\s*=\s*/=/g" -e "s/\s\{1,\}/,/g" -e "s/,\{1,\}/,/g" -e "s/\#/ #/" -e "s/THIS_/export _THIS_/g"  > $WINROLL_TMP/$this_nw_conf_tmp
+				tail -n $line_nm_dm_reverse $CLIENT_MAC_NETWORK | head -n $line_nm_dm_content | grep THIS_ | sed -e "s/^\s*//g" -e "s/\s*//g" -e "s/\s\{1,\}/,/g" -e "s/,\{1,\}/,/g" -e "s/\#/ #/" -e "s/THIS_/export _THIS_/g"  > $WINROLL_TMP/$this_nw_conf_tmp
 				. $WINROLL_TMP/$this_nw_conf_tmp
 			fi
 			
