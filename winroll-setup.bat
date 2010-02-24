@@ -129,8 +129,7 @@ REM # To decide language during installation
 	reg QUERY "HKEY_CURRENT_USER\Control Panel\International" /v Locale | find "00000404" > Locale.txt
 	IF "%ERRORLEVEL%" == "0" (
 		set LANG=tc
-		CALL lang\%LANG%.cmd
-		goto :END_OF_SET_LANGUAGE
+		goto :BEFORE_OF_CALL_LANGUAGE
 	)
 	
 	REM ### For English
@@ -140,27 +139,23 @@ REM # To decide language during installation
 	reg QUERY "HKEY_CURRENT_USER\Control Panel\International" /v Locale | find "00000409" > Locale.txt
 	IF "%ERRORLEVEL%" == "0" (
 		set LANG=en
-		CALL lang\%LANG%.cmd
-		goto :END_OF_SET_LANGUAGE
+		goto :BEFORE_OF_CALL_LANGUAGE
 	)
 
 	REM ### A sample for other language
 	REM reg QUERY "HKEY_CURRENT_USER\Control Panel\International" /v Locale | find "0000040x" > Locale.txt
 	REM IF "%ERRORLEVEL%" == "0" (
 	REM 	set LANG=xxx
-	REM 	CALL lang\%LANG%.cmd
-	REM 	goto :END_OF_SET_LANGUAGE
+	REM 	goto :BEFORE_OF_CALL_LANGUAGE
 	REM )
 
 	IF EXIST "%FR_OS_PATH%" (
 		set LANG=fr
-		CALL lang\%LANG%.cmd
-		goto :END_OF_SET_LANGUAGE
+		goto :BEFORE_OF_CALL_LANGUAGE
 	)
 	IF EXIST "%NL_OS_PATH%" (
 		set LANG=nl
-		CALL lang\%LANG%.cmd
-		goto :END_OF_SET_LANGUAGE
+		goto :BEFORE_OF_CALL_LANGUAGE
 	)
   
 	IF "%LANG%" == "0" (
@@ -173,6 +168,9 @@ REM # To decide language during installation
 		echo !! [Ctrl+C] to exit, any key to continue.
 		pause
 	)
+:BEFORE_OF_CALL_LANGUAGE
+
+	CALL lang\%LANG%.cmd
 
 :END_OF_SET_LANGUAGE
 
@@ -856,3 +854,5 @@ goto :EOF
 	call :DRBL-WINROLL_INSTALL
 	:END_OF_DRBL-WINROLL_REINSTALL
 goto :EOF
+
+:EOF
