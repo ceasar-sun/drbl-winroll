@@ -37,20 +37,23 @@ NEED_TO_REBOOT=0
 do_config_network(){
 	SERVICE_NAME="CONFIG_NETWORK"
 	DEFAULT_CLIENT_MAC_NETWORK="$WINROLL_CONF_ROOT/client-mac-network.conf"
-	_Physical_Address_KEYWORD="Physical Address"
-	_Ethernet_adapter_KEYWORD="Ethernet adapter"
+	DEFAULT_DEVICE_KEYWORD_CONF="$WINROLL_CONF_ROOT/keyword-conf/_legacy/_default.conf"
 	
-	OS_VERSION=
-	LOCALEID=$(cat /proc/registry/HKEY_CURRENT_USER/Control\ Panel/International/Locale)
+	OS_VERSION=$(detect_win_version)
+	LOCALEID=$(detect_locale_code)
 	
-	if [ "$(cat /proc/registry/HKEY_LOCAL_MACHINE/SOFTWARE/Microsoft/Windows\ NT/CurrentVersion/ProductName | grep "Vista")" ] ; then
-		OS_VERSION=vista
-		[ -e  $WINROLL_CONF_ROOT/keyword-conf/$OS_VERSION/$LOCALEID.conf ] && . $WINROLL_CONF_ROOT/keyword-conf/$OS_VERSION/$LOCALEID.conf
-	elif [ "$(cat /proc/registry/HKEY_LOCAL_MACHINE/SOFTWARE/Microsoft/Windows\ NT/CurrentVersion/ProductName | grep "Windows 7")" ] ; then
-		OS_VERSION=win7
-		[ -e  $WINROLL_CONF_ROOT/keyword-conf/$OS_VERSION/$LOCALEID.conf ] && . $WINROLL_CONF_ROOT/keyword-conf/$OS_VERSION/$LOCALEID.conf
+	if [ "$OS_VERSION" == "win2000" ] || [ "$OS_VERSION" == "xp" ] || [ "$OS_VERSION" == "win2003" ]; then
+		OS_KEYWORD_CONF=_legacy
 	else
-		OS_VERSION=_legacy
+		OS_KEYWORD_CONF=$OS_VERSION
+	fi 
+
+	if [ -e  $WINROLL_CONF_ROOT/keyword-conf/$OS_KEYWORD_CONF/$LOCALEID.conf ] ; then
+		. $WINROLL_CONF_ROOT/keyword-conf/$OS_KEYWORD_CONF/$LOCALEID.conf
+	else
+		echo "No match keyword for your OS:$OS_VERSION and locale code in path :$WINROLL_CONF_ROOT/keyword-conf/$OS_KEYWORD_CONF/$LOCALEID.conf"
+		echo "use $DEFAULT_DEVICE_KEYWORD_CONF as default keyword"
+		. $DEFAULT_DEVICE_KEYWORD_CONF
 	fi 
 	
 	# CONFIG_NETWORK_MODE = none ; do nothing
@@ -80,7 +83,7 @@ do_config_network(){
 		# get network default configuration
 		nw_conf_tmp=nic-conf.tmp
 		# grep -e "^_DEFAULT" $CLIENT_MAC_NETWORK | sed -e "s/\s*=\s*/=/g" -e "s/\s\{1,\}/,/g" -e "s/,\{1,\}/,/g"  -e "s/\#/ #/" -e "s/^_DEFAULT_/export _DEFAULT_/g" > $WINROLL_TMP/$nw_conf_tmp
-		# 原先使用 space 為分隔符號，後改用","
+		# use comma "," to be separate sign 
 		grep -e "^_DEFAULT" $CLIENT_MAC_NETWORK | sed -e "s/\s\{1,\}//g" -e "s/,\{1,\}/,/g"  -e "s/\#/ #/" -e "s/^_DEFAULT_/export _DEFAULT_/g" > $WINROLL_TMP/$nw_conf_tmp
 		. $WINROLL_TMP/$nw_conf_tmp
 

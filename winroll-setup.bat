@@ -19,8 +19,8 @@ REM #     http://www.ceasar.tw/modules/news/article.php?storyid=98
 REM ####################################################################
 
 REM # identify your OS language 
-set ENG_OS_PATH=%USERPROFILE%\Desktop
-set ZHTW_OS_PATH=%USERPROFILE%\орн▒
+REM set ENG_OS_PATH=%USERPROFILE%\Desktop
+REM set ZHTW_OS_PATH=%USERPROFILE%\орн▒
 set FR_OS_PATH=%USERPROFILE%\Bureau
 set NL_OS_PATH=%USERPROFILE%\Bureaublad
 
@@ -59,11 +59,11 @@ set INIT_FUNCTIONS_FILE=%INIT_CONF%\winroll-functions.sh
 rem set INIT_KEYWORD_CONF=%INIT_CONF%\keyword-conf
 set INIT_DOC_FOLDER=doc
 
+call :CHECK_OS_VERSION
 call :SET_LANGUAGE
 set ROOT_NAME=%ADMIN%
 cls
 call :PRINTHEAD
-call :CHECK_OS_VERSION
 echo %YOUR_OS_VERSION_IS% :"%OS_VERSION%"
 echo %YOUR_LANGUAGE_IS% : %LANGUAGE_DESC%
 
@@ -118,25 +118,88 @@ goto :EOF
 REM #####################################
 REM # Sub function
 REM #####################################
+:CHECK_OS_VERSION
+	set OS_VERSION=NONE
+	
+	reg QUERY "HKEY_LOCAL_MACHINE\SOFTWARE\Microsoft\Windows NT\CurrentVersion" /v  ProductName | find "2000" >OS-version.txt
+	if "%ERRORLEVEL%" == "0" (
+		set OS_VERSION=WIN2000
+		goto :END_OF_CHECK_OS_VERSION
+	)
+
+	reg QUERY "HKEY_LOCAL_MACHINE\SOFTWARE\Microsoft\Windows NT\CurrentVersion" /v  ProductName | find "XP" >OS-version.txt
+	if "%ERRORLEVEL%" == "0" (
+		set OS_VERSION=WINXP
+		goto :END_OF_CHECK_OS_VERSION
+	)
+
+	reg QUERY "HKEY_LOCAL_MACHINE\SOFTWARE\Microsoft\Windows NT\CurrentVersion" /v  ProductName | find "2003" >OS-version.txt
+	if "%ERRORLEVEL%" == "0"  (
+		set OS_VERSION=WIN2003
+		goto :END_OF_CHECK_OS_VERSION
+	)
+
+	reg QUERY "HKEY_LOCAL_MACHINE\SOFTWARE\Microsoft\Windows NT\CurrentVersion" /v  ProductName | find "2008" >OS-version.txt
+	if "%ERRORLEVEL%" == "0"  (
+		set OS_VERSION=WIN2008
+		goto :END_OF_CHECK_OS_VERSION
+	)
+
+	reg QUERY "HKEY_LOCAL_MACHINE\SOFTWARE\Microsoft\Windows NT\CurrentVersion" /v  ProductName | find "Vista" >OS-version.txt
+	if "%ERRORLEVEL%" == "0"  (
+		set OS_VERSION=Vista
+		set STARTMENU_PATH=%ALLUSERSPROFILE%\Start Menu\Programs\Cygwin
+		goto :END_OF_CHECK_OS_VERSION
+	)
+
+	reg QUERY "HKEY_LOCAL_MACHINE\SOFTWARE\Microsoft\Windows NT\CurrentVersion" /v  ProductName | find "Windows 7" >OS-version.txt
+	if "%ERRORLEVEL%" == "0"  (
+		set OS_VERSION=WIN7
+		set STARTMENU_PATH=%ALLUSERSPROFILE%\Start Menu\Programs\Cygwin
+		goto :END_OF_CHECK_OS_VERSION
+	)
+
+	REM # Just in case for Windows 2000 
+	if "%SystemRoot%" == "C:\WINNT" (
+		set OS_VERSION=WIN2000
+		goto :END_OF_CHECK_OS_VERSION
+	)
+
+	if "%OS_VERSION%" == "NONE" (
+		echo .
+		echo !!! Unknow your OS version ... !!!
+		echo !!! Please attach "OS-version.txt" file at installation folder and mail to "ceasar.sun@gmail.com" to call for support !!!
+		reg QUERY "HKEY_LOCAL_MACHINE\SOFTWARE\Microsoft\Windows NT\CurrentVersion" /v  ProductName >OS-version.txt
+		echo !!! Program EXIT !!!
+		pause
+		exit 1
+		goto :EOF
+	)
+	:END_OF_CHECK_OS_VERSION
+goto :EOF
 
 REM # To decide language during installation
 :SET_LANGUAGE
 	set LANG=0
 	
+	REM # Just in case for Win 2000, because it has no reg command to use 
+	if "%OS_VERSION%" == "WIN2000" (
+		set set LANG=en
+		goto :BEFORE_OF_CALL_LANGUAGE
+	)
+	
 	REM ### For zh_TW 
-	REM IF EXIST "%ZHTW_OS_PATH%" (
-	REM   set LANG=tc
-	REM )
 	reg QUERY "HKEY_CURRENT_USER\Control Panel\International" /v Locale | find "00000404" > Locale.txt
 	IF "%ERRORLEVEL%" == "0" (
 		set LANG=tc
 		goto :BEFORE_OF_CALL_LANGUAGE
 	)
+	REM # IF EXIST "%ZHTW_OS_PATH%" (
+	REM #   set LANG=tc
+	REM #   goto :BEFORE_OF_CALL_LANGUAGE
+	REM #)
 	
 	REM ### For English
-	REM IF EXIST "%ENG_OS_PATH%" (
-	REM   set LANG=en
-	REM )
 	reg QUERY "HKEY_CURRENT_USER\Control Panel\International" /v Locale | find "00000409" > Locale.txt
 	IF "%ERRORLEVEL%" == "0" (
 		set LANG=en
@@ -214,62 +277,6 @@ goto :EOF
 	echo CYGWIN_ROOT=%CYGWIN_ROOT%>>%WINROLL_SETUP_LOG%
 	echo LOCAL_REPOSITORY=%LOCAL_REPOSITORY%>>%WINROLL_SETUP_LOG%
 	echo INIT_DOC_FOLDER=%INIT_DOC_FOLDER%>>%WINROLL_SETUP_LOG%
-goto :EOF
-
-:CHECK_OS_VERSION
-
-	set OS_VERSION=NONE
-	
-	reg QUERY "HKEY_LOCAL_MACHINE\SOFTWARE\Microsoft\Windows NT\CurrentVersion" /v  ProductName | find "2000" >OS-version.txt
-	if "%ERRORLEVEL%" == "0" (
-		set OS_VERSION=WIN2000
-		goto :END_OF_CHECK_OS_VERSION
-	)
-
-	reg QUERY "HKEY_LOCAL_MACHINE\SOFTWARE\Microsoft\Windows NT\CurrentVersion" /v  ProductName | find "XP" >OS-version.txt
-	if "%ERRORLEVEL%" == "0" (
-		set OS_VERSION=WINXP
-		goto :END_OF_CHECK_OS_VERSION
-	)
-
-	reg QUERY "HKEY_LOCAL_MACHINE\SOFTWARE\Microsoft\Windows NT\CurrentVersion" /v  ProductName | find "2003" >OS-version.txt
-	if "%ERRORLEVEL%" == "0"  (
-		set OS_VERSION=WIN2003
-		goto :END_OF_CHECK_OS_VERSION
-	)
-
-	reg QUERY "HKEY_LOCAL_MACHINE\SOFTWARE\Microsoft\Windows NT\CurrentVersion" /v  ProductName | find "2008" >OS-version.txt
-	if "%ERRORLEVEL%" == "0"  (
-		set OS_VERSION=WIN2008
-		goto :END_OF_CHECK_OS_VERSION
-	)
-
-	reg QUERY "HKEY_LOCAL_MACHINE\SOFTWARE\Microsoft\Windows NT\CurrentVersion" /v  ProductName | find "Vista" >OS-version.txt
-	if "%ERRORLEVEL%" == "0"  (
-		set OS_VERSION=Vista
-		set STARTMENU_PATH=%ALLUSERSPROFILE%\Start Menu\Programs\Cygwin
-		goto :END_OF_CHECK_OS_VERSION
-	)
-
-	reg QUERY "HKEY_LOCAL_MACHINE\SOFTWARE\Microsoft\Windows NT\CurrentVersion" /v  ProductName | find "Windows 7" >OS-version.txt
-	if "%ERRORLEVEL%" == "0"  (
-		set OS_VERSION=WIN7
-		set STARTMENU_PATH=%ALLUSERSPROFILE%\Start Menu\Programs\Cygwin
-		goto :END_OF_CHECK_OS_VERSION
-	)
-
-	REM Case in Windows 2000 
-	if "%SystemRoot%" == "C:\WINNT" (
-		set OS_VERSION=WIN2000
-		goto :END_OF_CHECK_OS_VERSION
-	)
-
-	if "%OS_VERSION%" == "NONE" (
-		echo .
-		echo !!! %NUKNOW_OS_VERSION% , %PROCESS_TERNIMAL% !!!
-		exit /B 1
-	)
-	:END_OF_CHECK_OS_VERSION
 goto :EOF
 
 :CHECK_IF_WINADMIN
@@ -857,4 +864,4 @@ goto :EOF
 goto :EOF
 
 :EOF
-exit 0
+exit /B 1

@@ -25,7 +25,13 @@ cp -a $WINROLL_CONF_ROOT $report_tmpdir
 echo "Copy relative logs ..."
 cp -a $WINROLL_TMP $report_tmpdir
 echo "Get pc informations by 'set' ..."
-set > $report_tmpdir/pc-info.txt
+echo "Get Windows ProductName from registry"
+touch $report_tmpdir/pc-info.txt
+echo "cat /proc/registry/HKEY_LOCAL_MACHINE/SOFTWARE/Microsoft/Windows\ NT/CurrentVersion/ProductName" >> $report_tmpdir/pc-info.txt
+cat /proc/registry/HKEY_LOCAL_MACHINE/SOFTWARE/Microsoft/Windows\ NT/CurrentVersion/ProductName >> $report_tmpdir/pc-info.txt
+echo "cat /proc/registry/HKEY_CURRENT_USER/Control\ Panel/International/Locale" >> $report_tmpdir/pc-info.txt
+cat /proc/registry/HKEY_CURRENT_USER/Control\ Panel/International/Locale >> $report_tmpdir/pc-info.txt
+set >> $report_tmpdir/pc-info.txt
 cd `dirname $report_tmpdir`; zip -r -q `basename $report_tmpdir`.zip `basename $report_tmpdir`; mv `basename $report_tmpdir`.zip  /winroll-bug-report.`date +%Y%m%d`.zip
 rm -rf $report_tmpdir
 echo "================================================="

@@ -58,12 +58,10 @@ detect_win_version(){
 	else
 		OS_VERSION=
 	fi 
-	return $OS_VERSION
+	echo $OS_VERSION
 }
 detect_locale_code(){
-
-	LOCALEID=$(cat /proc/registry/HKEY_CURRENT_USER/Control\ Panel/International/Locale)
-	return $OS_VERSION
+	echo $(cat /proc/registry/HKEY_CURRENT_USER/Control\ Panel/International/Locale)
 }
 
 
