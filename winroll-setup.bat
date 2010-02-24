@@ -280,10 +280,10 @@ goto :EOF
 goto :EOF
 
 :CHECK_IF_WINADMIN
+	echo %YOUR_CURRENT_ACCOUNT_IS% : "%USERNAME%"
 	IF "%USERNAME%" == "%ROOT_NAME%" (
 	 REM Dummy line
 	) ELSE (
-	  echo %YOUR_CURRENT_ACCOUNT_IS% : "%USERNAME%"
 	  echo .
 	  echo %PLZ_CONFIRM_ADMIN_ACCOUNT%
 	  echo !!! %IF_KEEP_GO%
