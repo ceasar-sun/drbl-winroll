@@ -37,10 +37,33 @@ check_if_root_and_envi(){
 	
 	chown -R .Administrators $WINROLL_CONF_ROOT
 	chmod g+w $WINROLL_CONF_ROOT/*.conf
-	#username=`whoami`
-	#if [ ! "$username" = "Administrator" ]; then
-	#	echo "[$username] , You aren't Administrtor, keep go on ?";
-	#	echo "[Ctrl+C] to exit; Any key to continue"
-	#fi
 }
+detect_win_version(){
+	OS_VERSION=
+	OS_ProductName=$(cat /proc/registry/HKEY_LOCAL_MACHINE/SOFTWARE/Microsoft/Windows\ NT/CurrentVersion/ProductName)
+	LOCALEID=$(cat /proc/registry/HKEY_CURRENT_USER/Control\ Panel/International/Locale)
+	
+	if [ -n "$(echo $OS_ProductName | grep '2000')" ] ; then
+		OS_VERSION=win2000
+	elif [ -n "$(echo $OS_ProductName | grep 'XP')" ] ; then
+		OS_VERSION=xp
+	elif [ -n "$(echo $OS_ProductName | grep '2003')" ] ; then
+		OS_VERSION=win2003
+	elif [ -n "$(echo $OS_ProductName | grep 'Vista')" ] ; then
+		OS_VERSION=vista
+	elif [ -n "$(echo $OS_ProductName | grep 'Windows 7')" ] ; then
+		OS_VERSION=win7
+	elif [ -n "$(echo $OS_ProductName | grep '2008')" ] ; then
+		OS_VERSION=win2008
+	else
+		OS_VERSION=
+	fi 
+	return $OS_VERSION
+}
+detect_locale_code(){
+
+	LOCALEID=$(cat /proc/registry/HKEY_CURRENT_USER/Control\ Panel/International/Locale)
+	return $OS_VERSION
+}
+
 

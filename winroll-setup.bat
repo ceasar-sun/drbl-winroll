@@ -116,40 +116,65 @@ if  "%IF_NEWSID_SERVICE%" == "y" (
 REM #####################################
 REM # Sub function
 REM #####################################
+
+REM # To decide language during installation
 :SET_LANGUAGE
 
-  set LANG=0
-  IF EXIST "%ZHTW_OS_PATH%" (
-    set LANG=tc
-  )
-  IF EXIST "%ENG_OS_PATH%" (
-    set LANG=en
-  )
-  IF EXIST "%FR_OS_PATH%" (
-    set LANG=fr
-  )
-  IF EXIST "%NL_OS_PATH%" (
-    set LANG=nl
-  )
-  
-  reg QUERY "HKEY_CURRENT_USER\Control Panel\International" /v Locale | find "00000404" > Locale.txt
-  IF "%ERRORLEVEL%" == "0" (
-    set LANG=tc
-  )
-  
-  REM ### Add your language down below this line
+	set LANG=0
 
-  IF "%LANG%" == "0" (
-	set LANG=unknow
-	echo *** Warning !! ****
-	echo !! Your currnet language not be supported complete yet,
-	echo !! But you still can install it under this release.
-	echo !! Let me know if any problem. Email :ceasar@nchc.org.tw !!
-	echo .
-	echo !! [Ctrl+C] to exit, any key to continue.
-	pause
-)
-  CALL lang\%LANG%.cmd
+	REM ### For zh_TW 
+	REM IF EXIST "%ZHTW_OS_PATH%" (
+	REM   set LANG=tc
+	REM )
+	reg QUERY "HKEY_CURRENT_USER\Control Panel\International" /v Locale | find "00000404" > Locale.txt
+	IF "%ERRORLEVEL%" == "0" (
+		set LANG=tc
+		CALL lang\%LANG%.cmd
+		goto :END_OF_SET_LANGUAGE
+	)
+	
+	REM ### For English
+	REM IF EXIST "%ENG_OS_PATH%" (
+	REM   set LANG=en
+	REM )
+	reg QUERY "HKEY_CURRENT_USER\Control Panel\International" /v Locale | find "00000409" > Locale.txt
+	IF "%ERRORLEVEL%" == "0" (
+		set LANG=en
+		CALL lang\%LANG%.cmd
+		goto :END_OF_SET_LANGUAGE
+	)
+
+	REM ### A sample for other language
+	REM reg QUERY "HKEY_CURRENT_USER\Control Panel\International" /v Locale | find "0000040x" > Locale.txt
+	REM IF "%ERRORLEVEL%" == "0" (
+	REM 	set LANG=xxx
+	REM 	CALL lang\%LANG%.cmd
+	REM 	goto :END_OF_SET_LANGUAGE
+	REM )
+
+	IF EXIST "%FR_OS_PATH%" (
+		set LANG=fr
+		CALL lang\%LANG%.cmd
+		goto :END_OF_SET_LANGUAGE
+	)
+	IF EXIST "%NL_OS_PATH%" (
+		set LANG=nl
+		CALL lang\%LANG%.cmd
+		goto :END_OF_SET_LANGUAGE
+	)
+  
+	IF "%LANG%" == "0" (
+		set LANG=unknow
+		echo *** Warning !! ****
+		echo !! Your currnet language not be supported complete yet,
+		echo !! But you still can install it under this release.
+		echo !! Let me know if any problem. Email :ceasar@nchc.org.tw !!
+		echo .
+		echo !! [Ctrl+C] to exit, any key to continue.
+		pause
+	)
+
+:END_OF_SET_LANGUAGE
 
 goto :EOF
 
@@ -212,6 +237,12 @@ goto :EOF
 	reg QUERY "HKEY_LOCAL_MACHINE\SOFTWARE\Microsoft\Windows NT\CurrentVersion" /v  ProductName | find "2003" >OS-version.txt
 	if "%ERRORLEVEL%" == "0"  (
 		set OS_VERSION=WIN2003
+		goto :END_OF_CHECK_OS_VERSION
+	)
+
+	reg QUERY "HKEY_LOCAL_MACHINE\SOFTWARE\Microsoft\Windows NT\CurrentVersion" /v  ProductName | find "2008" >OS-version.txt
+	if "%ERRORLEVEL%" == "0"  (
+		set OS_VERSION=WIN2008
 		goto :END_OF_CHECK_OS_VERSION
 	)
 
