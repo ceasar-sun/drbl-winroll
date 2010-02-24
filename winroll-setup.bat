@@ -113,15 +113,16 @@ if "%ACTION%" == "u" (
 if  "%IF_NEWSID_SERVICE%" == "y" (
 	call :STARTUP_AUTONEWSID
 )
+
+goto :EOF
 REM #####################################
 REM # Sub function
 REM #####################################
 
 REM # To decide language during installation
 :SET_LANGUAGE
-
 	set LANG=0
-
+	
 	REM ### For zh_TW 
 	REM IF EXIST "%ZHTW_OS_PATH%" (
 	REM   set LANG=tc
@@ -168,12 +169,11 @@ REM # To decide language during installation
 		echo !! [Ctrl+C] to exit, any key to continue.
 		pause
 	)
-:BEFORE_OF_CALL_LANGUAGE
+	:BEFORE_OF_CALL_LANGUAGE
 
 	CALL lang\%LANG%.cmd
 
-:END_OF_SET_LANGUAGE
-
+	:END_OF_SET_LANGUAGE
 goto :EOF
 
 :PRINTHEAD
@@ -269,7 +269,7 @@ goto :EOF
 		echo !!! %NUKNOW_OS_VERSION% , %PROCESS_TERNIMAL% !!!
 		exit /B 1
 	)
-:END_OF_CHECK_OS_VERSION
+	:END_OF_CHECK_OS_VERSION
 goto :EOF
 
 :CHECK_IF_WINADMIN
@@ -671,7 +671,8 @@ goto :EOF
 	rem echo ... %REMOV_AUTONEWSID_SERVICE% ...
 	rem %CYGWIN_ROOT%\bin\cygrunsrv.exe -E %AUTONEWSID_SERVICE%
 	rem %CYGWIN_ROOT%\bin\cygrunsrv.exe -R %AUTONEWSID_SERVICE%
-		
+	
+	:END_OF_AUTONEWSID_REMOVE
 goto :EOF
 
 :SSHD_SETUP
@@ -737,7 +738,6 @@ goto :EOF
 	:END_OF_IMPORT_SSH_KTU
 goto :EOF
 
-
 :SSHD_REMOVE
 	echo %HR%
 	echo %NEXT_STEP% : %REMOVE_SSHD_SERVICE%
@@ -766,6 +766,28 @@ goto :EOF
 	net user sshd /DELETE 1> /dev/null 2>&1
 	net user sshd_server /DELETE 1> /dev/null 2>&1
 
+	:SSHD_REMOVE
+goto :EOF
+
+:STARTUP_AUTONEWSID
+	echo .
+	echo %FIRST_USE_NEWSID% %ACCEPT_LICENCE%
+	pause 
+	%CYGWIN_ROOT%\bin\cygrunsrv.exe -S %WINROLL_SERVICE%
+	echo --- Start %WINROLL_SERVICE% service right now>>%WINROLL_SETUP_LOG%
+	copy %WINROLL_SETUP_LOG% %CYGWIN_ROOT%
+	echo .
+	echo %HR%
+	echo %PLZ_WAIT_TO_REBOOT%
+	echo %HR%
+	:SLEEP_TIME
+	%CYGWIN_ROOT%\bin\sleep.exe 5
+	echo .
+	goto :SLEEP_TIME
+	:END_OF_SLEEP_TIME
+	pause
+
+	:END_OF_STARTUP_AUTONEWSID
 goto :EOF
 
 :DRBL-WINROLL_INSTALL
@@ -797,27 +819,6 @@ goto :EOF
 	echo %FOOTER15%
 	pause
 	:END_OF_DRBL-WINROLL_INSTALL
-goto :EOF
-
-:STARTUP_AUTONEWSID
-	echo .
-	echo %FIRST_USE_NEWSID% %ACCEPT_LICENCE%
-	pause 
-	%CYGWIN_ROOT%\bin\cygrunsrv.exe -S %WINROLL_SERVICE%
-	echo --- Start %WINROLL_SERVICE% service right now>>%WINROLL_SETUP_LOG%
-	copy %WINROLL_SETUP_LOG% %CYGWIN_ROOT%
-	echo .
-	echo %HR%
-	echo %PLZ_WAIT_TO_REBOOT%
-	echo %HR%
-	:SLEEP_TIME
-	%CYGWIN_ROOT%\bin\sleep.exe 5
-	echo .
-	goto :SLEEP_TIME
-	:END_OF_SLEEP_TIME
-	pause
-
-	:END_OF_STARTUP_AUTONEWSID
 goto :EOF
 
 :DRBL-WINROLL_UNINSTALL
@@ -856,3 +857,4 @@ goto :EOF
 goto :EOF
 
 :EOF
+exit 0
