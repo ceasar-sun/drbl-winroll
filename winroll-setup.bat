@@ -168,7 +168,7 @@ REM #####################################
 	if "%OS_VERSION%" == "NONE" (
 		echo .
 		echo !!! Unknow your OS version ... !!!
-		echo !!! Please attach "OS-version.txt" file at installation folder and mail to "ceasar.sun@gmail.com" to call for support !!!
+		echo !!! Please attach "OS-version.txt" file at installation folder and mail to "ceasar@nchc.org.tw" to call for support !!!
 		reg QUERY "HKEY_LOCAL_MACHINE\SOFTWARE\Microsoft\Windows NT\CurrentVersion" /v  ProductName >OS-version.txt
 		echo !!! Program EXIT !!!
 		pause
@@ -706,6 +706,7 @@ goto :EOF
 	)
 
 	%CYGWIN_ROOT%\bin\chmod.exe +r %CYGWIN_ROOT%\etc\passwd %CYGWIN_ROOT%\etc\group
+	%CYGWIN_ROOT%\bin\chmod.exe u+w %CYGWIN_ROOT%\etc\passwd %CYGWIN_ROOT%\etc\group
 	%CYGWIN_ROOT%\bin\chmod.exe +x %CYGWIN_ROOT%\var
 	%CYGWIN_ROOT%\bin\bash.exe --login -c "ssh-host-config -y -c ntsec %SSHD_SERVER_PW_OPT%"
 	%CYGWIN_ROOT%\bin\cygrunsrv.exe -S %SSHD_SERVICE%
