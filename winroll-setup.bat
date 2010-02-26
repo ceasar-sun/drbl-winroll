@@ -236,10 +236,13 @@ REM # To decide language during installation
 
 	CALL lang\%LANG%.cmd
 	
+	REM # to setup STARTMENU_PATH for special windows version
 	if "%OS_VERSION%" == "Vista"  (
 		set STARTMENU_PATH=%ALLUSERSPROFILE%\Start Menu\Programs\Cygwin
 	)
-
+	if "%OS_VERSION%" == "WIN2008"  (
+		set STARTMENU_PATH=%ALLUSERSPROFILE%\Start Menu\Programs\Cygwin
+	)
 	if "%OS_VERSION%" == "WIN7"  (
 		set STARTMENU_PATH=%ALLUSERSPROFILE%\Start Menu\Programs\Cygwin
 	)
