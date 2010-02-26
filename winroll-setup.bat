@@ -235,6 +235,14 @@ REM # To decide language during installation
 	:BEFORE_OF_CALL_LANGUAGE
 
 	CALL lang\%LANG%.cmd
+	
+	if "%OS_VERSION%" == "Vista"  (
+		set STARTMENU_PATH=%ALLUSERSPROFILE%\Start Menu\Programs\Cygwin
+	)
+
+	if "%OS_VERSION%" == "WIN7"  (
+		set STARTMENU_PATH=%ALLUSERSPROFILE%\Start Menu\Programs\Cygwin
+	)
 
 	:END_OF_SET_LANGUAGE
 goto :EOF
@@ -381,7 +389,7 @@ goto :EOF
 	
 	REM Create link files for cygwin program menu
 	copy "%INIT_CONF%\*.lnk" "%STARTMENU_PATH%"
-	REM "%CYGWIN_ROOT%\bin\ln.exe" -s "%CYGWIN_ROOT%\drbl_winroll-config" "%STARTMENU_PATH%"
+	REM "%CYGWIN_ROOT%\bin\ln.exe" STARTMENU_PATH-s "%CYGWIN_ROOT%\drbl_winroll-config" "%STARTMENU_PATH%"
 	REM echo %CYGWIN_ROOT%\bin\bash.exe --login -i %CYGWIN_ROOT%\bin\winrollsrv-controllor.sh > "%STARTMENU_PATH%\winrollsrv-controllor.bat"
 	
 	echo %CREATE_WINROLL_CONFIG%
