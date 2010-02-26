@@ -32,9 +32,19 @@ declare SSHD_SERVER_PW=1qaz2wsx
 declare SYSINT_LINCESE_URL="http://drbl.nchc.org.tw/drbl-winroll/download/newsid-licence.php"
 declare NEWSID_DOWNLOAD_URL="http://drbl.nchc.org.tw/drbl-winroll/download/newsid-download.php"
 
+OS_VERSION="$(detect_win_version)"
+LOCALEID="$(detect_locale_code)"
+
+if [ "$OS_VERSION" == "win2000" ] || [ "$OS_VERSION" == "xp" ] || [ "$OS_VERSION" == "win2003" ]; then
+	SSHD_SERVER_PW_OPT="-w $SSHD_SERVER_PW"
+else
+	SSHD_SERVER_PW_OPT=
+fi
 
 config_sshd(){
-	ssh-host-config -y -c ntsec -w $SSHD_SERVER_PW
+	chmod u+w,a+r /etc/passwd /etc/group
+	chmod a+x /var
+	ssh-host-config -y -c ntsec $SSHD_SERVER_PW_OPT
 	cygrunsrv -S $SSHD_SNAME
 	
 	netsh firewall add portopening TCP 22 sshd 1>/dev/null 2>&1
@@ -50,6 +60,7 @@ config_sshd(){
 			echo "Import backuped ssh key : $WINROLL_LOCAL_BACKUP\.ssh\authorized_keys "
 		fi
 	fi
+	
 }
 config_autohostname(){
 	HOSTNAME_PREFIX=PC
