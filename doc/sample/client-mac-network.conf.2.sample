@@ -10,7 +10,7 @@ subnet 10.0.2.0/8 {
 	THIS_GATEWAY		= 10.0.2.2
 	THIS_DNS			= 10.0.1.1
 	THIS_WINS			= 	# it will unset wins information
-	# THIS_DNS_Suffix		= 	# it will inherit DNS stuffix information form  _DEFAULT_DNS_SUFFIX
+	# THIS_DNS_SUFFIX		= 	# it will inherit DNS stuffix information form  _DEFAULT_DNS_SUFFIX
 }
 
 subnet 192.168.0.0/24 {

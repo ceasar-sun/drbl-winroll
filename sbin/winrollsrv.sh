@@ -96,7 +96,10 @@ do_config_network(){
 		mac_address_list=$(ipconfig /all | grep "$_Physical_Address_KEYWORD" | cut -d":" -f2 | sed -e "s/\s//g" | grep -e "^\w\w-\w\w-\w\w-\w\w-\w\w-\w\w$")
 		
 		for mac in $mac_address_list ; do
-			thisip=$(grep $mac $CLIENT_MAC_NETWORK 2>/dev/null |awk -F '=' '{print $2}'| sed -e "s/\s//g" )
+			this_nw_conf_tmp=this-nic-conf.tmp
+			#thisip=$(grep $mac $CLIENT_MAC_NETWORK 2>/dev/null | grep - |awk -F '=' '{print $2}'| sed -e "s/\s//g" )
+			grep $mac $CLIENT_MAC_NETWORK 2>/dev/null | sed -e "s/\s//g" -e "s/$mac/export thisip/g" > $WINROLL_TMP/this-nic-conf.tmp
+			. $WINROLL_TMP/$this_nw_conf_tmp
 			
 			# To get nic device name 
 			line_nm_rev=$(ipconfig /all | grep -n "$mac"| head -n 1 | awk -F ":" '{print $1}')
@@ -143,10 +146,9 @@ do_config_network(){
 			done
 			
 			if [ "$_THIS_NETWORK" != "$_DEFAULT_NETWORK" ] ; then
-				this_nw_conf_tmp=this-nic-conf.tmp
 				line_nm_dm_reverse=$(tac $CLIENT_MAC_NETWORK | grep -n -e "^subnet.\{1,\}$_THIS_NETWORK" | awk -F ":" '{print $1}' )
 				line_nm_dm_content=$(tail -n $line_nm_dm_reverse $CLIENT_MAC_NETWORK | grep -n "}" | head -n 1 | awk -F ":" '{print $1}')
-				tail -n $line_nm_dm_reverse $CLIENT_MAC_NETWORK | head -n $line_nm_dm_content | grep THIS_ | sed -e "s/^\s*//g" -e "s/\s*//g" -e "s/\s\{1,\}/,/g" -e "s/,\{1,\}/,/g" -e "s/\#/ #/" -e "s/THIS_/export _THIS_/g"  > $WINROLL_TMP/$this_nw_conf_tmp
+				tail -n $line_nm_dm_reverse $CLIENT_MAC_NETWORK | head -n $line_nm_dm_content | grep THIS_ | sed -e "s/^\s*//g" -e "s/\s*//g" -e "s/\s\{1,\}/,/g" -e "s/,\{1,\}/,/g" -e "s/\#/ #/" -e "s/THIS_/export _THIS_/g"  >> $WINROLL_TMP/$this_nw_conf_tmp
 				. $WINROLL_TMP/$this_nw_conf_tmp
 			fi
 			
@@ -175,7 +177,22 @@ do_config_network(){
 				[ -n "$(ipcalc $wins | grep 'INVALID ADDRESS')" ]  && echo "Illegal wins ip :$wins" && continue
 				echo "netsh interface ip add wins \"$_devname\" $wins"
 				netsh interface ip add wins "$_devname" $wins
-			done			
+			done
+			
+			# For setup dns suffix search list
+			_current_dns_suffix="$(cat /proc/registry/HKEY_LOCAL_MACHINE/SYSTEM/CurrentControlSet/Services/Tcpip/Parameters/SearchList 2>/dev/null)"
+			if [ -n "$_THIS_DNS_SUFFIX" ] &&  [ "$_THIS_DNS_SUFFIX" != "$_current_dns_suffix" ] ; then 
+				# skip illegal ip
+				echo "Reset DNS suffix as : $_THIS_DNS_SUFFIX"
+        		cat >$WINROLL_TMP/set_dns_suffix.vbs<<EOF
+''' This vbs is create by winrollsrv.sh
+SET WSHShell = CreateObject("WScript.Shell")
+WSHShell.RegWrite"HKLM\System\CurrentControlSet\Services\TCPIP\Parameters\SearchList","$_THIS_DNS_SUFFIX","REG_SZ"
+EOF
+				unix2dos set_dns_suffix.vbs
+				wscript `cygpath -d $WINROLL_TMP/set_dns_suffix.vbs`
+			fi
+
 		done
 		
 	else 
@@ -271,8 +288,8 @@ do_autohostname(){
 		
 		NM="$(ipconfig | grep "$_NETMASK_KEYWORD" | head -n 1 | cut -d ":" -f 2 | sed -e "s/\s*//g" )"
 		IP="$(ipconfig | grep "$_IPV4_ADDRESS_KEYWORD" | head -n 1 | cut -d ":" -f 2 | sed -e "s/\s*//g" |awk -F. '{print $1+1000"-"$2+1000"-"$3+1000"-"$4+1000 }' | sed -e 's/^1//' -e 's/\-1/-/g' )"
-		DNS_SUFF="$(ipconfig /all | grep '_DNS_SEARCH_SUFFIX_KEYWORD' 2>/dev/null |head -n 1 | cut -d ":" -f 2 | cut -d "." -f 1,2 |sed -e "s/\./-/g" -e "s/\s*//g" )"
-
+		DNS_SUFF="$(ipconfig /all | grep "$_DNS_SEARCH_SUFFIX_KEYWORD" 2>/dev/null |head -n 1 | cut -d ":" -f 2 | cut -d "." -f 1,2 |sed -e "s/\./-/g" -e "s/\s*//g" )"
+		
 		if [ "$NM" = "255.255.0.0" ] ;then
 			NM_STR=$(echo $IP| cut -d "-" -f 2,3)
 		else
