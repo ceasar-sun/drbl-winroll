@@ -4,21 +4,23 @@ See also https://tux.nchc.org.tw/trac/drbl-winroll/wiki/ChangeLog
 ---------------------------------------------------------------------------------------------------
 Change log:
 
-version 1.2.1-94 :
+version 1.2.1-96 :
 	* 新增 Windows Server 2008 支援(安裝時請先將 UAC 關閉)
 	* 更新 wsname 程式至 v2.88b 以修正對 Winsows7 版本之參數判斷
 	* 使用 registry 資訊判讀系統資訊與語系(Win 2000 安裝時除外)
-	* 使用 keyword file 對應語系進行多語系支援
+	* 使用 locale keyword map file  對應語系進行多語系支援
 	* 新增 bug-report 部分資訊
-	* 修正設定網路卡配置功能參數 (注意：從 1.2.1 之後使用',' 作為多值時分隔符號)
-	* 修正自動群組功能支援不同語系判斷
-	* 修正其他關錯誤
+	* 新增 自動設定網路『DNS Suffix Search List』設定功能 
+	* 修正 設定網路卡配置功能參數 (注意：從 1.2.1 之後使用',' 作為多值時分隔符號)
+	* 修正 自動群組功能支援不同語系判斷
+	* 修正 其他關錯誤
 	
 	[English]
 	* Add Windows Server 2008 support (Please disable UAC before insatll)
 	* Update wsnameprogram to v2.88b for Support WIndows 7
 	* Use registry information to detect OS version and language locale (exclude Windows 2000 serial)
 	* Use locale keyword map file to support multi-language
+	* Add "DNS Suffix Search List" setup function in auto network configuration service
 	* Add bug-report part of function
 	* Fix parameter for network configuration auto-setup function (Note: use comma',' as separator for v1.2.1 or later)
 	* Fix auto-workgroup function to support multi-language 
