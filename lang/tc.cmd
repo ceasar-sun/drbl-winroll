@@ -127,7 +127,7 @@ set FOOTER13=*   Email：ceasar@nchc.org.tw, steven@nchc.org.tw
 set FOOTER14=*
 set FOOTER15=********  國網中心自由軟體實驗室  , NCHC ,Taiwan  *********
 
-REM # new add for uninstal.bat
+REM # new add for drbl_winroll-uninstall.bat
 set WRONG_OS_VERSION=目前不支援您所使用的作業系統
 set PROGRAM_ABORTED=程式中斷
 set SURE_TO=您確定要
@@ -135,7 +135,7 @@ set WARNING=警告
 set SERVICES=相關服務
 set ANY_KEY_TO_EXIT=任意鍵離開
 
-REM # Add form v1.2.0-2, 20090909
+REM # Add from v1.2.0-2, 20090909
 set SETUP_NETWORK_MODE=設定網路模式
 set SELECT_NETWORK_MODE=選擇網路模式
 set BY_FILE=由本地端檔案決定

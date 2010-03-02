@@ -127,7 +127,7 @@ set FOOTER13=*  Email¡Gceasar@nchc.org.tw, steven@nchc.org.tw
 set FOOTER14=*
 set FOOTER15=********  NCHC Free Software Labs  , NCHC ,Taiwan  *********
 
-REM # new add for uninstal.bat
+REM # new add for drbl_winroll-uninstall.bat
 set WRONG_OS_VERSION=No support MS Windows version
 set PROGRAM_ABORTED=Program aborted
 set SURE_TO=Are you sure to

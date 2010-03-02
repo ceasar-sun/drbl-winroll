@@ -463,6 +463,17 @@ goto :EOF
 		goto :END_OF_AUTOHOSTNAME_SETUP
 	)
 	
+	if EXIST "%WINROLL_LOCAL_BACKUP%\hosts.txt"  (
+		copy /Y "%WINROLL_LOCAL_BACKUP%\hosts.txt" "%CYGWIN_ROOT%\drbl_winroll-config"
+	)
+	if EXIST "%WINROLL_LOCAL_BACKUP%\winroll.conf"  (
+		REM copy /Y "%WINROLL_LOCAL_BACKUP%\winroll.conf" "%CYGWIN_ROOT%\drbl_winroll-config"
+		rem call :IMPORT_WINROLL_CONFIG
+	)
+	if "%ANSWER_IF_IMPORT_CONF%" == "y" (
+		goto :END_OF_AUTOHOSTNAME_SETUP
+	)
+	
 	set HOSTNAME_PREFIX=PC
 	echo .
 	echo %Select_HOSTNAME_FORMAT% (%HOSTNAME_PREFIX%-XXX )
@@ -557,8 +568,19 @@ goto :EOF
 	rem "%CYGWIN_ROOT%\bin\cygrunsrv.exe" -I "%AUTOHOSTNAME_SERVICE%" -d "Auto Hostname Checker" -p "%CYGWIN_ROOT%\bin\autohostname.sh" -e "CYGWIN=${_cygwin}" -u "LocalSystem" -w ""
 	echo IF_AUTOHOSTNAME_SERVICE = %IF_AUTOHOSTNAME_SERVICE%>>%WINROLL_CONFIG_FILE%
 	echo IF_AUTOHOSTNAME_SERVICE = %IF_AUTOHOSTNAME_SERVICE%>>%WINROLL_SETUP_LOG%
-	:END_OF_AUTOHOSTNAME_SETUP
-	goto :EOF
+
+:END_OF_AUTOHOSTNAME_SETUP
+goto :EOF
+
+:IMPORT_WINROLL_CONFIG
+	echo Detect old config winroll.conf , import it for Windows hostname and workgroup ?
+	set /P ANSWER_IF_IMPORT_CONF="[y/N]"
+	if "%ANSWER_IF_IMPORT_CONF%" == "y" (
+		type "%WINROLL_LOCAL_BACKUP%\winroll.conf" >> "%WINROLL_CONFIG_FILE%"
+	)
+	
+:END_OF_IMPORT_WINROLL_CONFIG
+goto :EOF
 
 :AUTOHOSTNAME_REMOVE
 	echo %HR%
@@ -606,7 +628,7 @@ goto :EOF
 		echo .
 		netsh interface ip set address "%NIC_NAME%" source=dhcp
 	)
-	:END_OF_NETWORK_MODE_SETUP
+:END_OF_NETWORK_MODE_SETUP
 goto :EOF
 
 :NETWORK_MODE_REMOVE

@@ -128,7 +128,7 @@ REM ##############################
 REM ### Etapes
 set NEXT_STEP=Etape suivante
 
-REM # new add for uninstal.bat
+REM # new add for drbl_winroll-uninstall.bat
 set WRONG_OS_VERSION=Version MS Windows non supportée
 set PROGRAM_ABORTED=Programme interrompu
 set SURE_TO=Etes-vous s–r de

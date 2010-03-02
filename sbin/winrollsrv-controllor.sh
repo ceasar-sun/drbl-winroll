@@ -17,9 +17,10 @@ WINROLL_FUNCTIONS="/drbl_winRoll-config/winroll-functions.sh"
 . $WINROLL_FUNCTIONS
 
 # Local service paremeter 
-declare CYGWIN_ROOT='c:\cygwin'
-declare WINROLL_LOCAL_BACKUP=$HOMEPATH/drbl-winroll.bak
 declare WINROOT=Administrator
+declare CYGWIN_ROOT='c:\cygwin'
+declare WINROLL_BACKUP_DIR=$HOMEPATH/drbl-winroll.bak
+declare WINROLL_BACKUP_LIST="/home/$WINROOT/.ssh /drbl_winroll-config/*.conf"
 declare WINROLLSRV_SNAME='winrollsrv'
 declare SSHD_SNAME='sshd'
 declare AUTOHN_SNAME='autohostname'
@@ -50,14 +51,14 @@ config_sshd(){
 	netsh firewall add portopening TCP 22 sshd 1>/dev/null 2>&1
 	[ -d "/home/$WINROOT/.ssh" ] || mkdir /home/$WINROOT/.ssh
 	
-	if [ -f "$WINROLL_LOCAL_BACKUP\.ssh\authorized_keys" ]; then
-		echo "Import $WINROLL_LOCAL_BACKUP\.ssh ?" 
+	if [ -f "$WINROLL_BACKUP_DIR\.ssh\authorized_keys" ]; then
+		echo "Import $WINROLL_BACKUP_DIR\.ssh ?" 
 		ANSWER_IF_GO=y
 		read -p "[Y/n] " ANSWER_IF_GO junk
 
 		if [ "$ANSWER_IF_GO" != "n" ]; then
-			cp -af "$WINROLL_LOCAL_BACKUP\.ssh" "/home/$WINROOT/"
-			echo "Import backuped ssh key : $WINROLL_LOCAL_BACKUP\.ssh\authorized_keys "
+			cp -af "$WINROLL_BACKUP_DIR\.ssh" "/home/$WINROOT/"
+			echo "Import backuped ssh key : $WINROLL_BACKUP_DIR\.ssh\authorized_keys "
 		fi
 	fi
 	
@@ -189,12 +190,7 @@ remove_sshd(){
 	net user sshd_server /DELETE 1> /dev/null 2>&1
 	net user $priv_sshd_user 1>/devnull 2>&1
 	[ "$?" = "0" ] && net user $priv_sshd_user /DELETE 1> /dev/null 2>&1
-	
-	if [ -f "/home/$WINROOT/.ssh/authorized_keys" ];then
-		mkdir -p "$WINROLL_LOCAL_BACKUP"
-		echo "Find exist ssh key and backup to : $WINROLL_LOCAL_BACKUP/.ssh"
-		cp -af  "/home/$WINROOT/.ssh" "$WINROLL_LOCAL_BACKUP/"
-	fi
+
 }
 remove_autohostname(){
 	echo "Remove $AUTOHN_SNAME service ..."	
@@ -293,6 +289,14 @@ if [ "$action" = "r" ]; then
 	echo "stop : $WINROLLSRV_SNAME"
 	cygrunsrv.exe -R $WINROLLSRV_SNAME 1> /dev/null 2>&1
 	echo "remove : $WINROLLSRV_SNAME"
+	
+	# Backup configuration for next installation someday
+	# declare WINROLL_BACKUP_LIST="/home/$WINROOT/.ssh /drbl_winroll-config/*.conf"
+	[ ! -d "$WINROLL_BACKUP_DIR" ] && mkdir -p "$WINROLL_BACKUP_DIR"
+	[ -e /home/$WINROOT/.ssh ] && cp -af /home/$WINROOT/.ssh "$WINROLL_BACKUP_DIR"
+	cp /drbl_winroll-config/*.conf "$WINROLL_BACKUP_DIR"
+	grep -e "^\s*HN_WSNAME_PARAM\|^\s*WG_WSNAME_PARAM\|^\s*CONFIG_NETWORK_MODE\|^\s*IF_AUTOHOSTNAME_SERVICE\|^\s*IF_NEWSID_SERVICE" /drbl_winroll-config/winroll.conf > "$WINROLL_BACKUP_DIR/winroll.conf"
+	
 elif [ "$action" = "s" ]; then 
 	[ "$IF_AUTOHOSTNAME_SERVICE" != "y" ] && config_autohostname
 	[ "$IF_NEWSID_SERVICE" != "y" ] && config_autonewsid
