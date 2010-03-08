@@ -94,7 +94,7 @@ do_config_network(){
 		[ -n "$_DEFAULT_NETWORK" ] && network_domain_list="$_DEFAULT_NETWORK $network_domain_list"
 		
 		# get mac address of itself machine
-		mac_address_list=$(ipconfig /all | grep "$_Physical_Address_KEYWORD" | cut -d":" -f2 | sed -e "s/\s//g" | grep -e "^\w\w-\w\w-\w\w-\w\w-\w\w-\w\w$")
+		mac_address_list="$(ipconfig /all | dos2unix  | awk -F ":" "/ [0-9A-F]+-[0-9A-F]+-[0-9A-F]+-[0-9A-F]+-[0-9A-F]+-[0-9A-F]+$/{print \$2}" | sed -e 's/\s//g' )"
 		
 		for mac in $mac_address_list ; do
 			this_nw_conf_tmp=this-nic-conf.tmp
@@ -287,14 +287,23 @@ do_autohostname(){
 		#	ipconfig /renew; ipconfig /release; ipconfig /renew
 		#fi
 		
-		NM="$(ipconfig | grep "$_NETMASK_KEYWORD" | head -n 1 | cut -d ":" -f 2 | sed -e "s/\s*//g" )"
+		#NM="$(ipconfig | grep "$_NETMASK_KEYWORD" | head -n 1 | cut -d ":" -f 2 | sed -e "s/\s*//g" )"
+		NM="$(ipconfig | dos2unix | awk -F ":" "\$2 ~/ [0-9]+.[0-9]+.[0-9]+.[0-9]+$/ {print \$2}" | sed -e s/s//g | awk -F "." "\$1 == 255 {print \$0}"  | head -n 1 )"
 		IP="$(ipconfig | grep "$_IPV4_ADDRESS_KEYWORD" | head -n 1 | cut -d ":" -f 2 | sed -e "s/\s*//g" |awk -F. '{print $1+1000"-"$2+1000"-"$3+1000"-"$4+1000 }' | sed -e 's/^1//' -e 's/\-1/-/g' )"
-		DNS_SUFF="$(ipconfig /all | grep "$_DNS_SEARCH_SUFFIX_KEYWORD" 2>/dev/null |head -n 1 | cut -d ":" -f 2 | cut -d "." -f 1,2 |sed -e "s/\./-/g" -e "s/\s*//g" )"
+		#DNS_SUFF="$(ipconfig /all | grep "$_DNS_SEARCH_SUFFIX_KEYWORD" 2>/dev/null |head -n 1 | cut -d ":" -f 2 | cut -d "." -f 1,2 |sed -e "s/\./-/g" -e "s/\s*//g" )"
+		_DNS_SUFFIX_REGISTRY_KeyList="HKEY_LOCAL_MACHINE/SYSTEM/CurrentControlSet/Services/Tcpip/Parameters/DhcpDomain HKEY_LOCAL_MACHINE/SYSTEM/CurrentControlSet/Services/Tcpip/Parameters/SearchList"
+		_DNS_SUFFIX_REGISTRY_Value=
 		
-		if [ "$NM" = "255.255.0.0" ] ;then
-			NM_STR=$(echo $IP| cut -d "-" -f 2,3)
-		else
+		for key in $_DNS_SUFFIX_REGISTRY_KeyList ; do 
+			[ -n "$(cat /proc/registry/$key 2>/dev/null)" ] && _DNS_SUFFIX_REGISTRY_Value="$(cat /proc/registry/$key |cut -d "," -f 1)" && break;
+		done
+		# use first 2 strings as dns suffix name
+		[ -n "$_DNS_SUFFIX_REGISTRY_Value" ] && DNS_SUFF="$(echo $_DNS_SUFFIX_REGISTRY_Value | awk -F '.' '{ printf "%s.%s",$1,$2}' )"
+		
+		if [ "$NM" = "255.255.255.0" ] ;then
 			NM_STR=$(echo $IP| cut -d "-" -f 3)
+		else
+			NM_STR=$(echo $IP| cut -d "-" -f 2,3)
 		fi
 		
 		WG_STR=$(echo $WG_WSNAME_PARAM | sed -e "s/\$DNS_SUFFIX/$DNS_SUFF/g" -e "s/\$NM/$NM_STR/g" -e 's/\s//g')
