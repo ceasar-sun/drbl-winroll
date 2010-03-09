@@ -73,6 +73,7 @@ do_config_network(){
 			netsh interface ip set address name="$_devname" source=dhcp
 			netsh interface ip set dns name="$_devname" source=dhcp
 			netsh interface ip set wins name="$_devname" source=dhcp
+			echo "Set NIC:'$_devname' as dhcp mode"
 		done
 		ipconfig /renew >/dev/null ; ipconfig /release >/dev/null; ipconfig /renew >/dev/null
 		IF_IPRENEW=1
