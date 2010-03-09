@@ -67,7 +67,7 @@ do_config_network(){
 		echo "CONFIG_NETWORK_MODE : none"
 		return 3;
 	elif [ "$CONFIG_NETWORK_MODE" = "dhcp" ] ; then
-		_devname_str=$(ipconfig /all | grep "$_Ethernet_Adapter_KEYWORD"| head -n 1| dos2unix |  sed -e "s/$_Ethernet_Adapter_KEYWORD//g" )
+		_devname_str=$(ipconfig /all | grep "$_Ethernet_Adapter_KEYWORD"| dos2unix |  sed -e "s/$_Ethernet_Adapter_KEYWORD//g" )
 		for ((i=1;i<`echo ${_devname_str} | awk -F ":" '{print NF}'`;i++)) ; do
 			_devname="$(echo $_devname_str | awk -F ":" '{print $'$i'}' | sed -e 's/^\s*//g')"
 			netsh interface ip set address name="$_devname" source=dhcp
