@@ -178,9 +178,6 @@ REM #####################################
 		goto :EOF
 	)
 	:END_OF_CHECK_OS_VERSION
-	echo %OS_VERSION%
-	echo %STARTMENU_PATH%
-	pause
 goto :EOF
 
 REM # To decide language during installation
