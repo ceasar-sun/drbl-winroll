@@ -121,50 +121,52 @@ REM #####################################
 :CHECK_OS_VERSION
 	set OS_VERSION=NONE
 	
-	reg QUERY "HKEY_LOCAL_MACHINE\SOFTWARE\Microsoft\Windows NT\CurrentVersion" /v  ProductName | find "2000" >OS-version.txt
+	cscript %INIT_CONF%\reg_query.vbs //Nologo "HKEY_LOCAL_MACHINE\SOFTWARE\Microsoft\Windows NT\CurrentVersion\ProductName" > OS-version.txt
+
+	type OS-version.txt | find "2000"
 	if "%ERRORLEVEL%" == "0" (
 		set OS_VERSION=WIN2000
 		goto :END_OF_CHECK_OS_VERSION
 	)
 
-	reg QUERY "HKEY_LOCAL_MACHINE\SOFTWARE\Microsoft\Windows NT\CurrentVersion" /v  ProductName | find "XP" >OS-version.txt
+	type OS-version.txt | find "XP"
 	if "%ERRORLEVEL%" == "0" (
 		set OS_VERSION=WINXP
 		goto :END_OF_CHECK_OS_VERSION
 	)
 
-	reg QUERY "HKEY_LOCAL_MACHINE\SOFTWARE\Microsoft\Windows NT\CurrentVersion" /v  ProductName | find "2003" >OS-version.txt
+	type OS-version.txt | find "2003"
 	if "%ERRORLEVEL%" == "0"  (
 		set OS_VERSION=WIN2003
 		goto :END_OF_CHECK_OS_VERSION
 	)
 
-	reg QUERY "HKEY_LOCAL_MACHINE\SOFTWARE\Microsoft\Windows NT\CurrentVersion" /v  ProductName | find "2008" >OS-version.txt
+	type OS-version.txt | find "2008"
 	if "%ERRORLEVEL%" == "0"  (
 		set OS_VERSION=WIN2008
 		goto :END_OF_CHECK_OS_VERSION
 	)
 
-	reg QUERY "HKEY_LOCAL_MACHINE\SOFTWARE\Microsoft\Windows NT\CurrentVersion" /v  ProductName | find "Vista" >OS-version.txt
+	type OS-version.txt | find "Vista"
 	if "%ERRORLEVEL%" == "0"  (
 		set OS_VERSION=Vista
-		set STARTMENU_PATH=%ALLUSERSPROFILE%\Start Menu\Programs\Cygwin
+		rem set STARTMENU_PATH=%ALLUSERSPROFILE%\Start Menu\Programs\Cygwin
 		goto :END_OF_CHECK_OS_VERSION
 	)
 
-	reg QUERY "HKEY_LOCAL_MACHINE\SOFTWARE\Microsoft\Windows NT\CurrentVersion" /v  ProductName | find "Windows 7" >OS-version.txt
+	type OS-version.txt | find "Windows 7"
 	if "%ERRORLEVEL%" == "0"  (
 		set OS_VERSION=WIN7
-		set STARTMENU_PATH=%ALLUSERSPROFILE%\Start Menu\Programs\Cygwin
+		rem set STARTMENU_PATH=%ALLUSERSPROFILE%\Start Menu\Programs\Cygwin
 		goto :END_OF_CHECK_OS_VERSION
 	)
 
 	REM # Just in case for Windows 2000 
-	if "%SystemRoot%" == "C:\WINNT" (
-		set OS_VERSION=WIN2000
-		goto :END_OF_CHECK_OS_VERSION
-	)
-
+	rem if "%SystemRoot%" == "C:\WINNT" (
+	rem	set OS_VERSION=WIN2000
+	rem	goto :END_OF_CHECK_OS_VERSION
+	rem )
+	
 	if "%OS_VERSION%" == "NONE" (
 		echo .
 		echo !!! Unknow your OS version ... !!!
@@ -176,38 +178,39 @@ REM #####################################
 		goto :EOF
 	)
 	:END_OF_CHECK_OS_VERSION
+	echo %OS_VERSION%
+	echo %STARTMENU_PATH%
+	pause
 goto :EOF
 
 REM # To decide language during installation
 :SET_LANGUAGE
 	set LANG=0
-	
+
+	cscript %INIT_CONF%\reg_query.vbs //Nologo "HKEY_CURRENT_USER\Control Panel\International\Locale" > Locale.txt
+
 	REM # Just in case for Win 2000, because it has no reg command to use 
-	if "%OS_VERSION%" == "WIN2000" (
-		set set LANG=en
-		goto :BEFORE_OF_CALL_LANGUAGE
-	)
+	rem if "%OS_VERSION%" == "WIN2000" (
+	rem	set set LANG=en
+	rem	goto :BEFORE_OF_CALL_LANGUAGE
+	rem )
 	
 	REM ### For zh_TW 
-	reg QUERY "HKEY_CURRENT_USER\Control Panel\International" /v Locale | find "00000404" > Locale.txt
+	type Locale.txt | find "00000404"
 	IF "%ERRORLEVEL%" == "0" (
 		set LANG=tc
 		goto :BEFORE_OF_CALL_LANGUAGE
 	)
-	REM # IF EXIST "%ZHTW_OS_PATH%" (
-	REM #   set LANG=tc
-	REM #   goto :BEFORE_OF_CALL_LANGUAGE
-	REM #)
 	
 	REM ### For English
-	reg QUERY "HKEY_CURRENT_USER\Control Panel\International" /v Locale | find "00000409" > Locale.txt
+	type Locale.txt | find "00000409"
 	IF "%ERRORLEVEL%" == "0" (
 		set LANG=en
 		goto :BEFORE_OF_CALL_LANGUAGE
 	)
 
 	REM ### A sample for other language
-	REM reg QUERY "HKEY_CURRENT_USER\Control Panel\International" /v Locale | find "0000040x" > Locale.txt
+	REM type Locale.txt | find "0000040x"
 	REM IF "%ERRORLEVEL%" == "0" (
 	REM 	set LANG=xxx
 	REM 	goto :BEFORE_OF_CALL_LANGUAGE
@@ -237,15 +240,19 @@ REM # To decide language during installation
 	CALL lang\%LANG%.cmd
 	
 	REM # to setup STARTMENU_PATH for special windows version
-	if "%OS_VERSION%" == "Vista"  (
-		set STARTMENU_PATH=%ALLUSERSPROFILE%\Start Menu\Programs\Cygwin
-	)
-	if "%OS_VERSION%" == "WIN2008"  (
-		set STARTMENU_PATH=%ALLUSERSPROFILE%\Start Menu\Programs\Cygwin
-	)
-	if "%OS_VERSION%" == "WIN7"  (
-		set STARTMENU_PATH=%ALLUSERSPROFILE%\Start Menu\Programs\Cygwin
-	)
+	rem if "%OS_VERSION%" == "Vista"  (
+	rem 	set STARTMENU_PATH=%ALLUSERSPROFILE%\Start Menu\Programs\Cygwin
+	rem )
+	rem if "%OS_VERSION%" == "WIN2008"  (
+	rem 	set STARTMENU_PATH=%ALLUSERSPROFILE%\Start Menu\Programs\Cygwin
+	rem )
+	rem if "%OS_VERSION%" == "WIN7"  (
+	rem 	set STARTMENU_PATH=%ALLUSERSPROFILE%\Start Menu\Programs\Cygwin
+	rem )
+	
+	REM # assign "STARTMENU_PATH" from registry value
+	cscript %INIT_CONF%\reg_query.vbs //Nologo "HKEY_LOCAL_MACHINE\SOFTWARE\Microsoft\Windows\CurrentVersion\Explorer\Shell Folders\Common Programs" > program-path.txt
+	for /F "tokens=* delims=" %%S in ('type program-path.txt') do set STARTMENU_PATH=%%S
 
 	:END_OF_SET_LANGUAGE
 goto :EOF
@@ -288,6 +295,7 @@ goto :EOF
 	echo CYGWIN_ROOT=%CYGWIN_ROOT%>>%WINROLL_SETUP_LOG%
 	echo LOCAL_REPOSITORY=%LOCAL_REPOSITORY%>>%WINROLL_SETUP_LOG%
 	echo INIT_DOC_FOLDER=%INIT_DOC_FOLDER%>>%WINROLL_SETUP_LOG%
+	echo STARTMENU_PATH=%STARTMENU_PATH%>>%WINROLL_SETUP_LOG%
 goto :EOF
 
 :CHECK_IF_WINADMIN
@@ -622,12 +630,12 @@ goto :EOF
 	echo ** %USE_NETWORK_MODE_IS% : %NETWORK_MODE%
 	echo CONFIG_NETWORK_MODE = %NETWORK_MODE%>>%WINROLL_CONFIG_FILE%
 	
-	if "%NETWORK_MODE%" == "dhcp" (
-		echo . 
-		echo ... %FORCE_TO_NIC_AS_DHCP% ...
-		echo .
-		netsh interface ip set address "%NIC_NAME%" source=dhcp
-	)
+	rem if "%NETWORK_MODE%" == "dhcp" (
+	rem	echo . 
+	rem	echo ... %FORCE_TO_NIC_AS_DHCP% ...
+	rem	echo .
+	rem	netsh interface ip set address "%NIC_NAME%" source=dhcp
+	rem )
 :END_OF_NETWORK_MODE_SETUP
 goto :EOF
 
@@ -635,7 +643,8 @@ goto :EOF
 
 	REM echo Do nothing
 	REM netsh interface ip set address "%NIC_NAME%" source=dhcp
-		
+	
+:END_OF_NETWORK_MODE_REMOVE
 goto :EOF
 
 :AUTONEWSID_SETUP

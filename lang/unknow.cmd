@@ -3,8 +3,8 @@
 REM ############################
 REM # Global parameter
 REM ############################
-set NIC_NAME=Local Area Connection
-set STARTMENU_PATH=%ALLUSERSPROFILE%\Start Menu\Programs\Cygwin
+rem set NIC_NAME=Local Area Connection
+rem set STARTMENU_PATH=%ALLUSERSPROFILE%\Start Menu\Programs\Cygwin
 set ROOT_PASSWORD=
 set USER_NAME=
 set USER_PASSWORD=
@@ -17,7 +17,7 @@ set LANGUAGE_DESC=English
 set TRANSLATOR=Ceasar Sun ( ceasar@nchc.org.tw )
 
 REM ############################
-set HEAD01=*********   Welcome to use drbl-winRoll Installation  ******************
+set HEAD01=*********   Welcome to use drbl-winroll Installation  ******************
 set HEAD02=*
 set HEAD03=*  NCHC Free Software Labs  , NCHC ,Taiwan
 set HEAD04=*  License: GPL      
@@ -26,8 +26,8 @@ set HEAD06=*  This program will install software to solve windows hostname dupli
 set HEAD07=*  for clone Win OS, and it sopport needed function in DRBL environment   
 set HEAD08=*  Note :
 set HEAD09=*  1. Suggest to use Administrator(s) to install this package
-set HEAD10=*  2. Please remove cygwin if you have installed it before
-set HEAD11=*  3. The installation can work on Windows 2000, XP, 2003, Vista, Windows 7 serial edition
+set HEAD10=*  2. Please remove (or select [f] option) if cygwin had been installed before
+set HEAD11=*  3. Support Windows 2K,XP,Server(2003,2008),Vista,Win 7 edition
 set HEAD12=*
 set HEAD13=*    Translator : 
 set HEAD14=*        %LANGUAGE_DESC%  :  %TRANSLATOR%
@@ -51,7 +51,7 @@ set PLZ_CHOOSE=Please select
 set DIRECTORY=directory
 set STARTMENU=Start Menu
 set LOCAL_REPOSITORY_DIRECTORY=Local repository path
-set CREATE_WINROLL_CONFIG=Create drbl-winRoll configuartion file
+set CREATE_WINROLL_CONFIG=Create drbl-winroll configuartion file
 
 REM ############################
 REM # Messages for cygwin installation error
@@ -113,7 +113,7 @@ set PLZ_WAIT_TO_REBOOT=it would do lots of HD access, please wait until system r
 
 set FOOTER01=************         !!   Congratulation  !!         ****************
 set FOOTER02=* 
-set FOOTER03=*  You completed drbl-winRoll's  installation and configuration in  windows !
+set FOOTER03=*  You completed drbl-winroll's  installation and configuration in  windows !
 set FOOTER04=*
 set FOOTER05=*  1. If you want to let windows can accept DRBL server command automatically
 set FOOTER06=*  Please refer to item 5 in ~/doc/FAQ.*.txt to prepare need files for windows.
@@ -135,7 +135,7 @@ set WARNING=WARNING
 set SERVICES=services
 set ANY_KEY_TO_EXIT=Any key to exit
 
-REM # Add form v1.2.0-2, 20090909
+REM # Add from v1.2.0-2, 20090909
 set SETUP_NETWORK_MODE=Setup network mode
 set SELECT_NETWORK_MODE=Select network mode
 set BY_FILE=By local file

@@ -3,8 +3,8 @@
 REM ############################
 REM # Global parameter
 REM ############################
-set NIC_NAME=LAN-verbinding
-set STARTMENU_PATH=%ALLUSERSPROFILE%\Menu Start\Programma's\Cygwin
+rem set NIC_NAME=LAN-verbinding
+rem set STARTMENU_PATH=%ALLUSERSPROFILE%\Menu Start\Programma's\Cygwin
 set ROOT_PASSWORD=
 set USER_NAME=
 set USER_PASSWORD=
@@ -110,7 +110,7 @@ set PLZ_WAIT_TO_REBOOT=er zal veel harddisk activiteit zijn, wacht a.u.b tot het
 
 set FOOTER01=************         !!   Gefelicteerd  !!         ****************
 set FOOTER02=* 
-set FOOTER03=*  U heeft de installatie en configuratie van drbl-winRoll goed doorlopen in windows !
+set FOOTER03=*  U heeft de installatie en configuratie van drbl-winroll goed doorlopen in windows !
 set FOOTER04=*
 set FOOTER05=*  1. Als u wilt dat drbl-winroll commando's accepteerd
 set FOOTER06=*  Lees a.u.b het item 5 in ~/doc/FAQ.*.txt om de benodigde bestanden voor windows te preparen.
@@ -135,7 +135,7 @@ set ANY_KEY_TO_EXIT=Druk op een willekeurige toets om te stoppen
 set INSTALL_WINROLL_SERVICE=Install drbl-winroll master service
 set REMOV_WINROLL_SERVICE=Remove drbl-winroll master service
 
-REM # Add form v1.2.0-2, 20090909
+REM # Add from v1.2.0-2, 20090909
 set SETUP_NETWORK_MODE=Setup network mode
 set SELECT_NETWORK_MODE=Select network mode
 set BY_FILE=By local file

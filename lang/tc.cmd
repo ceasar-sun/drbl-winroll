@@ -3,8 +3,8 @@
 REM ############################
 REM # Global parameter
 REM ############################
-set NIC_NAME=區域連線
-set STARTMENU_PATH=%ALLUSERSPROFILE%\「開始」功能表\程式集\Cygwin
+rem set NIC_NAME=區域連線
+rem set STARTMENU_PATH=%ALLUSERSPROFILE%\「開始」功能表\程式集\Cygwin
 set ROOT_PASSWORD=
 set USER_NAME=
 set USER_PASSWORD=
@@ -17,7 +17,7 @@ set LANGUAGE_DESC=繁體中文
 set TRANSLATOR=ceasar@nchc.org.tw
 
 REM ############################
-set HEAD01=*********   歡迎使用 drbl-winRoll 安裝程式  ******************
+set HEAD01=*********   歡迎使用 drbl-winroll 安裝程式  ******************
 set HEAD02=*
 set HEAD03=*      國網中心自由軟體實驗室  , NCHC ,Taiwan
 set HEAD04=*      License: GPL      
@@ -26,8 +26,8 @@ set HEAD06=*     本程式會進行軟體安裝與系統設定以解決 clone windows 後 hostname
 set HEAD07=*     一樣的問題，並提供 windows  在  drbl 環境下之相關功能  
 set HEAD08=*     注意事項：
 set HEAD09=*     1. 本程式建議以 Administrator 身份執行
-set HEAD10=*     2. 若您之前以安裝過 cygwin 於不同路徑(c:\cygwin)，請先移除
-set HEAD11=*     3. 本程式適用於 Windows 2000, XP, 2003, Vista, Windows 7 系列之作業系統
+set HEAD10=*     2. 若您之前已安裝過 cygwin 於 c:\cygwin，建議先移除或選擇[f](強制安裝)
+set HEAD11=*     3. 本程式適用於 Windows 2K,XP,Server(2003,2008),Vista,Win 7 等版本
 set HEAD12=*
 set HEAD13=*    譯者 : 
 set HEAD14=*        %LANGUAGE_DESC%  :  %TRANSLATOR%
@@ -51,7 +51,7 @@ set PLZ_CHOOSE=請選擇
 set DIRECTORY=目錄
 set STARTMENU=程式集選單
 set LOCAL_REPOSITORY_DIRECTORY=本地儲藏庫目錄
-set CREATE_WINROLL_CONFIG=建立 drbl-winRoll 設定檔
+set CREATE_WINROLL_CONFIG=建立 drbl-winroll 設定檔
 
 REM ############################
 REM # Messages for cygwin installation error
@@ -111,9 +111,9 @@ set FIND_SSH_KEY_IF_IMPORT=發現備份的 ssh key, 需要匯入嗎
 set FIND_SSH_KEY_AND_MOVE=發現 ssh key, 將備份至
 set PLZ_WAIT_TO_REBOOT=此動作需要進行大量硬讀寫動作,請務必等待至自統自動重新開機
 
-set FOOTER01=************   恭喜您完成 drbl-winRoll 安裝  ****************
+set FOOTER01=************   恭喜您完成 drbl-winroll 安裝  ****************
 set FOOTER02=*
-set FOOTER03=*   您已經完成 drbl-winRoll 的相關軟體安裝與系統設定！
+set FOOTER03=*   您已經完成 drbl-winroll 的相關軟體安裝與系統設定！
 set FOOTER04=*
 set FOOTER05=*   1. 如果您要讓您的 windows 能"自動"接受 drbl server 的命令，
 set FOOTER06=*   請您參閱 FAQ 中第五項步驟，將您DRBL主機上的 SSH 公鑰安裝至 windows 。

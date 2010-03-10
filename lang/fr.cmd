@@ -3,8 +3,8 @@
 REM ############################
 REM # Global parameter
 REM ############################
-set NIC_NAME=Connexion au r‚seau local
-set STARTMENU_PATH=%ALLUSERSPROFILE%\Menu D‚marrer\Programmes\Cygwin
+rem set NIC_NAME=Connexion au r‚seau local
+rem set STARTMENU_PATH=%ALLUSERSPROFILE%\Menu D‚marrer\Programmes\Cygwin
 set ROOT_PASSWORD=
 set USER_NAME=
 set USER_PASSWORD=
@@ -17,7 +17,7 @@ set LANGUAGE_DESC=Fran‡ais
 set TRANSLATOR=Joël Gondouin (joel@gondouin.net)
 
 REM ############################
-set HEAD01=*********   Bienvenue dans l'installation de drbl-winRoll   ******************
+set HEAD01=*********   Bienvenue dans l'installation de drbl-winroll   ******************
 set HEAD02=*
 set HEAD03=*  NCHC Free Software Labs  , NCHC ,Taiwan
 set HEAD04=*  License: GPL      
@@ -50,7 +50,7 @@ set PLZ_CHOOSE=Choisissez SVP
 set DIRECTORY=R‚pertoire
 set STARTMENU=Menu d‚marrer
 set LOCAL_REPOSITORY_DIRECTORY=Chemin du r‚pertoire local
-set CREATE_WINROLL_CONFIG=Cr‚ation du fichier de configuration drbl-winRoll
+set CREATE_WINROLL_CONFIG=Cr‚ation du fichier de configuration drbl-winroll
 
 set IF_INSTALL_AUTOHOSTNAME=Installation de la fonction auto-hostname ?
 set SELECT_HOSTNAME_FORMAT%=Choisissez le format de nom de machine d‚sir‚:
@@ -102,7 +102,7 @@ set PLZ_WAIT_TO_REBOOT=Il va y avoir un certain nombre d'acc‚s au Disque Dur, SV
 
 set FOOTER01=************         !!   F‚licitations  !!         ****************
 set FOOTER02=* 
-set FOOTER03=*  Vous avez termin‚ l'installation et la configuration de drbl-winRoll pour windows !
+set FOOTER03=*  Vous avez termin‚ l'installation et la configuration de drbl-winroll pour windows !
 set FOOTER04=*
 set FOOTER05=*  1. Pour accepter automatiquement les commandes du serveur DRBL
 set FOOTER06=*     suivez le point 7 de ~/doc/FAQ.*.txt pour pr‚parer les fichiers.
@@ -139,7 +139,7 @@ set ANY_KEY_TO_EXIT=N'importe quelle touche pour sortir
 set INSTALL_WINROLL_SERVICE=Install drbl-winroll master service
 set REMOV_WINROLL_SERVICE=Remove drbl-winroll master service
 
-REM # Add form v1.2.0-2, 20090909
+REM # Add from v1.2.0-2, 20090909
 set SETUP_NETWORK_MODE=Setup network mode
 set SELECT_NETWORK_MODE=Select network mode
 set BY_FILE=By local file
