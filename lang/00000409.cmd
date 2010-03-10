@@ -78,7 +78,7 @@ set FIXED=Fixed string
 set SHOW_WORKGROUP_FORMAT=The "workgroup" parameter is
 set DNS_SUFFIX=Assigned via DNS suffix
 
-set INSTALL_AUTONEWSID_SERVICE=Setup SID-Check service
+set INSTALL_AUTONEWSID_SERVICE=Setup  SID-Check service
 set PLZ_READ_LICENSE=Because the function need the Sysinternals (http://www.sysinternals.com) program. In order to respect Sysinternals software license, you must read the license carefully. If you agree, then you can continue, if disagree, we will quit this part of installation.
 set ANS_IF_AGREE=Do you agree the lincese
 set NOT_AGREE_EXIT=Don't agree, exit this session instalation. Go no the other parts of drbl-winroll 
@@ -91,8 +91,8 @@ set ACCEPT_LICENCE=Please accept the licence when the service be started, and sy
 
 set NO_ANY_ATTENDED=You don't need to do anything during installing
 set SETUP_AUTOHOSTNAME_SERVICE=Setup Hostname-check service
-set REMOV_WINROLL_SERVICE=Remove drbl-winroll master service
 set REMOV_AUTOHOSTNAME_SERVICE=Remove Hostname-check service
+set REMOV_WINROLL_SERVICE=Remove drbl-winroll master service
 set REMOVE_REGISTRY=Delete Windows registry
 set COPY_NEEDED_FILES=Copy need files
 set REMOVE_NEEDED_FILES=Remove need files

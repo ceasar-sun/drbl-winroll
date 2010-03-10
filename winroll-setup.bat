@@ -160,12 +160,6 @@ REM #####################################
 		rem set STARTMENU_PATH=%ALLUSERSPROFILE%\Start Menu\Programs\Cygwin
 		goto :END_OF_CHECK_OS_VERSION
 	)
-
-	REM # Just in case for Windows 2000 
-	rem if "%SystemRoot%" == "C:\WINNT" (
-	rem	set OS_VERSION=WIN2000
-	rem	goto :END_OF_CHECK_OS_VERSION
-	rem )
 	
 	if "%OS_VERSION%" == "NONE" (
 		echo .
@@ -182,48 +176,29 @@ goto :EOF
 
 REM # To decide language during installation
 :SET_LANGUAGE
-	set LANG=0
+	set LOCALE_CODE=0
 
 	cscript %INIT_CONF%\reg_query.vbs //Nologo "HKEY_CURRENT_USER\Control Panel\International\Locale" > Locale.txt
+	for /F "tokens=* delims=" %%S in ('type Locale.txt') do set LOCALE_CODE=%%S
 
-	REM # Just in case for Win 2000, because it has no reg command to use 
-	rem if "%OS_VERSION%" == "WIN2000" (
-	rem	set set LANG=en
-	rem	goto :BEFORE_OF_CALL_LANGUAGE
-	rem )
-	
 	REM ### For zh_TW 
-	type Locale.txt | find "00000404"
-	IF "%ERRORLEVEL%" == "0" (
-		set LANG=tc
-		goto :BEFORE_OF_CALL_LANGUAGE
-	)
-	
-	REM ### For English
-	type Locale.txt | find "00000409"
-	IF "%ERRORLEVEL%" == "0" (
-		set LANG=en
-		goto :BEFORE_OF_CALL_LANGUAGE
-	)
+	rem type Locale.txt | find "00000404"
+	rem IF "%ERRORLEVEL%" == "0" (
+	rem 	set LANG=tc
+	rem 	goto :BEFORE_OF_CALL_LANGUAGE
+	rem )
 
-	REM ### A sample for other language
-	REM type Locale.txt | find "0000040x"
-	REM IF "%ERRORLEVEL%" == "0" (
-	REM 	set LANG=xxx
-	REM 	goto :BEFORE_OF_CALL_LANGUAGE
-	REM )
+	rem IF EXIST "%FR_OS_PATH%" (
+	rem 	set LANG=fr
+	rem 	goto :BEFORE_OF_CALL_LANGUAGE
+	rem )
+	rem IF EXIST "%NL_OS_PATH%" (
+	rem 	set LANG=nl
+	rem 	goto :BEFORE_OF_CALL_LANGUAGE
+	rem )
 
-	IF EXIST "%FR_OS_PATH%" (
-		set LANG=fr
-		goto :BEFORE_OF_CALL_LANGUAGE
-	)
-	IF EXIST "%NL_OS_PATH%" (
-		set LANG=nl
-		goto :BEFORE_OF_CALL_LANGUAGE
-	)
-  
-	IF "%LANG%" == "0" (
-		set LANG=unknow
+	IF NOT EXIST "lang\%LOCALE_CODE%.cmd" (
+		set LOCALE_CODE=unknow
 		echo *** Warning !! ****
 		echo !! Your currnet language not be supported complete yet,
 		echo !! But you still can install it under this release.
@@ -232,20 +207,10 @@ REM # To decide language during installation
 		echo !! [Ctrl+C] to exit, any key to continue.
 		pause
 	)
+	
 	:BEFORE_OF_CALL_LANGUAGE
 
-	CALL lang\%LANG%.cmd
-	
-	REM # to setup STARTMENU_PATH for special windows version
-	rem if "%OS_VERSION%" == "Vista"  (
-	rem 	set STARTMENU_PATH=%ALLUSERSPROFILE%\Start Menu\Programs\Cygwin
-	rem )
-	rem if "%OS_VERSION%" == "WIN2008"  (
-	rem 	set STARTMENU_PATH=%ALLUSERSPROFILE%\Start Menu\Programs\Cygwin
-	rem )
-	rem if "%OS_VERSION%" == "WIN7"  (
-	rem 	set STARTMENU_PATH=%ALLUSERSPROFILE%\Start Menu\Programs\Cygwin
-	rem )
+	CALL lang\%LOCALE_CODE%.cmd
 	
 	REM # assign "STARTMENU_PATH" from registry value
 	cscript %INIT_CONF%\reg_query.vbs //Nologo "HKEY_LOCAL_MACHINE\SOFTWARE\Microsoft\Windows\CurrentVersion\Explorer\Shell Folders\Common Programs" > program-path.txt
@@ -276,12 +241,13 @@ goto :EOF
 	date /T >%WINROLL_SETUP_LOG%
 	echo LANG=%LANG%>>%WINROLL_SETUP_LOG%
 	echo OS_VERSION=%OS_VERSION%>>%WINROLL_SETUP_LOG%
+	echo LOCALE_CODE=%LOCALE_CODE%>>%WINROLL_SETUP_LOG%
+	echo STARTMENU_PATH=%STARTMENU_PATH%>>%WINROLL_SETUP_LOG%
 	echo SURCE_DIR=%cd%>>%WINROLL_SETUP_LOG%
 	echo ACTION=%ACTION%>>%WINROLL_SETUP_LOG%
 	echo CYGWIN_ROOT=%CYGWIN_ROOT%>>%WINROLL_SETUP_LOG%
 	echo SERVICE_ACCOUNT_NAME=%SERVICE_ACCOUNT_NAME%>>%WINROLL_SETUP_LOG%
 	echo SERVICE_ACCOUNT_PW=%SERVICE_ACCOUNT_PW%>>%WINROLL_SETUP_LOG%
-	echo OS_VERSION=%OS_VERSION%>>%WINROLL_SETUP_LOG%>>%WINROLL_SETUP_LOG%
 	echo AUTOHOSTNAME_SERVICE=%AUTOHOSTNAME_SERVICE%>>%WINROLL_SETUP_LOG%
 	echo AUTONEWSID_SERVICE=%AUTONEWSID_SERVICE%>>%WINROLL_SETUP_LOG%
 	echo SSHD_SERVICE=%SSHD_SERVICE%>>%WINROLL_SETUP_LOG%
@@ -292,7 +258,6 @@ goto :EOF
 	echo CYGWIN_ROOT=%CYGWIN_ROOT%>>%WINROLL_SETUP_LOG%
 	echo LOCAL_REPOSITORY=%LOCAL_REPOSITORY%>>%WINROLL_SETUP_LOG%
 	echo INIT_DOC_FOLDER=%INIT_DOC_FOLDER%>>%WINROLL_SETUP_LOG%
-	echo STARTMENU_PATH=%STARTMENU_PATH%>>%WINROLL_SETUP_LOG%
 goto :EOF
 
 :CHECK_IF_WINADMIN
@@ -538,11 +503,6 @@ goto :EOF
 	echo [3]: %DNS_SUFFIX%
 	set /P ANSWER="[1] "
 
-	rem if not "%ANSWER%" == "2" ( if not "%ANSWER%" == "3" ( set ANSWER=1  ) )
-	rem if "%ANSWER%" == "1" ( echo =[1]: %FIXED% )
-	rem if "%ANSWER%" == "2" ( echo =[2]: IP/NETMASK )
-	rem if "%ANSWER%" == "3" ( echo =[3]: %DNS_SUFFIX% )
-	
 	if "%ANSWER%" == "3" (
 		goto :SKIP_WG_PREFIX
 	)
@@ -555,7 +515,6 @@ goto :EOF
 	:SKIP_WG_PREFIX
 
 	echo .
-	REM if "%ANSWER%" == "1" ( set WG_PARA=%WG_PREFIX% )
 	if "%ANSWER%" == "1" ( set WG_PARA=%WG_PREFIX% )
 	if "%ANSWER%" == "2" ( set WG_PARA=%WG_PREFIX%-$NM )
 	if "%ANSWER%" == "3" ( set WG_PARA=$DNS_SUFFIX )
@@ -568,9 +527,6 @@ goto :EOF
 	
 	set IF_AUTOHOSTNAME_SERVICE=y
 	echo .
-	rem  20080520 後用 winrollsrv 取代
-	rem echo ... %INSTALL_AUTOHOSTNAME_SERVICE% ...
-	rem "%CYGWIN_ROOT%\bin\cygrunsrv.exe" -I "%AUTOHOSTNAME_SERVICE%" -d "Auto Hostname Checker" -p "%CYGWIN_ROOT%\bin\autohostname.sh" -e "CYGWIN=${_cygwin}" -u "LocalSystem" -w ""
 	echo IF_AUTOHOSTNAME_SERVICE = %IF_AUTOHOSTNAME_SERVICE%>>%WINROLL_CONFIG_FILE%
 	echo IF_AUTOHOSTNAME_SERVICE = %IF_AUTOHOSTNAME_SERVICE%>>%WINROLL_SETUP_LOG%
 
@@ -597,17 +553,10 @@ goto :EOF
 
 	del /F /Q %CYGWIN_ROOT%\bin\autohostname.sh
 	del /F /Q %CYGWIN_ROOT%\bin\wsname.exe
-	
-	rem echo .
-	rem  echo ... %REMOV_AUTOHOSTNAME_SERVICE% ...
-	rem %CYGWIN_ROOT%\bin\cygrunsrv.exe -E %AUTOHOSTNAME_SERVICE%
-	rem %CYGWIN_ROOT%\bin\cygrunsrv.exe -R %AUTOHOSTNAME_SERVICE%
 		
 goto :EOF
 
 :NETWORK_MODE_SETUP
-	rem echo ... %FORCE_TO_NIC_AS_DHCP% ...
-	rem netsh -c interface ip set address name="%NIC_NAME%" source=dhcp
 
 	echo %HR%
 	echo %NEXT_STEP% : %SETUP_NETWORK_MODE%
@@ -713,11 +662,6 @@ goto :EOF
 	del /F /Q %CYGWIN_ROOT%\bin\autonewsid.sh
 	del /F /Q %CYGWIN_ROOT%\bin\newsid.exe
 
-	rem echo .
-	rem echo ... %REMOV_AUTONEWSID_SERVICE% ...
-	rem %CYGWIN_ROOT%\bin\cygrunsrv.exe -E %AUTONEWSID_SERVICE%
-	rem %CYGWIN_ROOT%\bin\cygrunsrv.exe -R %AUTONEWSID_SERVICE%
-	
 	:END_OF_AUTONEWSID_REMOVE
 goto :EOF
 
