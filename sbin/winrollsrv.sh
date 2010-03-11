@@ -12,8 +12,10 @@
 #
 ###########################################################################
 #WINROLL_CONFIG="/drbl_winRoll-config/winRoll.txt"
-WINROLL_FUNCTIONS="/drbl_winRoll-config/winroll-functions.sh"
-. $WINROLL_FUNCTIONS
+WINROLL_LIBS="/drbl_winroll-config/winroll.lib.sh "
+for lib in $WINROLL_LIBS ; do 
+	[ -f "$lib" ] && . $lib
+done
 
 # Local service paremeter 
 SERVICE_NAME='winrollsrv'
@@ -364,7 +366,7 @@ do_autonewsid(){
 
 	[ ! -f "$SID_MD5CHK_FILE" ] && touch $SID_MD5CHK_FILE;
 
-	NICMAC_ADDR_MD5="$(ipconfig /all | grep "Physical Address" | head -n 1 | cut -d ":" -f 2 | sed -e "s/\s*//g" | md5sum | cut -d ' ' -f 1)"
+	NICMAC_ADDR_MD5="$(ipconfig /all | dos2unix | awk -F ":" "/ [0-9A-F]+-[0-9A-F]+-[0-9A-F]+-[0-9A-F]+-[0-9A-F]+-[0-9A-F]+$/{print \$2}" | sed -e 's/\s//g' | head -n 1 | md5sum | awk '{print $1}')"
 	NEED_TO_CHANGE=0
 
 	echo $NICMAC_ADDR_MD5 

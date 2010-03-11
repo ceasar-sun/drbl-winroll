@@ -19,10 +19,11 @@ REM #     http://www.ceasar.tw/modules/news/article.php?storyid=98
 REM ####################################################################
 
 REM # identify your OS language 
+REM # use registry 'HKEY_CURRENT_USER\Control Panel\International\Locale' value  
 REM set ENG_OS_PATH=%USERPROFILE%\Desktop
 REM set ZHTW_OS_PATH=%USERPROFILE%\орн▒
-set FR_OS_PATH=%USERPROFILE%\Bureau
-set NL_OS_PATH=%USERPROFILE%\Bureaublad
+REM set FR_OS_PATH=%USERPROFILE%\Bureau
+REM set NL_OS_PATH=%USERPROFILE%\Bureaublad
 
 REM # Global parameter
 set LANG=
@@ -48,6 +49,7 @@ set WINROLL_LOCAL_BACKUP=%USERPROFILE%\drbl-winroll.bak
 set SYSINT_LINCESE_URL=http://www.sysinternals.com/Licensing.html
 set SYSINT_LINCESE_URL=http://drbl.nchc.org.tw/drbl-winroll/download/newsid-licence.php
 set NEWSID_DOWNLOAD_URL=http://drbl.nchc.org.tw/drbl-winroll/download/newsid-download.php
+set WINROLL_WEB_FAQ_URL=http://drbl.nchc.org.tw/drbl-winroll/faq.php
 
 set CYGWIN_ROOT=%SystemDrive%\cygwin
 set CYGWIN_LOCAL_MIRROR=
@@ -95,20 +97,21 @@ call :CREAT_SETUP_LOG
 
 if "%ACTION%" == "i" (
 	call :DRBL-WINROLL_INSTALL
-	call .\doc\Faq.%LANG%.txt
-)
+	rem call .\doc\Faq.%LOCALE_CODE%.txt
+	)
 if "%ACTION%" == "f" (
 	call :DRBL-WINROLL_INSTALL
-	call .\doc\Faq.%LANG%.txt
+	rem call .\doc\Faq.%LOCALE_CODE%.txt
 )
 if "%ACTION%" == "r" (
 	call :DRBL-WINROLL_REINSTALL
-	call .\doc\Faq.%LANG%.txt
+	rem call .\doc\Faq.%LOCALE_CODE%.txt
 )
 if "%ACTION%" == "u" (
 	call :DRBL-WINROLL_UNINSTALL
-	call .\doc\Faq.%LANG%.txt
+	rem call .\doc\Faq.%LOCALE_CODE%.txt
 )
+REM explorer %WINROLL_WEB_FAQ_URL%?localecode=%LOCALE_CODE%
 
 if  "%IF_NEWSID_SERVICE%" == "y" (
 	call :STARTUP_AUTONEWSID
@@ -164,8 +167,7 @@ REM #####################################
 	if "%OS_VERSION%" == "NONE" (
 		echo .
 		echo !!! Unknow your OS version ... !!!
-		echo !!! Please attach "OS-version.txt" file at installation folder and mail to "ceasar@nchc.org.tw" to call for support !!!
-		reg QUERY "HKEY_LOCAL_MACHINE\SOFTWARE\Microsoft\Windows NT\CurrentVersion" /v  ProductName >OS-version.txt
+		echo !!! Please attach "OS-version.txt" file at installation folder and email to "ceasar@nchc.org.tw" !!!
 		echo !!! Program EXIT !!!
 		pause
 		exit 1
@@ -239,7 +241,6 @@ goto :EOF
 
 :CREAT_SETUP_LOG
 	date /T >%WINROLL_SETUP_LOG%
-	echo LANG=%LANG%>>%WINROLL_SETUP_LOG%
 	echo OS_VERSION=%OS_VERSION%>>%WINROLL_SETUP_LOG%
 	echo LOCALE_CODE=%LOCALE_CODE%>>%WINROLL_SETUP_LOG%
 	echo STARTMENU_PATH=%STARTMENU_PATH%>>%WINROLL_SETUP_LOG%
@@ -362,8 +363,6 @@ goto :EOF
 	
 	REM Create link files for cygwin program menu
 	copy "%INIT_CONF%\*.lnk" "%STARTMENU_PATH%"
-	REM "%CYGWIN_ROOT%\bin\ln.exe" STARTMENU_PATH-s "%CYGWIN_ROOT%\drbl_winroll-config" "%STARTMENU_PATH%"
-	REM echo %CYGWIN_ROOT%\bin\bash.exe --login -i %CYGWIN_ROOT%\bin\winrollsrv-controllor.sh > "%STARTMENU_PATH%\winrollsrv-controllor.bat"
 	
 	echo %CREATE_WINROLL_CONFIG%
 	mkdir "%WINROLL_CONFIG_FOLDER%" "%WINROLL_DOC_FOLDER%" "%WINROLL_UNINSTALL_FOLDER%" "%WINROLL_CONFIG_FOLDER%\keyword-conf"
@@ -380,10 +379,8 @@ goto :EOF
 	copy "%INIT_CONF%\drbl_winroll-uninstall.bat" "%APPDATA%"
 
 	REM # copy language file for uninstall usage
-	copy "lang\%LANG%.cmd" "%APPDATA%\%WINROLL_UNINSTALL_PARA%"
-	REM echo @echo off>"%APPDATA%\%WINROLL_UNINSTALL_PARA%"
-	REM echo set STARTMENU_PATH=%STARTMENU_PATH%>>"%APPDATA%\%WINROLL_UNINSTALL_PARA%"
-	REM echo set SYSTEM_ADMIN=%ADMIN%>>"%APPDATA%\%WINROLL_UNINSTALL_PARA%"
+	copy "lang\%LOCALE_CODE%.cmd" "%APPDATA%\%WINROLL_UNINSTALL_PARA%"
+
 	echo. >>"%APPDATA%\%WINROLL_UNINSTALL_PARA%"
 	echo set CYGWIN_ROOT=%CYGWIN_ROOT%>>"%APPDATA%\%WINROLL_UNINSTALL_PARA%"
 	echo set STARTMENU_PATH=%STARTMENU_PATH%>>"%APPDATA%\%WINROLL_UNINSTALL_PARA%"
@@ -452,10 +449,6 @@ goto :EOF
 	echo [2]%BY_MAC%
 	echo [3]%BY_HOSTS_FILE% :%MORE_DETAIIL_TO_REFER% '%WINROLL_HOSTS_FILE%'
 	set /P ANSWER="[1] "
-	rem echo Hostname format is : %ANSWER%
-	rem if not "%ANSWER%" == "2" ( if not "%ANSWER%" == "3"  echo =[1]: %BY_IP%  )
-	rem if "%ANSWER%" == "2" ( echo =[2]: %BY_MAC% )
-	rem if "%ANSWER%" == "3" ( echo =[3]: %BY_HOSTS_FILE% )
 	
 	if "%ANSWER%" == "3" (
 		goto :SKIP_HN_PREFIX
@@ -576,12 +569,6 @@ goto :EOF
 	echo ** %USE_NETWORK_MODE_IS% : %NETWORK_MODE%
 	echo CONFIG_NETWORK_MODE = %NETWORK_MODE%>>%WINROLL_CONFIG_FILE%
 	
-	rem if "%NETWORK_MODE%" == "dhcp" (
-	rem	echo . 
-	rem	echo ... %FORCE_TO_NIC_AS_DHCP% ...
-	rem	echo .
-	rem	netsh interface ip set address "%NIC_NAME%" source=dhcp
-	rem )
 :END_OF_NETWORK_MODE_SETUP
 goto :EOF
 
@@ -598,12 +585,30 @@ goto :EOF
 	echo %NEXT_STEP% : %SETUP_AUTONEWSID_SERVICE%
 	echo %HR%
 	
+	:IF_INSTALL_AUTONEWSID
 	set ANSWER_IF_GO=n
 	echo %IF_INSTALL_AUTONEWSID% (Default: No)
 	set /P ANSWER_IF_GO="[y/N]"
 	if not "%ANSWER_IF_GO%" == "y" (
 		goto :END_OF_AUTONEWSID_SETUP
 	)
+
+	set NEWSID_PROGRAM_PATH=%TMP%\newsid.exe
+	echo %PLEASE_INPUT_NEWSID_PROGRAM_PATH%
+	set /P NEWSID_PROGRAM_PATH="[%TMP%\newsid.exe]"
+	if NOT EXIST "%NEWSID_PROGRAM_PATH%" (
+		echo %PROGRAM_NOT_FOUND%
+		goto :IF_INSTALL_AUTONEWSID
+	)
+	
+	set NEWSID_PROGRAM_PARAMS=/a /n
+	echo %PLEASE_INPUT_NEWSID_PROGRAM_PARAMS% 
+	set /P NEWSID_PROGRAM_PARAMs="[%NEWSID_PROGRAM_PARAMS%]"
+	if NOT EXIST "%NEWSID_PROGRAM_PATH%" (
+		echo %PROGRAM_NOT_FOUND%
+		goto :IF_INSTALL_AUTONEWSID
+	)
+
 
 	echo %PLZ_READ_LICENSE%
 	echo %SHOW_URL% : %SYSINT_LINCESE_URL%
