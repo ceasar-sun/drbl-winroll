@@ -144,3 +144,9 @@ set DO_NOTHIMG_FOR_NETWORK=不處理網路設定
 set USE_NETWORK_MODE_IS=網路設定模式為
 set FORCE_INSTALL=強制安裝(適合原先已有需要之 cygwin 環境, 但可能破壞原有之設定)
 set RUNSHELL=有在執行中的程序
+
+REM # Add from v1.2.2 , 20100315
+set PLEASE_INPUT_NEWSID_PROGRAM_PATH=請輸入用來變更 SID 工具的完整路徑
+set PROGRAM_NOT_FOUND=您所指定程式不存在
+set PLEASE_INPUT_NEWSID_PROGRAM_PARAMS=請輸入需要的參數, 如:'/a /n';若無則 [Enter] 跳過
+set FULL_NEW_SID_COMMAND=完整變更 SID 的指令

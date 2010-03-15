@@ -148,3 +148,9 @@ set DO_NOTHIMG_FOR_NETWORK=Do nothing for network configuration
 set USE_NETWORK_MODE_IS=network mode is
 set FORCE_INSTALL=Install over(For that cygwin environment installed already, but maybe affect the original)
 set RUNSHELL=running cygwin shell
+
+REM # Add from v1.2.2 , 20100315
+set PLEASE_INPUT_NEWSID_PROGRAM_PATH=Please input full path of renew SID tool
+set PROGRAM_NOT_FOUND=Program not found
+set PLEASE_INPUT_NEWSID_PROGRAM_PARAMS=Input parameters for SID tool if it needs, ex: '/a /n'. 
+set FULL_NEW_SID_COMMAND=Full command for renew Windows SID

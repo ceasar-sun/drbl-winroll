@@ -600,56 +600,21 @@ goto :EOF
 		echo %PROGRAM_NOT_FOUND%
 		goto :IF_INSTALL_AUTONEWSID
 	)
+	basename %NEWSID_PROGRAM_PATH% >%TMP%\NEWSID_PROGRAM_NAME.txt
+	for /F "tokens=* delims=" %%S in ('type %TMP%\NEWSID_PROGRAM_NAME.txt') do set NEWSID_PROGRAM_NAME=%%S
 	
 	set NEWSID_PROGRAM_PARAMS=/a /n
 	echo %PLEASE_INPUT_NEWSID_PROGRAM_PARAMS% 
-	set /P NEWSID_PROGRAM_PARAMS="[%NEWSID_PROGRAM_PARAMS%]"
-	echo %FULL_NEW_SID_COMMAND% : %NEWSID_PROGRAM_PATH:str1=str2%
+	set /P NEWSID_PROGRAM_PARAMS="[ex:/a /n]"
+	echo %FULL_NEW_SID_COMMAND% : %NEWSID_PROGRAM_NAME% %NEWSID_PROGRAM_PARAMS%
 
-
-	echo %PLZ_READ_LICENSE%
-	echo %SHOW_URL% : %SYSINT_LINCESE_URL%
-	explorer %SYSINT_LINCESE_URL%
-	echo .
-	echo .
-	pause
-	
-	set IF_AGREE=y
-	echo %ANS_IF_AGREE%
-	set /P IF_AGREE="[Y/n]"
-	if "%IF_AGREE%" == "n" (
-		echo %NOT_AGREE_EXIT%
-		goto :END_OF_AUTONEWSID_SETUP
-	)
-	
-	REM # Download newsid.zip from sysinternals.com
-	%CYGWIN_ROOT%\bin\rm.exe -rf %TMP%\NewSid.zip %TMP%\newsid.exe %TMP%\Eula.txt
-	%CYGWIN_ROOT%\bin\wget.exe %NEWSID_DOWNLOAD_URL% -P %TMP%
-	%CYGWIN_ROOT%\bin\unzip.exe %TMP%\NewSid.zip -d %TMP%
-	%CYGWIN_ROOT%\bin\mv.exe %TMP%\newsid.exe %CYGWIN_ROOT%\bin
-	%CYGWIN_ROOT%\bin\chmod.exe +x %CYGWIN_ROOT%\bin\newsid.exe
-	
-	%CYGWIN_ROOT%\bin\rm.exe -rf %TMP%\NewSid.zip %TMP%\newsid.exe %TMP%\Eula.txt
-	
-	set IF_NEWSID_SERVICE=y
 	echo ... %COPY_NEEDED_FILES% ...
-	rem copy .\sbin\autonewsid.sh %CYGWIN_ROOT%\bin
-	echo IF_NEWSID_SERVICE=%IF_NEWSID_SERVICE%>>%WINROLL_CONFIG_FILE%
-	echo IF_NEWSID_SERVICE=%IF_NEWSID_SERVICE%>>%WINROLL_SETUP_LOG%
+	copy %NEWSID_PROGRAM_PATH% %CYGWIN_ROOT%\bin
 
-	echo .
-	echo ... %INSTALL_AUTONEWSID_SERVICE% ...
-	REM set DEPEND_SERVICE=
-	REM if "%IF_AUTOHOSTNAME_SERVICE%" == "y" (
-	REM	set DEPEND_SERVICE=-y "%AUTOHOSTNAME_SERVICE%"
-	REM )
-
-	REM # use -y to assigen what service must be started before the new service
-	REM # 200612.0 的版本中在被拿掉,原因會造成 autonewsid 一直 autohostname 被中斷
-
-	rem  20080520 後用 winrollsrv 取代
-	rem "%CYGWIN_ROOT%\bin\cygrunsrv.exe" -I "%AUTONEWSID_SERVICE%" -d "Auto New SID" -p "%CYGWIN_ROOT%\bin\autonewsid.sh" -e "CYGWIN=${_cygwin}" -i %DEPEND_SERVICE%
-	
+	set IF_NEWSID_SERVICE=y
+	echo AUTONEWSID_PARAM = %NEWSID_PROGRAM_NAME% %NEWSID_PROGRAM_PARAMS%>> %WINROLL_CONFIG_FILE%
+	echo IF_NEWSID_SERVICE = y>>%WINROLL_CONFIG_FILE%
+	echo IF_NEWSID_SERVICE = y>>%WINROLL_SETUP_LOG%
 	:END_OF_AUTONEWSID_SETUP
 goto :EOF
 
@@ -789,6 +754,7 @@ goto :EOF
 	echo .
 	pause
 	call :CYGWIN_INSTALL
+	set PATH=%PATH%;%CYGWIN_ROOT%\bin;%CYGWIN_ROOT%\sbin;%CYGWIN_ROOT%\usr\sbin
 	call :AUTOHOSTNAME_SETUP
 	call :NETWORK_MODE_SETUP
 	call :AUTONEWSID_SETUP
