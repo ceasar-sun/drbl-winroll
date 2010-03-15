@@ -12,7 +12,7 @@
 #
 ###########################################################################
 #WINROLL_CONFIG="/drbl_winRoll-config/winRoll.txt"
-WINROLL_FUNCTIONS="/drbl_winRoll-config/winroll-functions.sh"
+WINROLL_FUNCTIONS="/drbl_winRoll-config/winroll.lib.sh"
 . $WINROLL_FUNCTIONS
 
 # Local service paremeter 
