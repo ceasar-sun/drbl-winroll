@@ -361,7 +361,7 @@ goto :EOF
 	
 	echo %CREATE_WINROLL_CONFIG%
 	mkdir "%WINROLL_CONFIG_FOLDER%" "%WINROLL_DOC_FOLDER%" "%WINROLL_UNINSTALL_FOLDER%" "%WINROLL_CONFIG_FOLDER%\keyword-conf"
-	copy  /Y "%INIT_CONF%\*.conf" "%WINROLL_CONFIG_FOLDER%"
+	copy /V "%INIT_CONF%\*.conf" "%WINROLL_CONFIG_FOLDER%"
 	xcopy  /Y /E "%INIT_CONF%\keyword-conf" "%WINROLL_CONFIG_FOLDER%\keyword-conf"
 
 	copy /Y "%INIT_CONF%\*.lib.sh" "%WINROLL_CONFIG_FOLDER%"
