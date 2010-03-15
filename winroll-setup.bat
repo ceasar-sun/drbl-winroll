@@ -360,7 +360,10 @@ goto :EOF
 	copy /Y "%INIT_CONF%\*.lnk" "%STARTMENU_PATH%"
 	
 	echo %CREATE_WINROLL_CONFIG%
-	mkdir "%WINROLL_CONFIG_FOLDER%" "%WINROLL_DOC_FOLDER%" "%WINROLL_UNINSTALL_FOLDER%" "%WINROLL_CONFIG_FOLDER%\keyword-conf"
+	if not exist "%WINROLL_CONFIG_FOLDER%" ( mkdir "%WINROLL_CONFIG_FOLDER%" )
+	if not exist "%WINROLL_DOC_FOLDER%" ( mkdir "%WINROLL_DOC_FOLDER%" )
+	if not exist "%WINROLL_CONFIG_FOLDER%\keyword-conf" ( mkdir "%WINROLL_CONFIG_FOLDER%\keyword-conf" )
+	
 	copy /V "%INIT_CONF%\*.conf" "%WINROLL_CONFIG_FOLDER%"
 	xcopy  /Y /E "%INIT_CONF%\keyword-conf" "%WINROLL_CONFIG_FOLDER%\keyword-conf"
 
