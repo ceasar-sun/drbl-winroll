@@ -57,7 +57,7 @@ set LOCAL_REPOSITORY=%SOURCE_DIR%
 set INIT_CONFIG_FILE=%INIT_CONF%\winroll.conf
 set INIT_HOSTS_FILE=%INIT_CONF%\hosts.conf
 set INIT_CLIENT_MAC_NETWORK_FILE=%INIT_CONF%\client-mac-network.conf
-set INIT_FUNCTIONS_FILE=%INIT_CONF%\winroll-functions.sh
+set INIT_FUNCTIONS_FILE=%INIT_CONF%\*.lib.sh
 rem set INIT_KEYWORD_CONF=%INIT_CONF%\keyword-conf
 set INIT_DOC_FOLDER=doc
 
@@ -216,7 +216,7 @@ REM # To decide language during installation
 	
 	REM # assign "STARTMENU_PATH" from registry value
 	cscript %INIT_CONF%\reg_query.vbs //Nologo "HKEY_LOCAL_MACHINE\SOFTWARE\Microsoft\Windows\CurrentVersion\Explorer\Shell Folders\Common Programs" > program-path.txt
-	for /F "tokens=* delims=" %%S in ('type program-path.txt') do set STARTMENU_PATH=%%S
+	for /F "tokens=* delims=" %%S in ('type program-path.txt') do set STARTMENU_PATH=%%S\cygwin
 
 	:END_OF_SET_LANGUAGE
 goto :EOF
@@ -371,7 +371,7 @@ goto :EOF
 	copy "%INIT_HOSTS_FILE%" "%WINROLL_CONFIG_FOLDER%"
 	copy "%INIT_CLIENT_MAC_NETWORK_FILE%" "%WINROLL_CONFIG_FOLDER%"
 
-	copy "%INIT_FUNCTIONS_FILE%" "%WINROLL_CONFIG_FOLDER%"
+	copy "%INIT_CONF%\*.lib.sh" "%WINROLL_CONFIG_FOLDER%"
 	xcopy /E "%INIT_DOC_FOLDER%" "%WINROLL_DOC_FOLDER%"
 	copy ".\sbin\*.*" "%CYGWIN_ROOT%\bin"
 
