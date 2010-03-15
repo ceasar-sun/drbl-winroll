@@ -54,11 +54,6 @@ set WINROLL_WEB_FAQ_URL=http://drbl.nchc.org.tw/drbl-winroll/faq.php
 set CYGWIN_ROOT=%SystemDrive%\cygwin
 set CYGWIN_LOCAL_MIRROR=
 set LOCAL_REPOSITORY=%SOURCE_DIR%
-set INIT_CONFIG_FILE=%INIT_CONF%\winroll.conf
-set INIT_HOSTS_FILE=%INIT_CONF%\hosts.conf
-set INIT_CLIENT_MAC_NETWORK_FILE=%INIT_CONF%\client-mac-network.conf
-set INIT_FUNCTIONS_FILE=%INIT_CONF%\*.lib.sh
-rem set INIT_KEYWORD_CONF=%INIT_CONF%\keyword-conf
 set INIT_DOC_FOLDER=doc
 
 call :CHECK_OS_VERSION
@@ -362,24 +357,21 @@ goto :EOF
 	"%CYGWIN_SETUP%" -q -d -L -l "%LOCAL_REPOSITORY%\cygwin_mirror" -R "%CYGWIN_ROOT%"
 	
 	REM Create link files for cygwin program menu
-	copy "%INIT_CONF%\*.lnk" "%STARTMENU_PATH%"
+	copy /Y "%INIT_CONF%\*.lnk" "%STARTMENU_PATH%"
 	
 	echo %CREATE_WINROLL_CONFIG%
 	mkdir "%WINROLL_CONFIG_FOLDER%" "%WINROLL_DOC_FOLDER%" "%WINROLL_UNINSTALL_FOLDER%" "%WINROLL_CONFIG_FOLDER%\keyword-conf"
-	copy "%INIT_CONFIG_FILE%" "%WINROLL_CONFIG_FOLDER%"
-	xcopy /E "%INIT_CONF%\keyword-conf" "%WINROLL_CONFIG_FOLDER%\keyword-conf"
-	copy "%INIT_HOSTS_FILE%" "%WINROLL_CONFIG_FOLDER%"
-	copy "%INIT_CLIENT_MAC_NETWORK_FILE%" "%WINROLL_CONFIG_FOLDER%"
+	copy  /Y "%INIT_CONF%\*.conf" "%WINROLL_CONFIG_FOLDER%"
+	xcopy  /Y /E "%INIT_CONF%\keyword-conf" "%WINROLL_CONFIG_FOLDER%\keyword-conf"
 
-	copy "%INIT_CONF%\*.lib.sh" "%WINROLL_CONFIG_FOLDER%"
-	xcopy /E "%INIT_DOC_FOLDER%" "%WINROLL_DOC_FOLDER%"
-	copy ".\sbin\*.*" "%CYGWIN_ROOT%\bin"
+	copy /Y "%INIT_CONF%\*.lib.sh" "%WINROLL_CONFIG_FOLDER%"
+	xcopy /Y /E "%INIT_DOC_FOLDER%" "%WINROLL_DOC_FOLDER%"
+	copy /Y ".\sbin\*.*" "%CYGWIN_ROOT%\bin"
 
-	copy "%INIT_CONF%\*.reg" "%WINROLL_UNINSTALL_FOLDER%"
-	copy "%INIT_CONF%\drbl_winroll-uninstall.bat" "%APPDATA%"
-
+	copy /Y "%INIT_CONF%\*.reg" "%WINROLL_UNINSTALL_FOLDER%"
+	copy /Y "%INIT_CONF%\drbl_winroll-uninstall.bat" "%APPDATA%"
 	REM # copy language file for uninstall usage
-	copy "lang\%LOCALE_CODE%.cmd" "%APPDATA%\%WINROLL_UNINSTALL_PARA%"
+	copy /Y "lang\%LOCALE_CODE%.cmd" "%APPDATA%\%WINROLL_UNINSTALL_PARA%"
 
 	echo. >>"%APPDATA%\%WINROLL_UNINSTALL_PARA%"
 	echo set CYGWIN_ROOT=%CYGWIN_ROOT%>>"%APPDATA%\%WINROLL_UNINSTALL_PARA%"
@@ -595,9 +587,10 @@ goto :EOF
 
 	set NEWSID_PROGRAM_PATH=%TMP%\newsid.exe
 	echo %PLEASE_INPUT_NEWSID_PROGRAM_PATH%
+	echo .
 	set /P NEWSID_PROGRAM_PATH="[%TMP%\newsid.exe]"
 	if NOT EXIST "%NEWSID_PROGRAM_PATH%" (
-		echo %PROGRAM_NOT_FOUND%
+		echo %PROGRAM_NOT_FOUND% !!
 		goto :IF_INSTALL_AUTONEWSID
 	)
 	basename %NEWSID_PROGRAM_PATH% >%TMP%\NEWSID_PROGRAM_NAME.txt
