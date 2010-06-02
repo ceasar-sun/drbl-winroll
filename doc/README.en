@@ -1,6 +1,6 @@
-README for drbl-winRoll
+README for drbl-winroll
 
-********  Welcome to use drbl-winRoll installation  ******************
+********  Welcome to use drbl-winroll installation  ******************
 
      NCHC Free Software Labs  , NCHC ,Taiwan
      License: GPL      
@@ -9,12 +9,12 @@ README for drbl-winRoll
 
 Introduction: 
 
-drbl-winRoll aim to support windows client can accept commands from server under DRBL environment, and it solve windows hostname duplication problem for clone Win OS in one local LAN.
+drbl-winroll aim to support windows client can accept commands from server under DRBL environment, and it solve windows hostname duplication problem for clone Win OS in one local LAN.
 
 How to install :
 
-1. Download the latest version of drbl-winRoll with http:http://drbl-winroll.sourceforge.net/
-2. ZIP : Uncompress the zip format package and double click to execute "winRoll-setup.bat". It would lead you to install and configure step by step.
+1. Download the latest version of drbl-winroll with http:http://drbl-winroll.sourceforge.net/
+2. ZIP : Uncompress the zip format package and double click to execute "winroll-setup.bat". It would lead you to install and configure step by step.
    EXE : Execute the download file.
 
 Note: 

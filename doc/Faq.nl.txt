@@ -1,4 +1,4 @@
-******** Welkom bij de nederlandse drbl-winRoll FAQ  ******************
+******** Welkom bij de nederlandse drbl-winroll FAQ  ******************
 
     NCHC Free Software Labs, NCHC ,Taiwan
     License	:	GPL      
@@ -15,7 +15,7 @@ FAQ:
 - 1.3 Automatische benaming van  Windows "Werkgroep" via netmask en network domein
 - 1.4 Automatische verniewing van Windows SID ( NTFS )
 
-2. Welke stappen loopt drbl-winRoll door voor de installatie ?
+2. Welke stappen loopt drbl-winroll door voor de installatie ?
 
 Deze stappen bevatten de benodigde software en configureerd gerelateerde registry ingangen in windows, het gaat als volgt:
 - 2.1 Automatische cygwin ( linux onder windows ) installatie
@@ -30,12 +30,12 @@ Deze stappen bevatten de benodigde software en configureerd gerelateerde registr
 - 3.3 Computernaam wordt gecontroleerd, werkgroep naam wordt gecontroleerd : autocomputername.sh, wsname.exe. Wordt ingesteld als service door cygwin en autocomputername.sh wordt gestart om veranderingen aan te brengen.
 - 3.4 Sid controle : autonewsid.sh ,newsid.exe. Wordt ingesteld als service door cygwin en autonewsid.sh wordt gestart om "sid" te vernieuwen
 
-4. Hoe wordt de windows computernaam ingesteld door drbl-winRoll
+4. Hoe wordt de windows computernaam ingesteld door drbl-winroll
 
 -Standaard zijn het de laatste 6 nummer voor het ipadres en dit wordt gecombineerd meten prefix "PC" als computernaam, voorbeeld:
 -Het ipadres is 192.168.1.52, dan zal de computernaam worden : PC-001-052
 -De Manager can de volgende stappen volgen om het computernaam formaat te krijgen zoals u wilt:
--In C:\cygwin\drbl_winRoll-config vind je het bestand  "winRoll.txt" , zoek naar de regel : HN_WSNAME_PARAM = xxxx
+-In C:\cygwin\drbl_winroll-config vind je het bestand  "winroll.txt" , zoek naar de regel : HN_WSNAME_PARAM = xxxx
  
 
 The guide is the follow:
@@ -47,7 +47,7 @@ The guide is the follow:
 #       HN_WSNAME_PARAM = /N:$ASSETTAG                  Alleen pc's met Assettag functie in de bios, voorbeeld HP, DELL, ACER, enz, enz)
 
 Hoewel, de computernaam kan worden ingesteld door een lokaal bestand, edit "HN_WSNAME_PARAM = xxxx " als volgt:
-HN_WSNAME_PARAM = /RDF:C:\cygwin\drbl_winRoll-config\computers.txt /DFK:$MAC
+HN_WSNAME_PARAM = /RDF:C:\cygwin\drbl_winroll-config\computers.txt /DFK:$MAC
 /RDF defineert het pad van het lokale bestand ---> /DFK defineert het veld voor het zoeken van de sleutel
 
 Een voorbeeld als lokaal bestand  : "IP or MAc Addres" = "computernaam" 
@@ -59,7 +59,7 @@ if use /DFK:$MAC ¡Ait would be assigned as "Cursist-01"¡A/DFK:$IP it would be "C
 Via deze weg, kan de manager de computernaam vrijdefinieren, maar we adviseren om alle Mac Adressen te collecteren en op te schrijven of op te slaanop de template machine. 
 De andere gekloonde machines zullen een computernaam toegewezen krijgen door hun eigen attributen. 
 
-PS drbl-winRoll gebruikt "wsname" tooling om de computernaam te veranderen. Ook ondersteunen wij de andere "wsname" parameters volledig
+PS drbl-winroll gebruikt "wsname" tooling om de computernaam te veranderen. Ook ondersteunen wij de andere "wsname" parameters volledig
 
 5. Hoe de windows werkgroep toe te wijzen ?
 Het kan toegewezen worden door 3 parameters
@@ -117,15 +117,15 @@ of
 
 http://support.microsoft.com/?scid=kb;zh-tw;302577
 
-9. Is het nodig om drbl-winRoll te gebruiken in een DRBL omgeving ?
+9. Is het nodig om drbl-winroll te gebruiken in een DRBL omgeving ?
 
 Niet echt. Het zou nog steeds nodig zijn om NAT functionaliteit te gebruiken om Windows clients met internet te verbinden.
 Natuurlijk, DRBL server verleend NAT, DHCP functionaliteit, end clients kunnen centraal gemanaged worden.
 
-10. Kan drbl-winRoll gebruikt worden met ander kloon tooling ?
+10. Kan drbl-winroll gebruikt worden met ander kloon tooling ?
 
 Tuurlijk, Het werkt met elke kloon tooling om het kloon probleem op te lossen , voorbeel: Clonezilla, BGcomputer, Acronis True Image... enz, enz.
-drbl-winRoll geen verband met andere software licenties. De ontwikkeling van drbl-winRoll gebruikt GPL om op te leveren.
+drbl-winroll geen verband met andere software licenties. De ontwikkeling van drbl-winroll gebruikt GPL om op te leveren.
 
 
 Ceasar Sun

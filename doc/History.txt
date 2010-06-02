@@ -1,4 +1,4 @@
-﻿History for drbl-winRoll
+﻿History for drbl-winroll
 Author: Ceasar Sun <ceasar at nchc org tw>
 See also https://tux.nchc.org.tw/trac/drbl-winroll/wiki/ChangeLog
 ---------------------------------------------------------------------------------------------------
@@ -100,7 +100,7 @@ version 200701.2 devel:
 	5. 適用於 win 2k, win XP, win 2003. Vista 目前還無法使用 cygrunsrv 處理OS 的service, 暫不支援
 
 	6. 其他錯誤修正
-	<a href="http://drbl.nchc.org.tw/screenshot/?op=show&filepath=album//02_DRBL-winRoll/c00_drbl-winRoll_at_Startmeun.JPG">[Screen shot 1]</a> <a href="http://drbl.nchc.org.tw/screenshot/?op=show&filepath=album//02_DRBL-winRoll/c00_drbl-winroll_Controler.JPG">[Screen shot 2]</a>
+	<a href="http://drbl.nchc.org.tw/screenshot/?op=show&filepath=album//02_DRBL-winroll/c00_drbl-winroll_at_Startmeun.JPG">[Screen shot 1]</a> <a href="http://drbl.nchc.org.tw/screenshot/?op=show&filepath=album//02_DRBL-winroll/c00_drbl-winroll_Controler.JPG">[Screen shot 2]</a>
 
 version 200612.0 stable:
 	1. 修正因被併購後的 newsid tool kit 在 autonewsid service 啟動後會 hold住而無法自動重開機的問題。
@@ -108,7 +108,7 @@ version 200612.0 stable:
 	3. Uninstall/Reinstall 時備份 ssh key. Install 時詢問後匯入。
 	4. 新增 setup log
 	5. 非 GPL 之 tool kit 採用 redirect 方式轉址
-	6. winRoll-setup.bat script 上流程修正
+	6. winroll-setup.bat script 上流程修正
 	7. 語言檔修正
 	8. 其他功能修正
 
@@ -164,7 +164,7 @@ version 20060418:
 	4. Use last 6 characters of IP or MAC to avoid over 15 characters in NetBIOS name
 	5. Use defaulr hostname format ($MAC) to avoid no available hostname format to used by wsname
 	6. Re-package cygwin, include "cron", "rsync", and "autossh tool"
-	7. Add "drbl-winRoll Config" and "drbl-winRoll Document" in Windows Startmenu
+	7. Add "drbl-winroll Config" and "drbl-winroll Document" in Windows Startmenu
 	8. Use wsname consistent parameter for hostnaem format, and re-fine the autohostname program 
 	9. Upgrade wsname version to 2.75g
 	10. Upgrade cygwin DLL to 1.5.19.4
@@ -177,7 +177,7 @@ Acknowledge:
 version 20060314:
 	1. 強迫新增 ~\administrator\.ssh目錄
 	2. 修改 faq 內容
-	3. %CYGWIN_ROOT%\drbl-config\winRoll.conf 中加入日期與版本資訊
+	3. %CYGWIN_ROOT%\drbl-config\winroll.conf 中加入日期與版本資訊
 
 version 20060314:
 	Features:
@@ -210,7 +210,7 @@ version 20060314:
 	2. 在 step 3 開啟 防火牆 指令：
 	netsh firewall add portopening TCP 22 sshd
 	在 Win 2K下沒有 netsh firewall 指令(Win 2K 本來就沒有預設之 firewall) 
-	-- Fixed in drbl-winRoll_20060112 -- 加入作業系統判斷，預 win2k 則不執行指令
+	-- Fixed in drbl-winroll_20060112 -- 加入作業系統判斷，預 win2k 則不執行指令
 
 
 
