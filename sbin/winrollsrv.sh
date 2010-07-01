@@ -103,7 +103,7 @@ do_config_network(){
 		for mac in $mac_address_list ; do
 			this_nw_conf_tmp=this-nic-conf.tmp
 			#thisip=$(grep $mac $CLIENT_MAC_NETWORK 2>/dev/null | grep - |awk -F '=' '{print $2}'| sed -e "s/\s//g" )
-			grep $mac $CLIENT_MAC_NETWORK 2>/dev/null | sed -e "s/\s//g" -e "s/$mac/export thisip/g" > $WINROLL_TMP/this-nic-conf.tmp
+			grep -i $mac $CLIENT_MAC_NETWORK 2>/dev/null | sed -e "s/\s//g" -e "s/$mac/export thisip/g" > $WINROLL_TMP/this-nic-conf.tmp
 			. $WINROLL_TMP/$this_nw_conf_tmp
 			
 			# To get nic device name 
