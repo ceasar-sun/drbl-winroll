@@ -81,7 +81,7 @@ do_config_network(){
 		IF_IPRENEW=1
 		echo "CONFIG_NETWORK_MODE : dhcp"
 		return 2;
-	elif [ -n "$(echo $CONFIG_NETWORK_MODE | grep -e '/RDF' 2> /dev/null )" ] ; then
+	elif [ -n "$(echo $CONFIG_NETWORK_MODE | grep -ie '^/RDF' 2> /dev/null )" ] ; then
 		CLIENT_MAC_NETWORK_Winpath="$(echo $CONFIG_NETWORK_MODE | awk -F ':' '{print $2":"$3}' )"
 		CLIENT_MAC_NETWORK="$(cygpath -u $CLIENT_MAC_NETWORK_Winpath )"
 		[ ! -e "$CLIENT_MAC_NETWORK" ] &&  echo "No CLIENT_MAC_NETWORK file : $CLIENT_MAC_NETWORK" && return 1
@@ -103,7 +103,7 @@ do_config_network(){
 		for mac in $mac_address_list ; do
 			this_nw_conf_tmp=this-nic-conf.tmp
 			#thisip=$(grep $mac $CLIENT_MAC_NETWORK 2>/dev/null | grep - |awk -F '=' '{print $2}'| sed -e "s/\s//g" )
-			grep -i $mac $CLIENT_MAC_NETWORK 2>/dev/null | sed -e "s/\s//g" -e "s/$mac/export thisip/g" > $WINROLL_TMP/this-nic-conf.tmp
+			grep -i $mac $CLIENT_MAC_NETWORK 2>/dev/null | sed -e "s/\s//g" -e "s/$mac/export thisip/ig" > $WINROLL_TMP/this-nic-conf.tmp
 			. $WINROLL_TMP/$this_nw_conf_tmp
 			
 			# To get nic device name 
