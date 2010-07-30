@@ -13,7 +13,7 @@
 ###########################################################################
 
 #Golbal paremeter for drbl-winroll
-WINROLL_FUNCTIONS="/drbl_winRoll-config/winroll.lib.sh"
+WINROLL_FUNCTIONS="/drbl_winroll-config/winroll.lib.sh"
 . $WINROLL_FUNCTIONS
 
 # Local service paremeter 

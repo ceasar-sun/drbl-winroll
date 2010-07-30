@@ -599,9 +599,9 @@ goto :EOF
 	basename %NEWSID_PROGRAM_PATH% >%TMP%\NEWSID_PROGRAM_NAME.txt
 	for /F "tokens=* delims=" %%S in ('type %TMP%\NEWSID_PROGRAM_NAME.txt') do set NEWSID_PROGRAM_NAME=%%S
 	
-	set NEWSID_PROGRAM_PARAMS=/a /n
+	set NEWSID_PROGRAM_PARAMS=
 	echo %PLEASE_INPUT_NEWSID_PROGRAM_PARAMS% 
-	set /P NEWSID_PROGRAM_PARAMS="[ex:/a /n]"
+	set /P NEWSID_PROGRAM_PARAMS="[ex:/a /n (for newsid.exe)]"
 	echo %FULL_NEW_SID_COMMAND% : %NEWSID_PROGRAM_NAME% %NEWSID_PROGRAM_PARAMS%
 
 	echo ... %COPY_NEEDED_FILES% ...

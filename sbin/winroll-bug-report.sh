@@ -34,10 +34,10 @@ echo "cat /proc/registry/HKEY_CURRENT_USER/Control\ Panel/International/Locale" 
 cat /proc/registry/HKEY_CURRENT_USER/Control\ Panel/International/Locale >> $report_tmpdir/pc-info.txt
 echo . >>$report_tmpdir/pc-info.txt
 
-echo "Get pc informations by 'set' ..."
+echo "Get pc informations by 'set' ..." | tee -a $report_tmpdir/pc-info.txt
 set >> $report_tmpdir/pc-info.txt
 
-echo "Get pc informations by 'systeminfo' ..."
+echo "Get pc informations by 'systeminfo' ..." | tee -a $report_tmpdir/pc-info.txt
 systeminfo 2>/dev/null >> $report_tmpdir/pc-info.txt
 
 unix2dos --force -D $report_tmpdir/pc-info.txt
