@@ -30,7 +30,8 @@ waiting_to_reboot(){
 check_if_root_and_envi(){
 	#echo `whoami`, `id`
 	if [ ! -n "$(id| grep '(Administrators)')" ] && [ ! -n "$(id| grep '(SYSTEM)')" ] && [ ! -n "$(id| grep '(root)')" ] ; then
-		echo "You have no privilege to change, abort !!!"
+		echo "You have no privilege to change, abort !!!" | tee -a $WINROLL_LOG
+		id | tee -a $WINROLL_LOG
 		read
 		exit 1
 	fi
