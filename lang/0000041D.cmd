@@ -147,8 +147,8 @@ set RUNSHELL=running cygwin shell
 
 
 REM # Add from v1.2.2 , 20100315
-set PLEASE_INPUT_NEWSID_PROGRAM_PATH=請輸入用來變更 SID 工具的完整路徑
-set PROGRAM_NOT_FOUND=您所指定程式不存在
-set PLEASE_INPUT_NEWSID_PROGRAM_PARAMS=請輸入需要的參數, 如:'/a /n';若無則 [Enter] 跳過
-set FULL_NEW_SID_COMMAND=完整變更 SID 的指令
+set PLEASE_INPUT_NEWSID_PROGRAM_PATH=Please input full path of renew SID tool
+set PROGRAM_NOT_FOUND=Program not found
+set PLEASE_INPUT_NEWSID_PROGRAM_PARAMS=Input parameters for SID tool if it needs, ex: '/a /n'. 
+set FULL_NEW_SID_COMMAND=Full command for renew Windows SID
 
