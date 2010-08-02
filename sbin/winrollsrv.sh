@@ -64,7 +64,7 @@ do_config_network(){
 	# CONFIG_NETWORK_MODE = dhcp ; do dhcp
 	# CONFIG_NETWORK_MODE = /RDF:/drbl_winroll-config/client-mac-network.conf  ; config by file 
 	 
-	CONFIG_NETWORK_MODE="$(sed -e "s/\s*=\s*/=/g" $WINROLL_CONFIG | grep -e "^CONFIG_NETWORK_MODE=" | sed -e "s/^CONFIG_NETWORK_MODE=//" -e "s/(\s! )//g")"
+	CONFIG_NETWORK_MODE="$(sed -e "s/\s*=\s*/=/g" $WINROLL_CONFIG | grep -e "^CONFIG_NETWORK_MODE=" | sed -e "s/^CONFIG_NETWORK_MODE=//" -e "s/(\s! )//g" -e "s/\s*$//g")"
 	if [ "$CONFIG_NETWORK_MODE" = "none" ] || [ -z "$CONFIG_NETWORK_MODE" ] ; then
 		echo "CONFIG_NETWORK_MODE : none"
 		return 3;
@@ -339,9 +339,10 @@ do_autohostname(){
 	fi
 }
 fix_usersid_restart_sshd(){
+	echo "do fix_usersid_restart_sshd" 
 	mkpasswd -l >/etc/passwd
 	mkgroup -l >/etc/group
-	
+
 	cygrunsrv -Q sshd 
 	if [ "$?" -eq "0" ]; then
 		cygrunsrv -E sshd
@@ -352,7 +353,6 @@ fix_usersid_restart_sshd(){
 		chmod 750 /etc/ssh_config
 		echo "Restart sshd service ..."
 		cygrunsrv -S sshd
-		echo "do fix_usersid_restart_sshd" 
 	fi
 	rm -rf "$WINROLL_TMP/$FIX_SSHD_LOCKFILE"
 }
@@ -383,7 +383,9 @@ do_autonewsid(){
 		mv -f /etc/passwd /etc/passwd.old
 		mv -f /etc/group /etc/group.old
 		
-		newsid.exe /a /n;
+		AUTONEWSID_PARAM="$(sed -e "s/\s*=\s*/=/g" $WINROLL_CONFIG | grep -e "^AUTONEWSID_PARAM=" | sed -e "s/^IF_AUTOHOSTNAME_SERVICE=//" -e "s/(\s! )//g")"
+
+		`$AUTONEWSID_PARAM`
 		while [ $(ps au| grep newsid | wc -l) -gt 0 ]
 		do
 			echo "Waiting for renew sid ..."
