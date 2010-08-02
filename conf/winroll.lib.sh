@@ -29,12 +29,6 @@ waiting_to_reboot(){
 	done
 }
 
-get_administrators_gid(){
-	_gid=$1
-	_administrators_gid=$(awk -F ':' '/:544:/ {print $1}' /etc/group)
-	echo $(awk -F ':' /:$gid:/'{print $1}' /etc/group)
-}
-
 check_if_root_and_envi(){
 	if [ -z "$(id| grep -iE 'gid=.*,'$_GID_Administrators'\(' )" ] ; then
 		echo "You have no privilege to change, abort !!!" | tee -a $WINROLL_LOG
