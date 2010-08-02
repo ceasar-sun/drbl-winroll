@@ -344,14 +344,13 @@ fix_usersid_restart_sshd(){
 	
 	cygrunsrv -Q sshd 
 	if [ "$?" -eq "0" ]; then
-		chmod 644 /var/log/sshd.log
-		chmod 644 /etc/ssh_host*_key.pub
+		cygrunsrv -E sshd
+		priv_sshd_user=$(cygrunsrv.exe -V -Q sshd | grep -e "^Account" | awk -F ":" '{print $2}' | sed -e "s/\.\\\//" -e "s/ //")
+		chown $priv_sshd_user.$_GID_Administrators /etc/ssh*
+		chmod 644 /var/log/sshd.log /etc/ssh_host*_key.pub /etc/sshd_config
 		chmod 600 /etc/ssh_host*_key
 		chmod 750 /etc/ssh_config
-		chmod 644 /etc/sshd_config
 		echo "Restart sshd service ..."
-		cygrunsrv -E sshd
-		sleep 5
 		cygrunsrv -S sshd
 		echo "do fix_usersid_restart_sshd" 
 	fi
