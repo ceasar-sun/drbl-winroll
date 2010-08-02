@@ -1,65 +1,46 @@
-******* DRBL-winRoll Translation How To Document ********
+******* DRBL-winroll Translation How To Document ********
 
     NCHC Free Software Labs, NCHC ,Taiwan
-    Date	:	2007/3/2
+    Date	:	2010/8/2
     License	:	GPL      
     Author	:	Ceasar Sun
 
 *********************************************************
 
-The guide is for how to translate drbl-winroll into your language, include translate 4 
- files and how to test with your language patch.
-
-Let me know if any problem. And lots of thanks for your great help !!!
-Contact with us if any problem.
+The guide is for how to translate drbl-winroll to suit for your language and how to test. Please let me know if any problem and thanks in advanced for your great contribution !!!
 
 	Ceasar <ceasar at nchc.org.tw>, Steven <steven at nchc.org.tw>
 
 --------------------------------------------------------------------------------------------------------------------------------------------
-* Phase 1: Translate files
-NOTE:
-    ** Please use system default values in your transartion files
-    ** Only the streams between "[" "]" is what you need to modify/translate
-    ** DO NOT use unix new-line in batch script !! 
+* Translate 2 essential files 
+Get current system locale number:
+	Before to translate, system locale RFC1766 number must be identified. It can get form Windows registry , 
+	\\HKEY_CURRENT_USER\Control Panel\International\Locale
+	* It must has 8 characters, ex: zh_TW : 00000404, en-US :00000409, Nederlands:00000413, france: 0000040C, Svenska :0000041D, ....
+	* It must has 8 characters
 
-Start to translate :
-For installation:
-*** Edit ~/drbl-winroll/winRoll-setup.bat
-1. Below "REM # identify your OS language " session, add a new line as :
-set [YOUR_LANG]_OS_PATH=%USERPROFILE%\[your_desktop_path]
+1. Translate 1 file for installation
+	1.1 Make a copy from ~/drbl-winroll/lang/default.cmd to ~/drbl-winroll/lang/[your-locale-number].cmd
+	1.2 Translate it and DO NOT use unix new-line in cmd file.
 
-2.  In ":SET_LANGUAGE" sub-function , find out the lines as  the follow:
-REM #####################################
-REM # Sub function
-REM #####################################
-:SET_LANGUAGE
+2. Translate 1 keyword file for winroll service running
+	2.1 Make a copy from ~/drbl-winroll/conf/keyword-conf/_legacy/_default.conf to ~/drbl-winroll/conf/keyword-conf/[os-version]/[your-locale-number].conf
+	* For Windows 2000, XP, 2003 , [os-version] directory is "_legacy"
+	* After installation, whole keyword folder should be copy to "c:\cygwin\drbl_winroll-config\keyword-conf"
 
-Add several  lines as the follow format :
-  IF EXIST "%[YOUR_LANG]_OS_PATH%" (
-    set LANG=[your_lang]
-  )
+	2.2  Translate it and USE unix new-line in conf file (Remember to convert to UNIX format via your text editor)
+	* On keyword file, only 2 items need to translate and they are high-dependence with your locale system. Please see the file that you cpoy for more deatil.
 
-*** Rename language file: ~/drbl-winroll/lang/[your_lang].cmd
-set NIC_NAME=[your environment of "Local Area Connection"] 
-set STARTMENU_PATH=[your system path for "%ALLUSERSPROFILE%\Start Menu\Programs\Cygwin"]
-set ADMIN=[you system account of Administrator]
-
-For others, please translate them in your language properly
-NOTE: Keep empty value if it has nothing in original script, ex:
-set ROOT_PASSWORD=
-
-*** Rename FAQ file: ~/drbl-winroll/doc/FAQ.[your_lang].cmd
-Please translate its content for easy to read . And don't forget leave your name in document header if you want .
-...
-   [Your_lang] Translation   :       [your-name , contact ...]
-....
-
+* Translate Faq (Optional, it has no impact during installation and service running)
+Translate ~/drbl-winroll/doc/Faq.en.txt to ~/drbl-winroll/doc/Faq.[your-language].txt
 
 --------------------------------------------------------------------------------------------------------------------------------------------
 * Phase 2: Test your language patch
 
-Step 1. Copy the 4 files into the original drbl-winroll folder , 
-NOTE: Suggest to make a copy for winRoll-setup.bat and drbl_winroll-uninstall.bat
+1. Download drbl-winroll-setup wuth zip format, extract and make sure the translation files be stored correctly before install
+	1.1 For installation : ~/drbl-winroll/lang/[your-locale-number].cmd
+	1.2 For service running : ~/drbl-winroll/conf/keyword-conf/[os-version]/[your-locale-number].conf
+2. Finish installation. Check if your keyword file be stored into "c:\cygwin\drbl_winroll-config\keyword-conf" (This should be no problem) 
 
 Step 2: Install in a non-contaminative environment  
 Check it works with your language description during installation.

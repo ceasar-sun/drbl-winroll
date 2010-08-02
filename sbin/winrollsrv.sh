@@ -1,7 +1,7 @@
 #!/bin/sh
 
 ###########################################################################
-#  drbl-winRoll service
+#  drbl-winroll service
 #
 # License: GPL
 # Author	: Ceasar Sun Chen-kai <ceasar@nchc.org.tw> , Steven steven@nchc.org.tw
