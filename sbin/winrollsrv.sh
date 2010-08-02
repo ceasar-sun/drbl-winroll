@@ -374,6 +374,12 @@ do_autonewsid(){
 	if [ "$(cat $SID_MD5CHK_FILE)" != "$NICMAC_ADDR_MD5" ] ; then
 		echo "Renew sid for: $NICMAC_ADDR_MD5 " 
 		rm -rf $SID_MD5CHK_FILE;
+		cygrunsrv -Q sshd 
+		if [ "$?" -eq "0" ]; then
+			echo "Stop sshd service ..."
+			cygrunsrv -E sshd
+		fi
+
 		NEED_TO_CHANGE=1
 		mv -f /etc/passwd /etc/passwd.old
 		mv -f /etc/group /etc/group.old
