@@ -19,6 +19,8 @@ WINROLL_LOG="$WINROLL_TMP/winrollsrv.log"
 TEMP="/var/log"
 TMP="/var/log"
 
+_GID_Administrators='544'
+
 waiting_to_reboot(){
 	while [ $(ls $WINROLL_TMP/winroll-*.lock | wc -l) -gt 0 ]
 	do
@@ -27,16 +29,21 @@ waiting_to_reboot(){
 	done
 }
 
+get_administrators_gid(){
+	_gid=$1
+	_administrators_gid=$(awk -F ':' '/:544:/ {print $1}' /etc/group)
+	echo $(awk -F ':' /:$gid:/'{print $1}' /etc/group)
+}
+
 check_if_root_and_envi(){
-	#echo `whoami`, `id`
-	if [ ! -n "$(id| grep '(Administrators)')" ] && [ ! -n "$(id| grep '(SYSTEM)')" ] && [ ! -n "$(id| grep '(root)')" ] ; then
+	if [ -z "$(id| grep -iE 'gid=.*,'$_GID_Administrators'\(' )" ] ; then
 		echo "You have no privilege to change, abort !!!" | tee -a $WINROLL_LOG
 		id | tee -a $WINROLL_LOG
 		read
 		exit 1
 	fi
 	
-	chown -R .Administrators $WINROLL_CONF_ROOT
+	chown -R .$_GID_Administrators $WINROLL_CONF_ROOT
 	chmod g+w $WINROLL_CONF_ROOT/*.conf
 }
 detect_win_version(){
