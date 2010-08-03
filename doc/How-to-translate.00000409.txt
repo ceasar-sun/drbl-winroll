@@ -1,0 +1,8 @@
+Please refer to How-to-translate.txt
+
+	Ceasar Sun <ceasar_at_nchc_org_tw>
+*********************************************************
+ 	NCHC Free Software Labs  , NCHC ,Taiwan
+	License: GPL
+*********************************************************
+

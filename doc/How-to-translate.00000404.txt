@@ -1,0 +1,79 @@
+******* DRBL-winroll Translation How To Document ********
+
+    NCHC Free Software Labs, NCHC ,Taiwan
+    Date	:	2010/8/2
+    License	:	GPL      
+    Author	:	Ceasar Sun  <ceasar at nchc.org.tw>
+
+*********************************************************
+
+The guide is for how to translate drbl-winroll (for version 1.2.x or later) to suit for your language and how to test. Please let me know if any problem and thanks in advanced for your great contribution !!!
+
+此文件是關於如何翻譯並協助 drbl-winroll 以支援更多樣化的 Windows 系統與語系。
+
+在 1.2.1-x 後即採用新的語系對應架構，所以協助翻譯時會有 3 個檔案需要處理：
+1. 關鍵字對應表 (必要)
+2. 安裝用語言檔 (方便安裝時閱讀訊息. 非必要，但建議翻譯)
+3. Faq 文件 (非必要)
+
+為何需要有關鍵字對應表：
+由於Windows 在不同的版本/語系，其命令結果與初始環境都相不盡相同，例如同樣都是繁體中文的 XP 與 Windows 7 下 ipconfig 指令，輸出卻有不同的關鍵字結構; 而相同作業系統版本在不同語系，當然更是不同。
+不像在 Linux 下可以透過 export LC_ALL=C 來使得指令輸出有相同的規格. 所以要使其支援多寵版本與語系，最簡易的方式位設置關鍵字對應表. 如此，將使不同語系支援更容易，不同版本作業系統也容易有彈性增加其支援.
+
+為何要抽離『安裝用語言檔』和『關鍵字對應表』？
+較具彈性。在沒有支援的環境下，仍然可以進行安裝。安裝後，使用者依 ~/drbl-winroll/conf/keyword-conf/_legacy/_default.conf 進行關鍵字對應表的配置並放置適當的 OS keyword 目錄，即可正常運作。
+
+--------------------------------------------------------------------------------------------------------------------------------------------
+如何進行翻譯：
+
+0. 取得目前系統環境的語系編號：
+	開始翻譯前，妳必須先確認您系統的語系編號, 為 RFC1766 標準. 可以從 Windows registry 取得, 其鍵值為
+	\\HKEY_CURRENT_USER\Control Panel\International\Locale
+	語系編號一定是 8 字元的字串, 例如: zh_TW = 00000404, en-US = 00000409, Nederlands = 00000413, france = 0000040C, Svenska = 0000041D, ....
+
+1. 配置關鍵字對應表 (必要)
+	1.1 Make a copy from ~/drbl-winroll/conf/keyword-conf/_legacy/_default.conf to ~/drbl-winroll/conf/keyword-conf/[os-version]/[your-locale-number].conf
+	* For Windows 2000, XP, 2003 , [os-version] directory is "_legacy"
+	* After installation, whole keyword folder should be copy to "c:\cygwin\drbl_winroll-config\keyword-conf"
+
+	1.2  Translate it and USE unix new-line in conf file (Remember to convert to UNIX format via your text editor)
+	* On keyword file, only 2 items need to translate and they are high-dependence with your locale system. Please see the file that you cpoy for more deatil.
+
+2. 翻譯安裝用語言檔 (方便安裝時閱讀訊息. 非必要，但建議翻譯)
+	2.1 Make a copy from ~/drbl-winroll/lang/default.cmd to ~/drbl-winroll/lang/[your-locale-number].cmd
+	2.2 Translate it and DO NOT use unix new-line in cmd file.
+
+* Translate Faq (Optional, it has no impact during installation and service running)
+Translate ~/drbl-winroll/doc/Faq.en.txt to ~/drbl-winroll/doc/Faq.[your-language].txt
+
+--------------------------------------------------------------------------------------------------------------------------------------------
+* Phase 2: Test your language patch
+
+1. Download drbl-winroll-setup with zip format, extract and make sure the translation files be stored correctly before install
+	1.1 For installation : ~/drbl-winroll/lang/[your-locale-number].cmd
+	1.2 For service running : ~/drbl-winroll/conf/keyword-conf/[os-version]/[your-locale-number].conf
+
+2. Finish installation. Check if your keyword file be stored into "c:\cygwin\drbl_winroll-config\keyword-conf" (This should be no problem) 
+
+3. Start a "Cygwin Batch Shell", run keyword-check.sh, it should get some information , include: OS version, locale number, keyword file, all of NIC name and ip address
+if the nics are available. The follow is the result on en-Us environment with 3 NIC device :
+>>>>>>>>>>>>>>>>>>>>>>>>>>>>>>>>>>>>>>>>>>>>>>>>>>>>>>>>>>>>>>>>>>>>>>>>>>>>>>>>
+OS verion: 'xp', Locale number: '00000409'
+Use keyword config: '/drbl_winroll-config/keyword-conf/_legacy/00000409.conf'
+Get NIC ->'Local Area Connection'
+Get NIC ->'Local Area Connection 2'
+Get NIC ->'Local Area Connection 3'
+Extarct IP: '10.0.2.15'
+Extarct IP: '169.254.41.40'
+Extarct IP: '169.254.74.88'
+Fill-up mode for first one ip:
+010-000-002-015
+>>>>>>>>>>>>>>>>>>>>>>>>>>>>>>>>>>>>>>>>>>>>>>>>>>>>>>>>>>>>>>>>>>>>>>>>>>>>>>>>
+--------------------------------------------------------------------------------------------------------------------------------------------
+
+
+*********************************************************
+ 	NCHC Free Software Labs  , NCHC ,Taiwan
+	License: GPL
+*********************************************************
+
