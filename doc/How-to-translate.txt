@@ -10,7 +10,10 @@
 The guide is for how to translate drbl-winroll (for version 1.2.x or later) to suit for your language and how to test. Please let me know if any problem and thanks in advanced for your great contribution !!!
 
 --------------------------------------------------------------------------------------------------------------------------------------------
-Here to start :
+Prepare:
+Download the latest version with zip format then extract the zip file. You can download drbl-winroll form https://sourceforge.net/projects/drbl-winroll/files/
+
+*** Here to start ***
 
 Get current system locale number:
 	Before to translate, system locale RFC1766 number must be identified. It can get form Windows registry , 
@@ -36,7 +39,7 @@ Translate ~/drbl-winroll/doc/Faq.en.txt to ~/drbl-winroll/doc/Faq.[your-language
 --------------------------------------------------------------------------------------------------------------------------------------------
 * Phase 2: Test your language patch
 
-1. Download drbl-winroll-setup with zip format, extract and make sure the translation files be stored correctly before install
+1. Make sure the translation files be stored correctly before install
 	1.1 For installation : ~/drbl-winroll/lang/[your-locale-number].cmd
 	1.2 For service running : ~/drbl-winroll/conf/keyword-conf/[os-version]/[your-locale-number].conf
 

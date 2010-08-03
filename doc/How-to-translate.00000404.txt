@@ -24,7 +24,10 @@ The guide is for how to translate drbl-winroll (for version 1.2.x or later) to s
 較具彈性。在沒有支援的環境下，仍然可以進行安裝。安裝後，使用者依 ~/drbl-winroll/conf/keyword-conf/_legacy/_default.conf 進行關鍵字對應表的配置並放置適當的 OS keyword 目錄，即可正常運作。
 
 --------------------------------------------------------------------------------------------------------------------------------------------
-如何進行翻譯：
+準備：
+請先下載最新版本drbl-winroll 的 zip 檔並解壓縮. 可以從 https://sourceforge.net/projects/drbl-winroll/files/ 取得.
+
+*** 開始進行翻譯 ***
 
 0. 取得目前系統環境的語系編號：
 	開始翻譯前，妳必須先確認您系統的語系編號, 為 RFC1766 標準. 可以從 Windows registry 取得, 其鍵值為
@@ -49,7 +52,7 @@ Translate ~/drbl-winroll/doc/Faq.en.txt to ~/drbl-winroll/doc/Faq.[your-language
 --------------------------------------------------------------------------------------------------------------------------------------------
 * Phase 2: Test your language patch
 
-1. Download drbl-winroll-setup with zip format, extract and make sure the translation files be stored correctly before install
+1. Make sure the translation files be stored correctly before install
 	1.1 For installation : ~/drbl-winroll/lang/[your-locale-number].cmd
 	1.2 For service running : ~/drbl-winroll/conf/keyword-conf/[os-version]/[your-locale-number].conf
 
