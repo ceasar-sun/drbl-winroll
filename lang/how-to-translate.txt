@@ -3,33 +3,32 @@
     NCHC Free Software Labs, NCHC ,Taiwan
     Date	:	2010/8/2
     License	:	GPL      
-    Author	:	Ceasar Sun
+    Author	:	Ceasar Sun  <ceasar at nchc.org.tw>
 
 *********************************************************
 
-The guide is for how to translate drbl-winroll to suit for your language and how to test. Please let me know if any problem and thanks in advanced for your great contribution !!!
+The guide is for how to translate drbl-winroll (for version 1.2.x or later) to suit for your language and how to test. Please let me know if any problem and thanks in advanced for your great contribution !!!
 
-	Ceasar <ceasar at nchc.org.tw>, Steven <steven at nchc.org.tw>
 
 --------------------------------------------------------------------------------------------------------------------------------------------
-* Translate 2 essential files 
+Here to start :
 Get current system locale number:
 	Before to translate, system locale RFC1766 number must be identified. It can get form Windows registry , 
 	\\HKEY_CURRENT_USER\Control Panel\International\Locale
 	* It must has 8 characters, ex: zh_TW : 00000404, en-US :00000409, Nederlands:00000413, france: 0000040C, Svenska :0000041D, ....
-	* It must has 8 characters
 
-1. Translate 1 file for installation
-	1.1 Make a copy from ~/drbl-winroll/lang/default.cmd to ~/drbl-winroll/lang/[your-locale-number].cmd
-	1.2 Translate it and DO NOT use unix new-line in cmd file.
-
-2. Translate 1 keyword file for winroll service running
-	2.1 Make a copy from ~/drbl-winroll/conf/keyword-conf/_legacy/_default.conf to ~/drbl-winroll/conf/keyword-conf/[os-version]/[your-locale-number].conf
+1. Translate 1 keyword file for winroll service running (Essential !!)
+	1.1 Make a copy from ~/drbl-winroll/conf/keyword-conf/_legacy/_default.conf to ~/drbl-winroll/conf/keyword-conf/[os-version]/[your-locale-number].conf
 	* For Windows 2000, XP, 2003 , [os-version] directory is "_legacy"
 	* After installation, whole keyword folder should be copy to "c:\cygwin\drbl_winroll-config\keyword-conf"
 
-	2.2  Translate it and USE unix new-line in conf file (Remember to convert to UNIX format via your text editor)
+	1.2  Translate it and USE unix new-line in conf file (Remember to convert to UNIX format via your text editor)
 	* On keyword file, only 2 items need to translate and they are high-dependence with your locale system. Please see the file that you cpoy for more deatil.
+
+
+2. Translate file for installation (Optional, but suggest to do for be friendly during installation )
+	2.1 Make a copy from ~/drbl-winroll/lang/default.cmd to ~/drbl-winroll/lang/[your-locale-number].cmd
+	2.2 Translate it and DO NOT use unix new-line in cmd file.
 
 * Translate Faq (Optional, it has no impact during installation and service running)
 Translate ~/drbl-winroll/doc/Faq.en.txt to ~/drbl-winroll/doc/Faq.[your-language].txt
@@ -37,9 +36,10 @@ Translate ~/drbl-winroll/doc/Faq.en.txt to ~/drbl-winroll/doc/Faq.[your-language
 --------------------------------------------------------------------------------------------------------------------------------------------
 * Phase 2: Test your language patch
 
-1. Download drbl-winroll-setup wuth zip format, extract and make sure the translation files be stored correctly before install
+1. Download drbl-winroll-setup with zip format, extract and make sure the translation files be stored correctly before install
 	1.1 For installation : ~/drbl-winroll/lang/[your-locale-number].cmd
 	1.2 For service running : ~/drbl-winroll/conf/keyword-conf/[os-version]/[your-locale-number].conf
+
 2. Finish installation. Check if your keyword file be stored into "c:\cygwin\drbl_winroll-config\keyword-conf" (This should be no problem) 
 
 Step 2: Install in a non-contaminative environment  

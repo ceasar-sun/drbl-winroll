@@ -11,7 +11,6 @@
 # Usage:  %CYGWIN_ROOT%\bin\autohostname.sh -e "CYGWIN=${_cygwin}"
 #
 ###########################################################################
-#WINROLL_CONFIG="/drbl_winRoll-config/winRoll.txt"
 WINROLL_LIBS="/drbl_winroll-config/winroll.lib.sh"
 for lib in $WINROLL_LIBS ; do 
 	[ -f "$lib" ] && . $lib
