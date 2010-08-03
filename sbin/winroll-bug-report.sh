@@ -37,7 +37,7 @@ cat /proc/registry/HKEY_CURRENT_USER/Control\ Panel/International/Locale >> $rep
 echo "DONE-----------------" | tee -a $report_tmpdir/pc-info.txt
 
 echo "Run keyword-check.sh" | tee -a  $report_tmpdir/pc-info.txt
-Run keyword-check.sh >> $report_tmpdir/pc-info.txt
+keyword-check.sh >> $report_tmpdir/pc-info.txt
 echo "DONE-----------------" | tee -a $report_tmpdir/pc-info.txt
 
 echo "Get pc informations by 'set' ..." | tee -a $report_tmpdir/pc-info.txt
