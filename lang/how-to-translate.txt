@@ -9,9 +9,9 @@
 
 The guide is for how to translate drbl-winroll (for version 1.2.x or later) to suit for your language and how to test. Please let me know if any problem and thanks in advanced for your great contribution !!!
 
-
 --------------------------------------------------------------------------------------------------------------------------------------------
 Here to start :
+
 Get current system locale number:
 	Before to translate, system locale RFC1766 number must be identified. It can get form Windows registry , 
 	\\HKEY_CURRENT_USER\Control Panel\International\Locale
@@ -42,25 +42,20 @@ Translate ~/drbl-winroll/doc/Faq.en.txt to ~/drbl-winroll/doc/Faq.[your-language
 
 2. Finish installation. Check if your keyword file be stored into "c:\cygwin\drbl_winroll-config\keyword-conf" (This should be no problem) 
 
-Step 2: Install in a non-contaminative environment  
-Check it works with your language description during installation.
-
-Step 3: Check any files lost during installation
-* "drbl_winroll-uninstall.bat" and "drbl_winroll-uninstall-path.cmd" should be stored in "%APPDATA%\"
-* "drbl_winroll-uninstall-path.cmd" should contain lines as the follow:
--------------
-@echo off
-set STARTMENU_PATH=[cygwin start menu path for all users]
-set SYSTEM_ADMIN=[your Administrator acccount for your environemnt]
-------------- End of file
-
-* all links should be stored in "%ALUSERSPROFILE%\[all_users_start_menu_path]" , screenshot should be like
-http://drbl.nchc.org.tw/screenshot/?op=show&filepath=album//02_DRBL-winRoll/c00_drbl-winRoll_at_Startmeun.JPG
-
-Step 4: Uninstall by use "Uninstal drbl-winrolll" link from program start-menu
-* All the links under "cygwin" in program menu should be cleaned.
-* "C:\cygwin" folder should be remove 
-
+3. Start a "Cygwin Batch Shell", run keyword-check.sh, it should get some information , include: OS version, locale number, keyword file, all of NIC name and ip address
+if the nics are available. The follow is the result on en-Us environment with 3 NIC device :
+>>>>>>>>>>>>>>>>>>>>>>>>>>>>>>>>>>>>>>>>>>>>>>>>>>>>>>>>>>>>>>>>>>>>>>>>>>>>>>>>
+OS verion: 'xp', Locale number: '00000409'
+Use keyword config: '/drbl_winroll-config/keyword-conf/_legacy/00000409.conf'
+Get NIC ->'Local Area Connection'
+Get NIC ->'Local Area Connection 2'
+Get NIC ->'Local Area Connection 3'
+Extarct IP: '10.0.2.15'
+Extarct IP: '169.254.41.40'
+Extarct IP: '169.254.74.88'
+Fill-up mode for first one ip:
+010-000-002-015
+>>>>>>>>>>>>>>>>>>>>>>>>>>>>>>>>>>>>>>>>>>>>>>>>>>>>>>>>>>>>>>>>>>>>>>>>>>>>>>>>
 --------------------------------------------------------------------------------------------------------------------------------------------
 
 

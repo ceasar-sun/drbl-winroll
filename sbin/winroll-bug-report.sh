@@ -27,12 +27,15 @@ cp -a $WINROLL_TMP $report_tmpdir
 
 echo "Get Windows ProductName from registry"
 touch $report_tmpdir/pc-info.txt
-echo "cat /proc/registry/HKEY_LOCAL_MACHINE/SOFTWARE/Microsoft/Windows\ NT/CurrentVersion/ProductName" >> $report_tmpdir/pc-info.txt
+echo "cat /proc/registry/HKEY_LOCAL_MACHINE/SOFTWARE/Microsoft/Windows\ NT/CurrentVersion/ProductName" | tee -a $report_tmpdir/pc-info.txt
 cat /proc/registry/HKEY_LOCAL_MACHINE/SOFTWARE/Microsoft/Windows\ NT/CurrentVersion/ProductName >> $report_tmpdir/pc-info.txt
-echo . >>$report_tmpdir/pc-info.txt
-echo "cat /proc/registry/HKEY_CURRENT_USER/Control\ Panel/International/Locale" >> $report_tmpdir/pc-info.txt
+echo . | tee -a $report_tmpdir/pc-info.txt
+echo "cat /proc/registry/HKEY_CURRENT_USER/Control\ Panel/International/Locale" | tee -a $report_tmpdir/pc-info.txt
 cat /proc/registry/HKEY_CURRENT_USER/Control\ Panel/International/Locale >> $report_tmpdir/pc-info.txt
-echo . >>$report_tmpdir/pc-info.txt
+echo . | tee -a $report_tmpdir/pc-info.txt
+echo "Run keyword-check.sh" | tee -a  $report_tmpdir/pc-info.txt
+cat /proc/registry/HKEY_CURRENT_USER/Control\ Panel/International/Locale >> $report_tmpdir/pc-info.txt
+echo . | tee -a $report_tmpdir/pc-info.txt
 
 echo "Get pc informations by 'set' ..." | tee -a $report_tmpdir/pc-info.txt
 set >> $report_tmpdir/pc-info.txt
