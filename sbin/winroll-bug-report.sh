@@ -27,21 +27,26 @@ cp -a $WINROLL_TMP $report_tmpdir
 
 echo "Get Windows ProductName from registry"
 touch $report_tmpdir/pc-info.txt
+
 echo "cat /proc/registry/HKEY_LOCAL_MACHINE/SOFTWARE/Microsoft/Windows\ NT/CurrentVersion/ProductName" | tee -a $report_tmpdir/pc-info.txt
 cat /proc/registry/HKEY_LOCAL_MACHINE/SOFTWARE/Microsoft/Windows\ NT/CurrentVersion/ProductName >> $report_tmpdir/pc-info.txt
-echo . | tee -a $report_tmpdir/pc-info.txt
+echo "DONE-----------------" | tee -a $report_tmpdir/pc-info.txt
+
 echo "cat /proc/registry/HKEY_CURRENT_USER/Control\ Panel/International/Locale" | tee -a $report_tmpdir/pc-info.txt
 cat /proc/registry/HKEY_CURRENT_USER/Control\ Panel/International/Locale >> $report_tmpdir/pc-info.txt
-echo . | tee -a $report_tmpdir/pc-info.txt
+echo "DONE-----------------" | tee -a $report_tmpdir/pc-info.txt
+
 echo "Run keyword-check.sh" | tee -a  $report_tmpdir/pc-info.txt
-cat /proc/registry/HKEY_CURRENT_USER/Control\ Panel/International/Locale >> $report_tmpdir/pc-info.txt
-echo . | tee -a $report_tmpdir/pc-info.txt
+Run keyword-check.sh >> $report_tmpdir/pc-info.txt
+echo "DONE-----------------" | tee -a $report_tmpdir/pc-info.txt
 
 echo "Get pc informations by 'set' ..." | tee -a $report_tmpdir/pc-info.txt
 set >> $report_tmpdir/pc-info.txt
+echo "DONE-----------------" | tee -a $report_tmpdir/pc-info.txt
 
 echo "Get pc informations by 'systeminfo' ..." | tee -a $report_tmpdir/pc-info.txt
 systeminfo 2>/dev/null >> $report_tmpdir/pc-info.txt
+echo "DONE-----------------" | tee -a $report_tmpdir/pc-info.txt
 
 unix2dos --force -D $report_tmpdir/pc-info.txt
 cd `dirname $report_tmpdir`; zip -r -q `basename $report_tmpdir`.zip `basename $report_tmpdir`; mv `basename $report_tmpdir`.zip  /winroll-bug-report.`date +%Y%m%d`.zip
