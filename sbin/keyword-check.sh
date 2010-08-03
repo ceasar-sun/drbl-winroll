@@ -52,6 +52,7 @@ for ip in $_ip_str ; do
 	echo "Extarct IP: '$ip'";
 done
 
+echo "Fill-up mode for first one ip:"
 get_ip_str | head -n 1 | cut -d ":" -f 2 | sed -e "s/\s*//g" |awk -F. '{print $1+1000"-"$2+1000"-"$3+1000"-"$4+1000 }' | sed -e 's/^1//' -e 's/\-1/-/g'		
 
 
