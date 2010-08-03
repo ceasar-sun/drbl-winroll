@@ -35,12 +35,23 @@ else
 	. $DEFAULT_DEVICE_KEYWORD_CONF
 fi 
 
-_devname_str=$(ipconfig /all | grep "$_Ethernet_Adapter_KEYWORD"| dos2unix |  sed -e "s/$_Ethernet_Adapter_KEYWORD//g" )
+echo "OS verion: '$OS_VERSION', Locale number: '$LOCALEID'"
+echo "Use keyword config: '$WINROLL_CONF_ROOT/keyword-conf/$OS_KEYWORD_CONF/$LOCALEID.conf'"
+
+_devname_str="$(get_nic_name_str)"
 for ((i=1;i<`echo ${_devname_str} | awk -F ":" '{print NF}'`;i++)) ; do
 	_devname="$(echo $_devname_str | awk -F ":" '{print $'$i'}' | sed -e 's/^\s*//g')"
-	line_nm_rev=$(ipconfig /all | tac | grep -n "$devname"| head -n 1 | awk -F ":" '{print $1}')
-	this_ip=$(ipconfig /all | tac | head -n $line_nm_rev | grep "$_IPV4_ADDRESS_KEYWORDD"| head -n 1| dos2unix | awk -F ":" '{print $2}'| sed -e "s/\s*//g")
-	echo "Get NIC name:'$_devname' and its ip address :'$this_ip'"
+	echo "Get NIC ->'$_devname'"
 done
+
+#_devname=$(get_nic_name_str "00-18-32-E7-D1-E1" |  sed -e "s/:$//g" )
+#echo "Get by mca:00-18-32-E7-D1-E1 ->'$_devname'"
+
+_ip_str=$(get_ip_str)
+for ip in $_ip_str ; do
+	echo "Extarct IP: '$ip'";
+done
+
+get_ip_str | head -n 1 | cut -d ":" -f 2 | sed -e "s/\s*//g" |awk -F. '{print $1+1000"-"$2+1000"-"$3+1000"-"$4+1000 }' | sed -e 's/^1//' -e 's/\-1/-/g'		
 
 

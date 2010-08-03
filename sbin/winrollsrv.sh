@@ -68,7 +68,8 @@ do_config_network(){
 		echo "CONFIG_NETWORK_MODE : none"
 		return 3;
 	elif [ "$CONFIG_NETWORK_MODE" = "dhcp" ] ; then
-		_devname_str=$(ipconfig /all | grep "$_Ethernet_Adapter_KEYWORD"| dos2unix |  sed -e "s/$_Ethernet_Adapter_KEYWORD//g" )
+		_devname_str=$(get_nic_name_str)
+		#_devname_str=$(ipconfig /all | grep "$_Ethernet_Adapter_KEYWORD"| dos2unix |  sed -e "s/$_Ethernet_Adapter_KEYWORD//g" )
 		for ((i=1;i<`echo ${_devname_str} | awk -F ":" '{print NF}'`;i++)) ; do
 			_devname="$(echo $_devname_str | awk -F ":" '{print $'$i'}' | sed -e 's/^\s*//g')"
 			netsh interface ip set address name="$_devname" source=dhcp
@@ -106,8 +107,9 @@ do_config_network(){
 			. $WINROLL_TMP/$this_nw_conf_tmp
 			
 			# To get nic device name 
-			line_nm_rev=$(ipconfig /all | grep -n "$mac"| head -n 1 | awk -F ":" '{print $1}')
-			_devname=$(ipconfig /all | head -n $line_nm_rev | tac | grep "$_Ethernet_Adapter_KEYWORD"| head -n 1| dos2unix |  sed -e "s/$_Ethernet_Adapter_KEYWORD//g" -e "s/^\s*//g" -e "s/:$//g" )
+			#line_nm_rev=$(ipconfig /all | grep -n "$mac"| head -n 1 | awk -F ":" '{print $1}')
+			#_devname=$(ipconfig /all | head -n $line_nm_rev | tac | grep "$_Ethernet_Adapter_KEYWORD"| head -n 1| dos2unix |  sed -e "s/$_Ethernet_Adapter_KEYWORD//g" -e "s/^\s*//g" -e "s/:$//g" )
+			_devname=$(get_nic_name_str $mac)
 
 			# can't find match mac address for itself
 			[ -z "$thisip" ] && echo "No match item for '$_devname' :$mac ," && continue
@@ -292,7 +294,9 @@ do_autohostname(){
 		
 		#NM="$(ipconfig | grep "$_NETMASK_KEYWORD" | head -n 1 | cut -d ":" -f 2 | sed -e "s/\s*//g" )"
 		NM="$(ipconfig | dos2unix | awk -F ":" "\$2 ~/ [0-9]+.[0-9]+.[0-9]+.[0-9]+$/ {print \$2}" | sed -e 's/\s//g' | awk -F "." "\$1 == 255 {print \$0}"  | head -n 1 )"
-		IP="$(ipconfig | grep "$_IPV4_ADDRESS_KEYWORD" | head -n 1 | cut -d ":" -f 2 | sed -e "s/\s*//g" |awk -F. '{print $1+1000"-"$2+1000"-"$3+1000"-"$4+1000 }' | sed -e 's/^1//' -e 's/\-1/-/g' )"
+		IP="$(get_ip_str |awk -F. '{print $1+1000"-"$2+1000"-"$3+1000"-"$4+1000 }' | sed -e 's/^1//' -e 's/\-1/-/g' )"
+		#IP="$(ipconfig | grep "$_IPV4_ADDRESS_KEYWORD" | head -n 1 | cut -d ":" -f 2 | sed -e "s/\s*//g" |awk -F. '{print $1+1000"-"$2+1000"-"$3+1000"-"$4+1000 }' | sed -e 's/^1//' -e 's/\-1/-/g' )"
+
 		#DNS_SUFF="$(ipconfig /all | grep "$_DNS_SEARCH_SUFFIX_KEYWORD" 2>/dev/null |head -n 1 | cut -d ":" -f 2 | cut -d "." -f 1,2 |sed -e "s/\./-/g" -e "s/\s*//g" )"
 		_DNS_SUFFIX_REGISTRY_KeyList="HKEY_LOCAL_MACHINE/SYSTEM/CurrentControlSet/Services/Tcpip/Parameters/DhcpDomain HKEY_LOCAL_MACHINE/SYSTEM/CurrentControlSet/Services/Tcpip/Parameters/SearchList"
 		_DNS_SUFFIX_REGISTRY_Value=
