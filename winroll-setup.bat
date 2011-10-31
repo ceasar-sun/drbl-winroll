@@ -615,7 +615,7 @@ goto :EOF
 	set _ADD2AD_RUN_SCRIPT=netdom join %%computername%% /domain:%_AD_DOMAIN% /userd:%_AD_USERD% /passwordd:%_AD_PASSWORDD% /reboot:8
 	
 	echo ** %SHOW_ADD2AD_RUN_SCRIPT% : %_ADD2AD_RUN_SCRIPT%
-	echo ** %NOTE_NETDOM_NECESSITY% Please make sure 'netdom.exe' dose exist in your system !!
+	echo ** %NOTE_NETDOM_NECESSITY% 
 	
 	echo %_ADD2AD_RUN_SCRIPT% >> %WINROLL_CONFIG_FOLDER%\%ADD2AD_RUN_FILE%
 	echo IF_ADD2AD_SERVICE = %IF_AUTOHOSTNAME_SERVICE%>>%WINROLL_CONFIG_FILE%
