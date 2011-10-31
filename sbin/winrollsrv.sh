@@ -405,6 +405,51 @@ do_autonewsid(){
 	fi
 
 }
+
+do_add2ad(){
+
+	ADD2AD_MD5CHK_FILE="$WINROLL_CONF_ROOT/add2ad.md5"
+	ADD2AD_RUN_FILE="$WINROLL_CONF_ROOT/add2ad.bat"
+	NICMAC_ADDR_MD5=""
+	#NEED_TO_CHANGE=0
+
+	if [ "$NEED_TO_REBOOT" = "1" ]; then
+		echo "Skip this time due to reboot flag !!"
+		return;
+	fi
+
+	which netdom.exe 1>/dev/null 2>&1
+	if [ "$?" != 0 ]; then
+		echo "No netdom.exe program in system !!"
+		return
+	fi
+
+	[ ! -f "$ADD2AD_MD5CHK_FILE" ] && touch $ADD2AD_MD5CHK_FILE;
+
+	NICMAC_ADDR_MD5="$(ipconfig /all | dos2unix | awk -F ":" "/ [0-9A-F]+-[0-9A-F]+-[0-9A-F]+-[0-9A-F]+-[0-9A-F]+-[0-9A-F]+$/{print \$2}" | sed -e 's/\s//g' | head -n 1 | md5sum | awk '{print $1}')"
+	NEED_TO_CHANGE=0
+
+	echo $NICMAC_ADDR_MD5 
+
+	if [ "$(cat $ADD2AD_MD5CHK_FILE)" != "$NICMAC_ADDR_MD5" ] ; then
+		echo "Add pc to AD server : $NICMAC_ADDR_MD5 " 
+		rm -rf $ADD2AD_MD5CHK_FILE;
+		
+		ADD2AD_RUN_FILE="$(sed -e "s/\s*=\s*/=/g" $WINROLL_CONFIG | grep -e "^ADD2AD_RUN_FILE=" | sed -e "s/^ADD2AD_RUN_FILE=//" -e "s/(\s! )//g")"
+
+		$WINROLL_CONF_ROOT/$ADD2AD_RUN_FILE
+
+		if [ "$?" = 0 ] ; then
+			echo "$NICMAC_ADDR_MD5" > $ADD2AD_MD5CHK_FILE
+			echo `date` "successfully ! Remove $ADD2AD_RUN_FILE for security ..."
+			rm -rf $WINROLL_CONF_ROOT/$ADD2AD_RUN_FILE
+		fi
+	else
+		echo "Already done, skip !"	
+	fi
+	
+}
+
 #######################
 # Main function
 #######################
@@ -422,6 +467,9 @@ IF_AUTOHOSTNAME_SERVICE="$(sed -e "s/\s*=\s*/=/g" $WINROLL_CONFIG | grep -e "^IF
 
 IF_NEWSID_SERVICE=$(sed -e "s/\s*=\s*/=/g" $WINROLL_CONFIG | grep -e "^IF_NEWSID_SERVICE=" | sed -e "s/^IF_NEWSID_SERVICE=//" -e "s/(\s! )//g")
 [ "$IF_NEWSID_SERVICE" = "y" ] && do_autonewsid;
+
+IF_ADD2AD_SERVICE=$(sed -e "s/\s*=\s*/=/g" $WINROLL_CONFIG | grep -e "^IF_ADD2AD_SERVICE=" | sed -e "s/^IF_ADD2AD_SERVICE=//" -e "s/(\s! )//g")
+[ "$IF_ADD2AD_SERVICE" = "y" ] && do_add2ad;
 
 
 #Unlock the service

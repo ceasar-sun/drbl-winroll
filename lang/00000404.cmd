@@ -150,3 +150,14 @@ set PLEASE_INPUT_NEWSID_PROGRAM_PATH=請輸入用來變更 SID 工具的完整路徑
 set PROGRAM_NOT_FOUND=您所指定程式不存在
 set PLEASE_INPUT_NEWSID_PROGRAM_PARAMS=請輸入需要的參數, 如:'/a /n';若無則 [Enter] 跳過
 set FULL_NEW_SID_COMMAND=完整變更 SID 的指令
+
+REM # Add from v1.2.3 , 20111031
+set SETUP_AUTO_ADD2AD_SERVICE=配置自動加入 AD 網域服務
+set IF_INSTALL_ADD2AD=是否要配置自動加入 AD 網域服務
+set SET_DEFAULT_AD_DOMAIN=請輸入 AD 的網域名稱
+set SET_DEFAULT_AD_USERD=請輸入 AD 的管理帳號
+set SET_DEFAULT_AD_PASSWORDD=請輸入 AD 管理帳號之密碼
+set SHOW_ADD2AD_RUN_SCRIPT=完整指令為
+set NOTE_NETDOM_NECESSITY=請確認系統中有 netdom.exe 執行檔
+
+

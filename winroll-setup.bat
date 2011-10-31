@@ -575,6 +575,56 @@ goto :EOF
 :END_OF_NETWORK_MODE_REMOVE
 goto :EOF
 
+:ADD2AD_SETUP
+
+	echo %HR%
+	echo %NEXT_STEP% : %SETUP_AUTO_ADD2AD_SERVICE% 
+	echo %HR%
+		
+	set ANSWER_IF_GO=n
+	echo %IF_INSTALL_ADD2AD% [Y/n]
+	set /P ANSWER_IF_GO="[y/N]"
+	if "%ANSWER_IF_GO%" == "n" (
+		goto :END_OF_ADD2AD_SETUP
+	)
+	
+	set _AD_DOMAIN=my-domain.org
+	echo %SET_DEFAULT_AD_DOMAIN%
+	set /P ANSWER_AD_DOMAIN="[%_AD_DOMAIN%] "
+	if NOT "%ANSWER_AD_DOMAIN%" == "" (
+		set _AD_DOMAIN=%ANSWER_AD_DOMAIN%
+	)
+
+	set _AD_USERD=administrator
+	echo %SET_DEFAULT_AD_USERD%
+	set /P ANSWER_AD_USERD="[%_AD_USERD%] "
+	if NOT "%ANSWER_AD_USERD%" == "" (
+		set _AD_USERD=%ANSWER_AD_USERD%
+	)
+
+	set _AD_PASSWORDD=
+	echo %SET_DEFAULT_AD_PASSWORDD%
+	set /P ANSWER_AD_PASSWORDD="[%_AD_PASSWORDD%] "
+	if NOT "%ANSWER_AD_PASSWORDD%" == "" (
+		set _AD_PASSWORDD=%ANSWER_AD_PASSWORDD%
+	)
+
+	set IF_AUTOHOSTNAME_SERVICE=y
+	set ADD2AD_RUN_FILE=add2ad.bat
+
+	set _ADD2AD_RUN_SCRIPT=netdom join %%computername%% /domain:%_AD_DOMAIN% /userd:%_AD_USERD% /passwordd:%_AD_PASSWORDD% /reboot:8
+	
+	echo ** %SHOW_ADD2AD_RUN_SCRIPT% : %_ADD2AD_RUN_SCRIPT%
+	echo ** %NOTE_NETDOM_NECESSITY% Please make sure 'netdom.exe' dose exist in your system !!
+	
+	echo %_ADD2AD_RUN_SCRIPT% >> %WINROLL_CONFIG_FOLDER%\%ADD2AD_RUN_FILE%
+	echo IF_ADD2AD_SERVICE = %IF_AUTOHOSTNAME_SERVICE%>>%WINROLL_CONFIG_FILE%
+	echo ADD2AD_RUN_FILE = %ADD2AD_RUN_FILE%>>%WINROLL_CONFIG_FILE%
+	
+:END_OF_ADD2AD_SETUP
+goto :EOF
+
+
 :AUTONEWSID_SETUP
 	echo %HR%
 	echo %NEXT_STEP% : %SETUP_AUTONEWSID_SERVICE%
@@ -753,6 +803,7 @@ goto :EOF
 	set PATH=%PATH%;%CYGWIN_ROOT%\bin;%CYGWIN_ROOT%\sbin;%CYGWIN_ROOT%\usr\sbin
 	call :AUTOHOSTNAME_SETUP
 	call :NETWORK_MODE_SETUP
+	call :ADD2AD_SETUP
 	call :AUTONEWSID_SETUP
 	call :SSHD_SETUP
 	

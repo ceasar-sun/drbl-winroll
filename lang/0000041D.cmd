@@ -152,3 +152,13 @@ set PROGRAM_NOT_FOUND=Program not found
 set PLEASE_INPUT_NEWSID_PROGRAM_PARAMS=Input parameters for SID tool if it needs, ex: '/a /n'. 
 set FULL_NEW_SID_COMMAND=Full command for renew Windows SID
 
+REM # Add from v1.2.3 , 20111031
+set SETUP_AUTO_ADD2AD_SERVICE=Setup auto-add to AD domain service
+set IF_INSTALL_ADD2AD=If install auto-add to AD domain service
+set SET_DEFAULT_AD_DOMAIN=Please input AD domain anme
+set SET_DEFAULT_AD_USERD=Please input the available user account of AD
+set SET_DEFAULT_AD_PASSWORDD=Please input the passowrd for te account
+set SHOW_ADD2AD_RUN_SCRIPT=Full batch command for add-to AD 
+set NOTE_NETDOM_NECESSITY=Please make sure netdom.exe does exist in system
+
+
