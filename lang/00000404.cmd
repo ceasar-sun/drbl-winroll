@@ -160,4 +160,3 @@ set SET_DEFAULT_AD_PASSWORDD=請輸入 AD 管理帳號之密碼
 set SHOW_ADD2AD_RUN_SCRIPT=完整指令為
 set NOTE_NETDOM_NECESSITY=請確認系統中有 netdom.exe 執行檔
 
-

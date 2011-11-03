@@ -414,14 +414,7 @@ do_add2ad(){
 	#NEED_TO_CHANGE=0
 
 	if [ "$NEED_TO_REBOOT" = "1" ]; then
-		echo "Skip this time due to reboot flag !!"
 		return;
-	fi
-
-	which netdom.exe 1>/dev/null 2>&1
-	if [ "$?" != 0 ]; then
-		echo "No netdom.exe program in system !!"
-		return
 	fi
 
 	[ ! -f "$ADD2AD_MD5CHK_FILE" ] && touch $ADD2AD_MD5CHK_FILE;
@@ -432,22 +425,18 @@ do_add2ad(){
 	echo $NICMAC_ADDR_MD5 
 
 	if [ "$(cat $ADD2AD_MD5CHK_FILE)" != "$NICMAC_ADDR_MD5" ] ; then
-		echo "Add pc to AD server : $NICMAC_ADDR_MD5 " 
+		echo "Add pc to add server : $NICMAC_ADDR_MD5 " 
 		rm -rf $ADD2AD_MD5CHK_FILE;
 		
 		ADD2AD_RUN_FILE="$(sed -e "s/\s*=\s*/=/g" $WINROLL_CONFIG | grep -e "^ADD2AD_RUN_FILE=" | sed -e "s/^ADD2AD_RUN_FILE=//" -e "s/(\s! )//g")"
 
-		$WINROLL_CONF_ROOT/$ADD2AD_RUN_FILE
+		`$WINROLL_CONF_ROOT/$ADD2AD_RUN_FILE`
 
-		if [ "$?" = 0 ] ; then
-			echo "$NICMAC_ADDR_MD5" > $ADD2AD_MD5CHK_FILE
-			echo `date` "successfully ! Remove $ADD2AD_RUN_FILE for security ..."
-			rm -rf $WINROLL_CONF_ROOT/$ADD2AD_RUN_FILE
+		if [ "$?" = 0] ; then
+			NEED_TO_CHANGE=0
+			echo `date` "ADD2AD need to reboot :" 
 		fi
-	else
-		echo "Already done, skip !"	
 	fi
-	
 }
 
 #######################

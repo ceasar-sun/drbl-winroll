@@ -333,17 +333,17 @@ goto :EOF
 	  mkdir "%CYGWIN_ROOT%"
 	)
 
-	IF NOT EXIST "%CYGWIN_ROOT%\etc\setup" (
-	  mkdir "%CYGWIN_ROOT%\etc\setup"
-	) ELSE (
-	  del /Q "%CYGWIN_ROOT%\etc\setup\last-*"
-	)
+	rem IF NOT EXIST "%CYGWIN_ROOT%\etc\setup" (
+	rem   mkdir "%CYGWIN_ROOT%\etc\setup"
+	rem ) ELSE (
+	rem   del /Q "%CYGWIN_ROOT%\etc\setup\last-*"
+	rem )
 
 	REM -- Note that last-* must *not* containing whitespace, e.g. " " etc. 
 	REM -- This is why there below is no space in front of ">".
-	echo Install> "%CYGWIN_ROOT%\etc\setup\last-action"
-	echo %LOCAL_REPOSITORY%> "%CYGWIN_ROOT%\etc\setup\last-cache"
-	echo cygwin_mirror> "%CYGWIN_ROOT%\etc\setup\last-mirror"
+	rem echo Install> "%CYGWIN_ROOT%\etc\setup\last-action"
+	rem echo %LOCAL_REPOSITORY%> "%CYGWIN_ROOT%\etc\setup\last-cache"
+	rem echo cygwin_mirror> "%CYGWIN_ROOT%\etc\setup\last-mirror"
 
 	REM - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - -
 	REM Finally, run Cygwin setup quietly
@@ -384,7 +384,7 @@ goto :EOF
 	set PATH=%CYGWIN_ROOT%\bin;%PATH%
 	
 	echo ... %INSTALL_WINROLL_SERVICE% ...
-	"%CYGWIN_ROOT%\bin\cygrunsrv.exe" -I "%WINROLL_SERVICE%" -d "DRBL-winroll auto-config service" -p "%CYGWIN_ROOT%\bin\winrollsrv.sh" -e "CYGWIN=${_cygwin}" -i
+	"%CYGWIN_ROOT%\bin\cygrunsrv.exe" -I "%WINROLL_SERVICE%" -d "DRBL-winroll auto-config service" -p "/bin/winrollsrv.sh" -e "CYGWIN=${_cygwin}" -i
 goto :EOF
 
 :CYGWIN_UNINSTALL
@@ -701,9 +701,10 @@ goto :EOF
 		set SSHD_SERVER_PW_OPT=-w %SSHD_SERVER_PW%
 	)
 
-	%CYGWIN_ROOT%\bin\chmod.exe +r %CYGWIN_ROOT%\etc\passwd %CYGWIN_ROOT%\etc\group
-	%CYGWIN_ROOT%\bin\chmod.exe u+w %CYGWIN_ROOT%\etc\passwd %CYGWIN_ROOT%\etc\group
-	%CYGWIN_ROOT%\bin\chmod.exe +x %CYGWIN_ROOT%\var
+	%CYGWIN_ROOT%\bin\chmod.exe +r /etc/passwd  /etc/group
+	%CYGWIN_ROOT%\bin\chmod.exe u+w /etc/passwd  /etc/group
+	%CYGWIN_ROOT%\bin\chmod.exe 755 /var
+	%CYGWIN_ROOT%\bin\touch.exe /var/log/sshd.log
 	%CYGWIN_ROOT%\bin\bash.exe --login -c "ssh-host-config -y -c ntsec %SSHD_SERVER_PW_OPT%"
 	%CYGWIN_ROOT%\bin\cygrunsrv.exe -S %SSHD_SERVICE%
 	

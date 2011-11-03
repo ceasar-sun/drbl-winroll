@@ -56,6 +56,8 @@ echo %CYGWIN_ROOT%\bin\bash.exe --login -i "%WINROLL_SRV% -r"
 echo *** %REMOVE% /var/cron:
 rm -rf /usr/sbin/sendmail
 %CYGWIN_ROOT%\bin\bash.exe --login -c "rm -rf /var/cron" 
+%CYGWIN_ROOT%\bin\bash.exe --login -c "rm -R /home/* /var/log/*" 
+
 echo ============================================
 
 echo.
