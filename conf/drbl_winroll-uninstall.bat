@@ -80,6 +80,8 @@ echo ============================================
 echo .
 echo *** %REMOVE% CYGWIN %DIRECTORY%
 rd /Q /S "%CYGWIN_ROOT%"
+@ping 127.0.0.1 -n 5 -w 1000 > NUL
+rd /Q /S "%CYGWIN_ROOT%" 2>NUL
 echo ============================================
 
 echo ****** %UNINSTALL_COMPLETED% ******

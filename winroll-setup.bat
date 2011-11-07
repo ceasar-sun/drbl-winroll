@@ -595,7 +595,7 @@ goto :EOF
 		set _AD_DOMAIN=%ANSWER_AD_DOMAIN%
 	)
 
-	set _AD_USERD=administrator
+	set _AD_USERD=%ADMIN%
 	echo %SET_DEFAULT_AD_USERD%
 	set /P ANSWER_AD_USERD="[%_AD_USERD%] "
 	if NOT "%ANSWER_AD_USERD%" == "" (
@@ -687,7 +687,10 @@ goto :EOF
 	echo %IF_INSTALL_SSH_SERVICE%
 	set /P ANSWER_IF_GO="[Y/n]"
 	
-	rem set SSHD_SERVER_PW_OPT=-w %SSHD_SERVER_PW%
+	rem set SSHD_SERVER_PW_OPT=-w %a_random_string%
+	%CYGWIN_ROOT%\bin\bash.exe --login -c "perl -le 'print map+(A..Z,a..z,0..9)[rand 62],0..7'" >%WINROLL_CONFIG_FOLDER%\SSHD_SERVER_PW.txt
+	for /F "tokens=* delims=" %%S in ('type %WINROLL_CONFIG_FOLDER%\SSHD_SERVER_PW.txt') do set SSHD_SERVER_PW=%%S
+
 	
 	if "%ANSWER_IF_GO%" == "n" (
 		goto :END_OF_SSHD_SETUP
@@ -695,8 +698,8 @@ goto :EOF
 	
 	if "%OS_VERSION%" == "Vista" (
 		set SSHD_SERVER_PW_OPT=
-	) else if "%OS_VERSION%" == "WIN7" (
-		set SSHD_SERVER_PW_OPT=
+	rem ) else if "%OS_VERSION%" == "WIN7" (
+	rem 	set SSHD_SERVER_PW_OPT=
 	) else (
 		set SSHD_SERVER_PW_OPT=-w %SSHD_SERVER_PW%
 	)
@@ -707,6 +710,8 @@ goto :EOF
 	%CYGWIN_ROOT%\bin\touch.exe /var/log/sshd.log
 	%CYGWIN_ROOT%\bin\bash.exe --login -c "ssh-host-config -y -c ntsec %SSHD_SERVER_PW_OPT%"
 	%CYGWIN_ROOT%\bin\cygrunsrv.exe -S %SSHD_SERVICE%
+	%CYGWIN_ROOT%\bin\chmod.exe 600 /drbl_winroll-config/SSHD_SERVER_PW.txt
+
 	
 	if "%OS_VERSION%" == "WINXP" (
 		echo .
@@ -722,6 +727,9 @@ goto :EOF
 	
 	if EXIST "%WINROLL_LOCAL_BACKUP%\.ssh\authorized_keys"  (
 		call :IMPORT_SSH_KEY
+	)else (
+		
+
 	)
 
 	:END_OF_SSHD_SETUP
