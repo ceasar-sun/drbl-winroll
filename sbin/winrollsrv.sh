@@ -430,9 +430,9 @@ do_add2ad(){
 		
 		ADD2AD_RUN_FILE="$(sed -e "s/\s*=\s*/=/g" $WINROLL_CONFIG | grep -e "^ADD2AD_RUN_FILE=" | sed -e "s/^ADD2AD_RUN_FILE=//" -e "s/(\s! )//g")"
 
-		`$WINROLL_CONF_ROOT/$ADD2AD_RUN_FILE`
+		$WINROLL_CONF_ROOT/$ADD2AD_RUN_FILE
 
-		if [ "$?" = 0] ; then
+		if [ "$?" = 0 ] ; then
 			NEED_TO_CHANGE=0
 			echo `date` "ADD2AD need to reboot :" 
 		fi

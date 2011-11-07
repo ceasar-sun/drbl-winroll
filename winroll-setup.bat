@@ -617,7 +617,7 @@ goto :EOF
 	echo ** %SHOW_ADD2AD_RUN_SCRIPT% : %_ADD2AD_RUN_SCRIPT%
 	echo ** %NOTE_NETDOM_NECESSITY% 
 	
-	echo %_ADD2AD_RUN_SCRIPT% >> %WINROLL_CONFIG_FOLDER%\%ADD2AD_RUN_FILE%
+	echo %_ADD2AD_RUN_SCRIPT%> %WINROLL_CONFIG_FOLDER%\%ADD2AD_RUN_FILE%
 	echo IF_ADD2AD_SERVICE = %IF_AUTOHOSTNAME_SERVICE%>>%WINROLL_CONFIG_FILE%
 	echo ADD2AD_RUN_FILE = %ADD2AD_RUN_FILE%>>%WINROLL_CONFIG_FILE%
 	
@@ -688,7 +688,9 @@ goto :EOF
 	set /P ANSWER_IF_GO="[Y/n]"
 	
 	rem set SSHD_SERVER_PW_OPT=-w %a_random_string%
-	%CYGWIN_ROOT%\bin\bash.exe --login -c "perl -le 'print map+(A..Z,a..z,0..9)[rand 62],0..7'" >%WINROLL_CONFIG_FOLDER%\SSHD_SERVER_PW.txt
+	rem %CYGWIN_ROOT%\bin\bash.exe -c "perl -le 'print map+(A..Z,a..z,0..9)[rand 62],0..7'" >%WINROLL_CONFIG_FOLDER%\SSHD_SERVER_PW.txt
+	%CYGWIN_ROOT%\bin\bash.exe --norc --noprofile "perl -le 'print map+(A..Z,a..z,0..9)[rand 62],0..7'" >%WINROLL_CONFIG_FOLDER%\SSHD_SERVER_PW.txt
+
 	for /F "tokens=* delims=" %%S in ('type %WINROLL_CONFIG_FOLDER%\SSHD_SERVER_PW.txt') do set SSHD_SERVER_PW=%%S
 
 	
