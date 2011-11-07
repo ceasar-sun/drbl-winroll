@@ -3,8 +3,8 @@
 ######################################################
 # Author: Ceasar Sun
 # Description: Package and release toolkit for latest version from RC repository then 
-#
 # Usage: bash ./drbl-winroll-release.sh
+# Note to commit into ~/drbl-winroll/tool if do something changes
 ######################################################
 
 export LC_ALL=C

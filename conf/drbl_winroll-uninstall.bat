@@ -45,8 +45,8 @@ echo .. %START_TO% %UNINSTALL% ...
 
 echo .
 echo *** %REMOVE% %RUNSHELL%:
-echo ps aux | tac | head -n -1 | sed -e "s/^I//"| gawk -F " " '{print $1}' | xargs -n 1 -r kill -9
-ps aux | tac | head -n -1 | sed -e "s/^I//"| gawk -F " " '{print $1}' | xargs -n 1 -r kill -9
+echo ps aux |grep bash | sed -e "s/^I//"| gawk -F " " '{print $1}' | xargs -n 1 -r kill -9
+ps aux |grep bash | sed -e "s/^I//"| gawk -F " " '{print $1}' | xargs -n 1 -r kill -9
 
 echo *** %REMOVE% %SERVICES%:
 echo %CYGWIN_ROOT%\bin\bash.exe --login -i "%WINROLL_SRV% -r"
@@ -79,7 +79,7 @@ echo ============================================
 
 echo .
 echo *** %REMOVE% CYGWIN %DIRECTORY%
-rd /Q /S "%CYGWIN_ROOT%"
+rd /Q /S "%CYGWIN_ROOT%" 2>NUL
 @ping 127.0.0.1 -n 5 -w 1000 > NUL
 rd /Q /S "%CYGWIN_ROOT%" 2>NUL
 echo ============================================
