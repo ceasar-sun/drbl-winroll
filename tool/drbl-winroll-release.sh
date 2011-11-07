@@ -1,4 +1,4 @@
-#!/bin/sh
+#!/bin/bash
 
 ######################################################
 # Author: Ceasar Sun
@@ -13,7 +13,7 @@ RELVER=
 CURRENT_PATH=`pwd`
 WORKDIR=`mktemp -d /tmp/pack.tmp.XXXXXX`
 PACKNAME=drbl-winroll
-REPOS_URL="ssh://free.nchc.org.tw:3322/home/gitpool/drbl-winroll.git"
+REPOS_URL="free:/home/gitpool/drbl-winroll.git"
 
 [ -z "$(which git 2/dev/null)" ] && echo 'Need git command installed !!' && exit 1;
 
@@ -36,13 +36,12 @@ zip -r -q $PACKNAME-v$RELVER-$PACKVER-setup.zip $PACKNAME
 popd
 
 mv $WORKDIR/$PACKNAME-v$RELVER-$PACKVER-setup.zip $CURRENT_PATH
-md5sum $WORKDIR-*-setup.zip > MD5SUMS
+md5sum $PACKNAME-*-setup.zip > MD5SUMS
 
 if [ -d ../../doc/ ] && [ -w ../../doc/ ] ; then
 	rsync -a $WORKDIR/$PACKNAME/doc/ ../../doc/
 fi
 
-popd
-
 [ -d "$WORKDIR" ] && rm -rf $WORKDIR
 
+exit 0;
