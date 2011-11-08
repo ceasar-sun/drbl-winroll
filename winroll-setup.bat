@@ -691,17 +691,19 @@ goto :EOF
 		goto :END_OF_SSHD_SETUP
 	)
 
+	%CYGWIN_ROOT%\bin\bash.exe -c "/usr/bin/perl -le 'print map+(A..Z,a..z,0..9)[rand 62],0..7'" >SSHD_SERVER_PW.txt
+	for /F "tokens=* delims=" %%S in ('type SSHD_SERVER_PW.txt') do set SSHD_SERVER_PW=%%S
+	set SSHD_SERVER_PW_OPT=-w %SSHD_SERVER_PW%
+
 	if "%OS_VERSION%" == "WINXP" (
 		set SSHD_SERVER_PW_OPT=
 	) else if "%OS_VERSION%" == "WIN2000" (
 		set SSHD_SERVER_PW_OPT=
 	) else (
-		rem set SSHD_SERVER_PW_OPT=-w %a_random_string%
-		%CYGWIN_ROOT%\bin\bash.exe -c "perl -le 'print map+(A..Z,a..z,0..9)[rand 62],0..7'" >%WINROLL_CONFIG_FOLDER%\SSHD_SERVER_PW.txt
-		for /F "tokens=* delims=" %%S in ('type %WINROLL_CONFIG_FOLDER%\SSHD_SERVER_PW.txt') do set SSHD_SERVER_PW=%%S
-		set SSHD_SERVER_PW_OPT=-w %SSHD_SERVER_PW%
+		copy /Y SSHD_SERVER_PW.txt %WINROLL_CONFIG_FOLDER%
 		%CYGWIN_ROOT%\bin\chmod.exe 600 /drbl_winroll-config/SSHD_SERVER_PW.txt
 	)
+	rem del /Q /S SSHD_SERVER_PW.txt
 
 	%CYGWIN_ROOT%\bin\chmod.exe +r /etc/passwd  /etc/group
 	%CYGWIN_ROOT%\bin\chmod.exe u+w /etc/passwd  /etc/group
