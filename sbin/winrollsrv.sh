@@ -433,8 +433,10 @@ do_add2ad(){
 		$WINROLL_CONF_ROOT/$ADD2AD_RUN_FILE
 
 		if [ "$?" = 0 ] ; then
+			rm -rf $WINROLL_CONF_ROOT/$ADD2AD_RUN_FILE
+			echo $NICMAC_ADDR_MD5 >$ADD2AD_MD5CHK_FILE
 			NEED_TO_CHANGE=0
-			echo `date` "ADD2AD need to reboot :" 
+			echo `date` "ADD2AD need to reboot :"
 		fi
 	fi
 }
