@@ -40,7 +40,7 @@ set AUTONEWSID_SERVICE=autonewsid
 set IF_NEWSID_SERVICE=n
 set IF_AUTOHOSTNAME_SERVICE=n
 set SSHD_SERVICE=sshd
-set SSHD_SERVER_PW=1qaz2wsx
+set SSHD_SERVER_PW=
 REM # Define ROOT_NAME atfer include language file
 set ROOT_NAME=
 set INIT_CONF=conf
@@ -687,21 +687,18 @@ goto :EOF
 	echo %IF_INSTALL_SSH_SERVICE%
 	set /P ANSWER_IF_GO="[Y/n]"
 	
-	rem set SSHD_SERVER_PW_OPT=-w %a_random_string%
-	%CYGWIN_ROOT%\bin\bash.exe -c "perl -le 'print map+(A..Z,a..z,0..9)[rand 62],0..7'" >%WINROLL_CONFIG_FOLDER%\SSHD_SERVER_PW.txt
-
-	for /F "tokens=* delims=" %%S in ('type %WINROLL_CONFIG_FOLDER%\SSHD_SERVER_PW.txt') do set SSHD_SERVER_PW=%%S
-
-	
 	if "%ANSWER_IF_GO%" == "n" (
 		goto :END_OF_SSHD_SETUP
 	)
-	
-	if "%OS_VERSION%" == "Vista" (
+
+	if "%OS_VERSION%" == "WINXP" (
 		set SSHD_SERVER_PW_OPT=
-	rem ) else if "%OS_VERSION%" == "WIN7" (
-	rem 	set SSHD_SERVER_PW_OPT=
+	) else if "%OS_VERSION%" == "WIN2000" (
+		set SSHD_SERVER_PW_OPT=
 	) else (
+		rem set SSHD_SERVER_PW_OPT=-w %a_random_string%
+		%CYGWIN_ROOT%\bin\bash.exe -c "perl -le 'print map+(A..Z,a..z,0..9)[rand 62],0..7'" >%WINROLL_CONFIG_FOLDER%\SSHD_SERVER_PW.txt
+		for /F "tokens=* delims=" %%S in ('type %WINROLL_CONFIG_FOLDER%\SSHD_SERVER_PW.txt') do set SSHD_SERVER_PW=%%S
 		set SSHD_SERVER_PW_OPT=-w %SSHD_SERVER_PW%
 	)
 
@@ -709,10 +706,13 @@ goto :EOF
 	%CYGWIN_ROOT%\bin\chmod.exe u+w /etc/passwd  /etc/group
 	%CYGWIN_ROOT%\bin\chmod.exe 755 /var
 	%CYGWIN_ROOT%\bin\touch.exe /var/log/sshd.log
+
+	echo To run  %CYGWIN_ROOT%\bin\bash.exe --login -c "ssh-host-config -y -c ntsec %SSHD_SERVER_PW_OPT%"
+	pause
+
 	%CYGWIN_ROOT%\bin\bash.exe --login -c "ssh-host-config -y -c ntsec %SSHD_SERVER_PW_OPT%"
 	%CYGWIN_ROOT%\bin\cygrunsrv.exe -S %SSHD_SERVICE%
 	%CYGWIN_ROOT%\bin\chmod.exe 600 /drbl_winroll-config/SSHD_SERVER_PW.txt
-
 	
 	if "%OS_VERSION%" == "WINXP" (
 		echo .
@@ -722,15 +722,21 @@ goto :EOF
 		pause
 		REM # It only support "netsh firewal" command in XP-sp2 or later
 		netsh firewall add portopening TCP 22 sshd
+
 	)
 	echo %CREATE_ADMIN_SSH_FOLDER% : %CYGWIN_ROOT%\%ROOT_NAME%\.ssh
 	mkdir %CYGWIN_ROOT%\home\%ROOT_NAME%\.ssh
-	
+
+	if not "%OS_VERSION%" == "WINXP" (
+		echo . 
+		echo %_PASSWORD_OF_SYG_SERVER_STORED% : %WINROLL_CONFIG_FOLDER%\SSHD_SERVER_PW.txt
+		echo %_DO_NOT_CHANGE_PASSWORD_OF_CYG_SERVER%
+	)
+
 	if EXIST "%WINROLL_LOCAL_BACKUP%\.ssh\authorized_keys"  (
 		call :IMPORT_SSH_KEY
 	)else (
 		
-
 	)
 
 	:END_OF_SSHD_SETUP
