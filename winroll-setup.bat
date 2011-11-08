@@ -700,6 +700,7 @@ goto :EOF
 		%CYGWIN_ROOT%\bin\bash.exe -c "perl -le 'print map+(A..Z,a..z,0..9)[rand 62],0..7'" >%WINROLL_CONFIG_FOLDER%\SSHD_SERVER_PW.txt
 		for /F "tokens=* delims=" %%S in ('type %WINROLL_CONFIG_FOLDER%\SSHD_SERVER_PW.txt') do set SSHD_SERVER_PW=%%S
 		set SSHD_SERVER_PW_OPT=-w %SSHD_SERVER_PW%
+		%CYGWIN_ROOT%\bin\chmod.exe 600 /drbl_winroll-config/SSHD_SERVER_PW.txt
 	)
 
 	%CYGWIN_ROOT%\bin\chmod.exe +r /etc/passwd  /etc/group
@@ -712,7 +713,6 @@ goto :EOF
 
 	%CYGWIN_ROOT%\bin\bash.exe --login -c "ssh-host-config -y -c ntsec %SSHD_SERVER_PW_OPT%"
 	%CYGWIN_ROOT%\bin\cygrunsrv.exe -S %SSHD_SERVICE%
-	%CYGWIN_ROOT%\bin\chmod.exe 600 /drbl_winroll-config/SSHD_SERVER_PW.txt
 	
 	if "%OS_VERSION%" == "WINXP" (
 		echo .
