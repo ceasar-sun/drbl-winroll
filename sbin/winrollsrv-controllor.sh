@@ -28,7 +28,7 @@ declare AUTOSID_SNAME='autonewsid'
 declare action="c"
 declare NEED_TO_RUN_SID=0
 declare NEED_TO_RUN_SID=0
-declare SSHD_SERVER_PW=1qaz2wsx
+declare SSHD_SERVER_PW=
 		
 declare SYSINT_LINCESE_URL="http://drbl.nchc.org.tw/drbl-winroll/download/newsid-licence.php"
 declare NEWSID_DOWNLOAD_URL="http://drbl.nchc.org.tw/drbl-winroll/download/newsid-download.php"
@@ -45,6 +45,10 @@ fi
 config_sshd(){
 	chmod u+w,a+r /etc/passwd /etc/group
 	chmod a+x /var
+
+	SSHD_SERVER_PW_OPT=$(perl -le 'print map+(A..Z,a..z,0..9)[rand 62],0..7')
+	[ -n "$(cat $WINROLL_CONF_ROOT/SSHD_SERVER_PW.txt)" ] && SSHD_SERVER_PW_OPT=$(cat $WINROLL_CONF_ROOT/SSHD_SERVER_PW.txt)
+
 	ssh-host-config -y -c ntsec $SSHD_SERVER_PW_OPT
 	cygrunsrv -S $SSHD_SNAME
 	

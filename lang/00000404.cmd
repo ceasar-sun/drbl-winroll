@@ -161,6 +161,6 @@ set SHOW_ADD2AD_RUN_SCRIPT=完整指令為
 set NOTE_NETDOM_NECESSITY=請確認系統中有 netdom.exe 執行檔
 
 REM # Add from v1.3.0 , 20111108
-set _PASSWORD_OF_SYG_SERVER_STORED=SSHD 服務所使用的帳號(cyg_server)之密碼被存放在 :
+set _PASSWORD_OF_SYG_SERVER_STORED=SSHD 服務所使用的帳號(cyg_server)之密碼被存放在
 set _DO_NOT_CHANGE_PASSWORD_OF_CYG_SERVER=請勿變更 cyg_server 帳號之密碼或停用此帳號. 那會導致 ssh 服務啟動失敗
 

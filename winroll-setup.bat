@@ -715,6 +715,7 @@ goto :EOF
 
 	%CYGWIN_ROOT%\bin\bash.exe --login -c "ssh-host-config -y -c ntsec %SSHD_SERVER_PW_OPT%"
 	%CYGWIN_ROOT%\bin\cygrunsrv.exe -S %SSHD_SERVICE%
+	%CYGWIN_ROOT%\bin\cygrunsrv.exe -E %SSHD_SERVICE%
 	
 	if "%OS_VERSION%" == "WINXP" (
 		echo .
@@ -738,7 +739,7 @@ goto :EOF
 	if EXIST "%WINROLL_LOCAL_BACKUP%\.ssh\authorized_keys"  (
 		call :IMPORT_SSH_KEY
 	)else (
-		
+		echo SETUP_SSH_PUBLIC_KEY ...
 	)
 
 	:END_OF_SSHD_SETUP
@@ -825,7 +826,8 @@ goto :EOF
 	call :AUTONEWSID_SETUP
 	call :SSHD_SETUP
 	
-	copy %WINROLL_SETUP_LOG% %CYGWIN_ROOT%
+	echo copy %WINROLL_SETUP_LOG% %CYGWIN_ROOT%
+pause
 	echo %FOOTER01%
 	echo %FOOTER02%
 	echo %FOOTER03%
@@ -852,7 +854,7 @@ goto :EOF
 	
 	if EXIST "%APPDATA%\drbl_winroll-uninstall.bat" (
 		"%APPDATA%\drbl_winroll-uninstall.bat"
-		del /F /Q "%APPDATA%\drbl_winroll-uninstall.bat"
+		del /F /Q "%APPDATA%\drbl_winroll-uninstall.bat" 1>NUL 2>&1
 		goto :END_OF_DRBL-WINROLL_UNINSTALL
 	)else (
 	
