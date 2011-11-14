@@ -1,3 +1,4 @@
 @echo off
-REM # locale name: zh-cn
+REM # locale name: no
 CALL lang\default.cmd
+
