@@ -1,4 +1,4 @@
-#!/bin/sh
+#!/bin/bash
 
 ###########################################################################
 # Unattended drbl-winRoll installation

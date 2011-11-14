@@ -1,4 +1,4 @@
-#!/bin/sh
+#!/bin/bash
 
 ###########################################################################
 #  drbl-winroll service
@@ -48,7 +48,7 @@ echo "Get pc informations by 'systeminfo' ..." | tee -a $report_tmpdir/pc-info.t
 systeminfo 2>/dev/null >> $report_tmpdir/pc-info.txt
 echo "DONE-----------------" | tee -a $report_tmpdir/pc-info.txt
 
-unix2dos --force -D $report_tmpdir/pc-info.txt
+unix2dos --force $report_tmpdir/pc-info.txt
 cd `dirname $report_tmpdir`; zip -r -q `basename $report_tmpdir`.zip `basename $report_tmpdir`; mv `basename $report_tmpdir`.zip  /winroll-bug-report.`date +%Y%m%d`.zip
 rm -rf $report_tmpdir
 echo "================================================="

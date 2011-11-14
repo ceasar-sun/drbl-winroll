@@ -1,4 +1,4 @@
-#!/bin/sh
+#!/bin/bash
 
 ###########################################################################
 # Unattended drbl-winRoll installation
@@ -189,10 +189,10 @@ remove_sshd(){
 	echo "Delet open port TCP 22 if need ..."
 	netsh firewall delete portopening TCP 22 1> /dev/null 2>&1
 	
-	echo "Delete user 'sshd', 'sshd_server' '$priv_sshd_user'..."
+	echo "Delete user 'sshd', 'cyg_server' '$priv_sshd_user' (if necessary)..."
 	net user sshd /DELETE 1> /dev/null 2>&1
-	net user sshd_server /DELETE 1> /dev/null 2>&1
-	net user $priv_sshd_user 1>/devnull 2>&1
+	net user cyg_server /DELETE 1> /dev/null 2>&1
+	net user $priv_sshd_user 1>/dev/null 2>&1
 	[ "$?" = "0" ] && net user $priv_sshd_user /DELETE 1> /dev/null 2>&1
 
 }
