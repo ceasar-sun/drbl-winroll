@@ -19,7 +19,10 @@ WINROLL_LOG="$WINROLL_TMP/winrollsrv.log"
 TEMP="/var/log"
 TMP="/var/log"
 
-_GID_Administrators='Administrators'
+#_GID_Administrators='Administrators'
+_GID_Administrators='root'
+
+alias clear='echo -e -n "\E[2J"'
 
 waiting_to_reboot(){
 	while [ $(ls $WINROLL_TMP/winroll-*.lock | wc -l) -gt 0 ]

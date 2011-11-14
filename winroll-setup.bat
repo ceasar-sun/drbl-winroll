@@ -615,8 +615,14 @@ goto :EOF
 	set _ADD2AD_RUN_SCRIPT=netdom join %%computername%% /domain:%_AD_DOMAIN% /userd:%_AD_USERD% /passwordd:%_AD_PASSWORDD% /reboot:8
 	
 	echo ** %SHOW_ADD2AD_RUN_SCRIPT% : %_ADD2AD_RUN_SCRIPT%
-	echo ** %NOTE_NETDOM_NECESSITY% 
-	
+	netdom 1>NUL 2>&1
+	if NOT %ERRORLEVEL% EQU 0 (
+		echo %HR%
+		echo ** %NOTE_NETDOM_NECESSITY% 
+		echo %HR%
+		pause
+	}
+
 	echo %_ADD2AD_RUN_SCRIPT%> %WINROLL_CONFIG_FOLDER%\%ADD2AD_RUN_FILE%
 	echo IF_ADD2AD_SERVICE = %IF_AUTOHOSTNAME_SERVICE%>>%WINROLL_CONFIG_FILE%
 	echo ADD2AD_RUN_FILE = %ADD2AD_RUN_FILE%>>%WINROLL_CONFIG_FILE%
@@ -731,9 +737,11 @@ goto :EOF
 	mkdir %CYGWIN_ROOT%\home\%ROOT_NAME%\.ssh
 
 	if not "%OS_VERSION%" == "WINXP" (
-		echo . 
+		echo %HR%
 		echo %_PASSWORD_OF_SYG_SERVER_STORED% : %WINROLL_CONFIG_FOLDER%\SSHD_SERVER_PW.txt
 		echo %_DO_NOT_CHANGE_PASSWORD_OF_CYG_SERVER%
+		echo %HR%
+		pause
 	)
 
 	if EXIST "%WINROLL_LOCAL_BACKUP%\.ssh\authorized_keys"  (

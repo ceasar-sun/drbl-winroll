@@ -165,5 +165,5 @@ set SHOW_ADD2AD_RUN_SCRIPT=Full batch command for add-to AD
 set NOTE_NETDOM_NECESSITY=Please make sure netdom.exe does exist in system
 
 REM # Add from v1.3.0 , 20111108
-set _PASSWORD_OF_SYG_SERVER_STORED=The password of 'cyg_server' (sshd runner) is stored :
+set _PASSWORD_OF_SYG_SERVER_STORED=The password of sshd runner 'cyg_server' is stored :
 set _DO_NOT_CHANGE_PASSWORD_OF_CYG_SERVER=Do not change cyg_server's password or disable it. That would lead to sshd be out of service .

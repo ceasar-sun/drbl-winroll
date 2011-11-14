@@ -55,14 +55,14 @@ config_sshd(){
 	netsh firewall add portopening TCP 22 sshd 1>/dev/null 2>&1
 	[ -d "/home/$WINROOT/.ssh" ] || mkdir /home/$WINROOT/.ssh
 	
-	if [ -f "$WINROLL_BACKUP_DIR\.ssh\authorized_keys" ]; then
-		echo "Import $WINROLL_BACKUP_DIR\.ssh ?" 
+	if [ -f "$WINROLL_BACKUP_DIR/.ssh/authorized_keys" ]; then
+		echo "Import $WINROLL_BACKUP_DIR/.ssh ?" 
 		ANSWER_IF_GO=y
 		read -p "[Y/n] " ANSWER_IF_GO junk
 
 		if [ "$ANSWER_IF_GO" != "n" ]; then
-			cp -af "$WINROLL_BACKUP_DIR\.ssh" "/home/$WINROOT/"
-			echo "Import backuped ssh key : $WINROLL_BACKUP_DIR\.ssh\authorized_keys "
+			cp -af "$WINROLL_BACKUP_DIR/.ssh" "/home/$WINROOT/"
+			echo "Import backuped ssh key : $WINROLL_BACKUP_DIR/.ssh/authorized_keys "
 		fi
 	fi
 	
