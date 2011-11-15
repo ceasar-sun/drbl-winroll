@@ -84,6 +84,30 @@ Function Print_OnlyEnabled_NICAdapter_information()
 		
 	Next
 
+	strComputer = "." 
+	Set objWMIService = GetObject("winmgmts:\\" & strComputer & "\root\CIMV2") 
+	Set colItems = objWMIService.ExecQuery("SELECT * FROM Win32_NetworkAdapter WHERE NetConnectionId IS NOT NULL")
+    i = 0
+
+	For Each objItem in colItems 
+        i = i + 1
+        Wscript.Echo "-----------------------------------"
+        Wscript.Echo "Win32_NetworkAdapter instance: " & i
+        Wscript.Echo "-----------------------------------"
+	    Wscript.Echo "Name: " & objItem.Name
+	    Wscript.Echo "Description: " & objItem.Description
+	    Wscript.Echo "NetConnectionId: " & objItem.NetConnectionId		
+	    Wscript.Echo "AdapterType: " & objItem.AdapterType		
+	    Wscript.Echo "AdapterTypeID: " & objItem.AdapterTypeID		
+	    Wscript.Echo "Availability: " & objItem.Availability		
+	    Wscript.Echo "Status: " & objItem.Status		
+	    Wscript.Echo "StatusInfo: " & objItem.StatusInfo		
+	    Wscript.Echo "MACAddress: " & objItem.MACAddress
+        Wscript.Echo "Index:" & objItem.Index
+        Wscript.Echo "DeviceID:" & objItem.DeviceID
+		
+	Next
+
     strComputer = "."
     Set objWMIService = GetObject("winmgmts:\\" _
     & strComputer & "\root\CIMV2")
