@@ -4,8 +4,7 @@ REM ####################################################################
 REM # Uninstall drbl-winRoll 
 REM #
 REM # License: GPL
-REM # Author	: Ceasar Sun Chen-kai <ceasar@nchc.org.tw>
-REM # Last update	: 2007/3/5
+REM # Author	: Ceasar Sun Chen-kai <ceasar@nchc.narl.org.tw>
 REM #
 REM # Usage: uninstall-winroll.bat
 REM #
@@ -14,7 +13,7 @@ REM ####################################################################
 REM # Global parameter
 REM set CYGWIN_ROOT=%SystemDrive%\cygwin
 set WINROLL_SRV=/bin/winrollsrv-controllor.sh
-set WINROLL_UNINSTALL_FOLDER=%CYGWIN_ROOT%\drbl_winRoll-config\uninstall
+set WINROLL_UNINSTALL_FOLDER=%CYGWIN_ROOT%\drbl_winroll-config\uninstall
 set STARTMENU_PATH=
 set SYSTEM_ADMIN=
 

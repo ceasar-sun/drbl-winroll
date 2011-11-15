@@ -4,11 +4,10 @@
 #  drbl-winroll service
 #
 # License: GPL
-# Author	: Ceasar Sun Chen-kai <ceasar@nchc.org.tw> , Steven steven@nchc.org.tw
-# Purpose	: Main service for drbl-winroll, refer winroll.conf(winroll.txt) to run auto-config for windows
-# Date	: 2008/05/20
+# Author	: Ceasar Sun Chen-kai <ceasar@nchc.narl.org.tw> , Steven steven@nchc.narl.org.tw
+# Purpose	: Main service for drbl-winroll, refer winroll.conf(winroll.conf) to run auto-config for windows
 #
-# Usage:  %CYGWIN_ROOT%\bin\autohostname.sh -e "CYGWIN=${_cygwin}"
+# Usage:  %CYGWIN_ROOT%\bin\winroll-bug-report.sh -e "CYGWIN=${_cygwin}"
 #
 ###########################################################################
 #WINROLL_CONFIG="/drbl_winRoll-config/winRoll.txt"

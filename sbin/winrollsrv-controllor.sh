@@ -6,9 +6,8 @@
 # License: GPL
 # Author	: Ceasar Sun Chen-kai <ceasar@nchc.org.tw> , Steven steven@nchc.org.tw
 # Purpose	: Solve windows hostname duplication problem for using clone tool to distribute  Win-OS in one local LAN. 
-# Date		: 2005/03/14
 #
-# Usage:  %CYGWIN_ROOT%\bin\autohostname.sh -e "CYGWIN=${_cygwin}"
+# Usage:  %CYGWIN_ROOT%\bin\winrollsrv-controllor.sh -e "CYGWIN=${_cygwin}"
 #
 ###########################################################################
 
@@ -18,8 +17,8 @@ WINROLL_FUNCTIONS="/drbl_winroll-config/winroll.lib.sh"
 
 # Local service paremeter 
 declare WINROOT=Administrator
-declare CYGWIN_ROOT='c:\cygwin'
-declare WINROLL_BACKUP_DIR=$HOMEPATH/drbl-winroll.bak
+declare CYGWIN_ROOT=$(cygpath -w "/")
+declare WINROLL_BACKUP_DIR=$(cygpath "$HOMEPATH\drbl-winroll.bak")
 declare WINROLL_BACKUP_LIST="/home/$WINROOT/.ssh /drbl_winroll-config/*.conf"
 declare WINROLLSRV_SNAME='winrollsrv'
 declare SSHD_SNAME='sshd'
@@ -49,7 +48,7 @@ config_sshd(){
 	SSHD_SERVER_PW_OPT=$(perl -le 'print map+(A..Z,a..z,0..9)[rand 62],0..7')
 	[ -n "$(cat $WINROLL_CONF_ROOT/SSHD_SERVER_PW.txt)" ] && SSHD_SERVER_PW_OPT=$(cat $WINROLL_CONF_ROOT/SSHD_SERVER_PW.txt)
 
-	ssh-host-config -y -c ntsec $SSHD_SERVER_PW_OPT
+	ssh-host-config -y -c ntsec -w $SSHD_SERVER_PW_OPT
 	cygrunsrv -S $SSHD_SNAME
 	
 	netsh firewall add portopening TCP 22 sshd 1>/dev/null 2>&1

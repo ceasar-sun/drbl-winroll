@@ -6,9 +6,7 @@
 # License: GPL
 # Author	: Ceasar Sun Chen-kai <ceasar@nchc.org.tw> , Steven steven@nchc.org.tw
 # Purpose	: Solve windows hostname duplication problem for using clone tool to distribute  Win-OS in one local LAN. 
-# Date		: 2005/03/14
 #
-# Usage:  %CYGWIN_ROOT%\bin\autohostname.sh -e "CYGWIN=${_cygwin}"
 #
 ###########################################################################
 

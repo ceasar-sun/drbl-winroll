@@ -4,7 +4,6 @@
 # License: GPL
 # Author	: Ceasar Sun Chen-kai <ceasar@nchc.org.tw> 
 # Purpose	: Check if keyword config be match your system locale
-# Date	: 2010/08/02
 #
 # Usage:  %CYGWIN_ROOT%\bin\autohostname.sh -e "CYGWIN=${_cygwin}"
 #

@@ -1,7 +1,7 @@
 @echo off
 
 REM ####################################################################
-REM # Unattended drbl-winRoll installation
+REM # Unattended drbl-winroll installation
 REM #
 REM # License: GPL
 REM # Author	: Ceasar Sun Chen-kai <ceasar@nchc.org.tw>
@@ -210,6 +210,7 @@ REM # To decide language during installation
 	CALL lang\%LOCALE_CODE%.cmd
 	
 	REM # assign "STARTMENU_PATH" from registry value
+	# cygpath -A -P -w : it can get the same result
 	cscript %INIT_CONF%\reg_query.vbs //Nologo "HKEY_LOCAL_MACHINE\SOFTWARE\Microsoft\Windows\CurrentVersion\Explorer\Shell Folders\Common Programs" > program-path.txt
 	for /F "tokens=* delims=" %%S in ('type program-path.txt') do set STARTMENU_PATH=%%S\cygwin
 
