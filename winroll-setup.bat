@@ -148,14 +148,12 @@ REM #####################################
 	type OS-version.txt | find "Vista"
 	if "%ERRORLEVEL%" == "0"  (
 		set OS_VERSION=Vista
-		rem set STARTMENU_PATH=%ALLUSERSPROFILE%\Start Menu\Programs\Cygwin
 		goto :END_OF_CHECK_OS_VERSION
 	)
 
 	type OS-version.txt | find "Windows 7"
 	if "%ERRORLEVEL%" == "0"  (
 		set OS_VERSION=WIN7
-		rem set STARTMENU_PATH=%ALLUSERSPROFILE%\Start Menu\Programs\Cygwin
 		goto :END_OF_CHECK_OS_VERSION
 	)
 	
@@ -178,24 +176,9 @@ REM # To decide language during installation
 	cscript %INIT_CONF%\reg_query.vbs //Nologo "HKEY_CURRENT_USER\Control Panel\International\Locale" > Locale.txt
 	for /F "tokens=* delims=" %%S in ('type Locale.txt') do set LOCALE_CODE=%%S
 
-	REM ### For zh_TW 
-	rem type Locale.txt | find "00000404"
-	rem IF "%ERRORLEVEL%" == "0" (
-	rem 	set LANG=tc
-	rem 	goto :BEFORE_OF_CALL_LANGUAGE
-	rem )
-
-	rem IF EXIST "%FR_OS_PATH%" (
-	rem 	set LANG=fr
-	rem 	goto :BEFORE_OF_CALL_LANGUAGE
-	rem )
-	rem IF EXIST "%NL_OS_PATH%" (
-	rem 	set LANG=nl
-	rem 	goto :BEFORE_OF_CALL_LANGUAGE
-	rem )
-
 	IF NOT EXIST "lang\%LOCALE_CODE%.cmd" (
-		set LOCALE_CODE=unknow
+		rem set LOCALE_CODE=default
+		copy /Y lang\default.cmd lang\%LOCALE_CODE%.cmd
 		echo *** Warning !! ****
 		echo !! Your currnet language not be supported complete yet,
 		echo !! But you still can install it under this release.
@@ -210,7 +193,7 @@ REM # To decide language during installation
 	CALL lang\%LOCALE_CODE%.cmd
 	
 	REM # assign "STARTMENU_PATH" from registry value
-	# cygpath -A -P -w : it can get the same result
+	REM cygpath -A -P -w : it can get the same result
 	cscript %INIT_CONF%\reg_query.vbs //Nologo "HKEY_LOCAL_MACHINE\SOFTWARE\Microsoft\Windows\CurrentVersion\Explorer\Shell Folders\Common Programs" > program-path.txt
 	for /F "tokens=* delims=" %%S in ('type program-path.txt') do set STARTMENU_PATH=%%S\cygwin
 
@@ -259,13 +242,13 @@ goto :EOF
 
 :CHECK_IF_WINADMIN
 	echo %YOUR_CURRENT_ACCOUNT_IS% : "%USERNAME%"
-	IF "%USERNAME%" == "%ROOT_NAME%" (
+		IF "%USERNAME%" == "%ROOT_NAME%" (
 	 REM Dummy line
 	) ELSE (
-	  echo .
-	  echo %PLZ_CONFIRM_ADMIN_ACCOUNT%
-	  echo !!! %IF_KEEP_GO%
-	  pause
+		echo .
+		echo %PLZ_CONFIRM_ADMIN_ACCOUNT%
+		echo !!! %IF_KEEP_GO%
+		pause
 	)
 
 goto :EOF
@@ -333,18 +316,6 @@ goto :EOF
 	IF NOT EXIST "%CYGWIN_ROOT%" (
 	  mkdir "%CYGWIN_ROOT%"
 	)
-
-	rem IF NOT EXIST "%CYGWIN_ROOT%\etc\setup" (
-	rem   mkdir "%CYGWIN_ROOT%\etc\setup"
-	rem ) ELSE (
-	rem   del /Q "%CYGWIN_ROOT%\etc\setup\last-*"
-	rem )
-
-	REM -- Note that last-* must *not* containing whitespace, e.g. " " etc. 
-	REM -- This is why there below is no space in front of ">".
-	rem echo Install> "%CYGWIN_ROOT%\etc\setup\last-action"
-	rem echo %LOCAL_REPOSITORY%> "%CYGWIN_ROOT%\etc\setup\last-cache"
-	rem echo cygwin_mirror> "%CYGWIN_ROOT%\etc\setup\last-mirror"
 
 	REM - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - -
 	REM Finally, run Cygwin setup quietly
@@ -596,7 +567,7 @@ goto :EOF
 		set _AD_DOMAIN=%ANSWER_AD_DOMAIN%
 	)
 
-	set _AD_USERD=%ADMIN%
+	set _AD_USERD=%ROOT_NAME%
 	echo %SET_DEFAULT_AD_USERD%
 	set /P ANSWER_AD_USERD="[%_AD_USERD%] "
 	if NOT "%ANSWER_AD_USERD%" == "" (

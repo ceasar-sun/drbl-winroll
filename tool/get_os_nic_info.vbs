@@ -2,11 +2,25 @@
 ' How to use :cscript //Nologo get_os_nic_info.vbs
 ' http://msdn.microsoft.com/en-us/library/Aa394217
 
+Print_Registry_Value()
 Print_System_Administrator_Account()
 Print_System_Information()
 Print_OnlyEnabled_NICAdapter_Information()
 
 '' Sub function ''
+Function Print_Registry_Value()
+	Dim WSHShell   		: Set WshShell = CreateObject("WScript.Shell")
+	Dim objArgs    		: Set objArgs = WScript.Arguments
+
+	If objArgs.Count > 0 Then ''若有參數
+		sRegKey = objArgs(0) ''讀入參數
+		WScript.Echo WshShell.RegRead(sRegKey)
+	else 
+		WScript.Echo WshShell.RegRead("HKEY_LOCAL_MACHINE\SOFTWARE\Microsoft\Windows NT\CurrentVersion\ProductName")
+		WScript.Echo WshShell.RegRead("HKEY_CURRENT_USER\Control Panel\International\Locale")
+		WScript.Echo WshShell.RegRead("HKEY_LOCAL_MACHINE\SOFTWARE\Microsoft\Windows\CurrentVersion\Explorer\Shell Folders\Common Programs")
+	End If
+End Function ' Print_Registry_Value()
 
 Function Print_System_Administrator_Account()
 	strComputer = "."
@@ -39,18 +53,20 @@ Function Print_System_Information()
 		Wscript.Echo "Build Type: " & objOperatingSystem.BuildType
 		Wscript.Echo "Caption: " & objOperatingSystem.Caption
 		Wscript.Echo "Code Set: " & objOperatingSystem.CodeSet
+		Wscript.Echo "Locale: " & objOperatingSystem.Locale
 		Wscript.Echo "Country Code: " & objOperatingSystem.CountryCode
 		Wscript.Echo "Debug: " & objOperatingSystem.Debug
 		Wscript.Echo "Encryption Level: " & objOperatingSystem.EncryptionLevel
 		dtmConvertedDate.Value = objOperatingSystem.InstallDate
 		dtmInstallDate = dtmConvertedDate.GetVarDate
 		Wscript.Echo "Install Date: " & dtmInstallDate 
-		Wscript.Echo "Licensed Users: " & _
-		    objOperatingSystem.NumberOfLicensedUsers
+		Wscript.Echo "Licensed Users: " & objOperatingSystem.NumberOfLicensedUsers
 		Wscript.Echo "Organization: " & objOperatingSystem.Organization
 		Wscript.Echo "OS Language: " & objOperatingSystem.OSLanguage
 		Wscript.Echo "OS Product Suite: " & objOperatingSystem.OSProductSuite
 		Wscript.Echo "OS Type: " & objOperatingSystem.OSType
+		strMUILanguages = Join(objOperatingSystem.MUILanguages, ",")
+		WScript.Echo "MUILanguages: " & strMUILanguages
 		Wscript.Echo "Primary: " & objOperatingSystem.Primary
 		Wscript.Echo "Registered User: " & objOperatingSystem.RegisteredUser
 		Wscript.Echo "Serial Number: " & objOperatingSystem.SerialNumber

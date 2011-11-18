@@ -9,12 +9,13 @@ set ROOT_PASSWORD=
 set USER_NAME=
 set USER_PASSWORD=
 set ADMIN=Administrator
+
 REM ############################
 REM # Language descripation
-
 set YOUR_LANGUAGE_IS=Your language is
-set LANGUAGE_DESC=English
+set LANGUAGE_DESC=not translated yet, so use English now
 set TRANSLATOR=Ceasar Sun ( ceasar@nchc.org.tw )
+
 
 REM ############################
 set HEAD01=*********   Welcome to use drbl-winroll Installation  ******************
@@ -32,10 +33,8 @@ set HEAD12=*
 set HEAD13=*    Translator : 
 set HEAD14=*        %LANGUAGE_DESC%  :  %TRANSLATOR%
 set HEAD15=*********************************************************
-
 set HR====================================================
 set NEXT_STEP=Next step
-
 set YOUR_CURRENT_ACCOUNT_IS=Current account is
 set PLZ_CONFIRM_ADMIN_ACCOUNT=Please confirm your Administration privilege at present
 set IF_KEEP_GO=Use [Ctrl+c] to exit, or press any key to continue
@@ -46,7 +45,6 @@ set INSTALLED=Installed
 set REINSTALL=Reinstall
 set UNINSTALL=Uninstall
 set REMOVE=Remove
-
 set PLZ_CHOOSE=Please select
 set DIRECTORY=directory
 set STARTMENU=Start Menu
@@ -55,7 +53,6 @@ set CREATE_WINROLL_CONFIG=Create drbl-winroll configuartion file
 
 REM ############################
 REM # Messages for cygwin installation error
-
 set ERR_DIR_DONT_EXIST=ERROR: Local repository does not exists: 
 set ERR_REP_DONT_EXIST=ERROR: Invalid local repository. Missing directory:
 set ERR_FIL_DONT_EXIST=ERROR: Invalid local repository. Missing file:
@@ -78,7 +75,7 @@ set FIXED=Fixed string
 set SHOW_WORKGROUP_FORMAT=The "workgroup" parameter is
 set DNS_SUFFIX=Assigned via DNS suffix
 
-set INSTALL_AUTONEWSID_SERVICE=Setup SID-Check service
+set INSTALL_AUTONEWSID_SERVICE=Setup  SID-Check service
 set PLZ_READ_LICENSE=Because the function need the Sysinternals (http://www.sysinternals.com) program. In order to respect Sysinternals software license, you must read the license carefully. If you agree, then you can continue, if disagree, we will quit this part of installation.
 set ANS_IF_AGREE=Do you agree the lincese
 set NOT_AGREE_EXIT=Don't agree, exit this session instalation. Go no the other parts of drbl-winroll 
@@ -91,8 +88,8 @@ set ACCEPT_LICENCE=Please accept the licence when the service be started, and sy
 
 set NO_ANY_ATTENDED=You don't need to do anything during installing
 set SETUP_AUTOHOSTNAME_SERVICE=Setup Hostname-check service
-set REMOV_WINROLL_SERVICE=Remove drbl-winroll master service
 set REMOV_AUTOHOSTNAME_SERVICE=Remove Hostname-check service
+set REMOV_WINROLL_SERVICE=Remove drbl-winroll master service
 set REMOVE_REGISTRY=Delete Windows registry
 set COPY_NEEDED_FILES=Copy need files
 set REMOVE_NEEDED_FILES=Remove need files
@@ -119,11 +116,11 @@ set FOOTER05=*  1. If you want to let windows can accept DRBL server command aut
 set FOOTER06=*  Please refer to item 5 in ~/doc/FAQ.*.txt to prepare need files for windows.
 set FOOTER07=*
 set FOOTER08=*   2. If you need to re-deploy Windows (modify serial number or Windows SID)
-set FOOTER09=*    ¡APlease refer to item 5 in ~/doc/FAQ.*.txt 
+set FOOTER09=*    ,Please refer to item 5 in ~/doc/FAQ.*.txt 
 set FOOTER10=*
 set FOOTER11=*
 set FOOTER12=*  Contact with us if any problem
-set FOOTER13=*  Email¡Gceasar@nchc.org.tw, steven@nchc.org.tw
+set FOOTER13=*  Email:ceasar@nchc.org.tw, steven@nchc.org.tw
 set FOOTER14=*
 set FOOTER15=********  NCHC Free Software Labs  , NCHC ,Taiwan  *********
 
