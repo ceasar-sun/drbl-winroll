@@ -593,7 +593,7 @@ goto :EOF
 		echo ** %NOTE_NETDOM_NECESSITY% 
 		echo %HR%
 		pause
-	}
+	)
 
 	echo %_ADD2AD_RUN_SCRIPT%> %WINROLL_CONFIG_FOLDER%\%ADD2AD_RUN_FILE%
 	echo IF_ADD2AD_SERVICE = %IF_AUTOHOSTNAME_SERVICE%>>%WINROLL_CONFIG_FILE%
@@ -738,7 +738,7 @@ goto :EOF
 	copy /Y "%WINROLL_LOCAL_BACKUP%\.ssh" "%CYGWIN_ROOT%\home\%ROOT_NAME%\.ssh"
 	echo --- Import backuped ssh key from %WINROLL_LOCAL_BACKUP%\.ssh\authorized_keys>>%WINROLL_SETUP_LOG%
 
-	:END_OF_IMPORT_SSH_KTU
+	:END_OF_IMPORT_SSH
 goto :EOF
 
 :SSHD_REMOVE
