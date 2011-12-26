@@ -4,6 +4,7 @@
 # Author: Ceasar Sun
 # Description: Package and release toolkit for latest version from RC repository then 
 # Usage: bash ./drbl-winroll-release.sh
+#		--localdb local-git/path
 # Note to commit into ~/drbl-winroll/tool if do something changes
 ######################################################
 
@@ -16,6 +17,21 @@ PACKNAME=drbl-winroll
 REPOS_URL="free:/home/gitpool/drbl-winroll.git"
 
 [ -z "$(which git 2/dev/null)" ] && echo 'Need git command installed !!' && exit 1;
+
+# Parse command-line options
+while [ $# -gt 0 ]; do
+	case "$1" in
+		--localdb) shift; REPOS_URL=$CURRENT_PATH/$1;
+			[ ! -d "$REPOS_URL" ] && echo "Local path error: $REPOS_URL , exit !!" && exit ;
+			 shift ;;
+		-d|--debug) shift ; _DEBUG=y ;;
+		-p|--purge) shift ; _PURGE="y" ;;
+		--help)	shift ; echo "man me !!" ;;
+		--)		shift ; break ;;
+		-*)		echo "${0}: ${1}: invalid option" ; do_print_help=y; 	shift ;;
+		*)	echo "man me !!" ; exit ;shift ;;
+	esac
+done
 
 pushd $WORKDIR
 git clone $REPOS_URL

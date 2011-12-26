@@ -602,6 +602,65 @@ goto :EOF
 :END_OF_ADD2AD_SETUP
 goto :EOF
 
+:ADD2AD_REMOVE
+
+	set ADD2AD_RUN_FILE=add2ad.bat
+
+	echo %HR%
+	echo %NEXT_STEP% : %REMOVE_ADD2AD_SERVICE%
+	echo %HR%
+
+	echo .
+	echo ... %REMOVE_NEEDED_FILES% ...
+
+	del /F /Q %WINROLL_CONFIG_FOLDER%\%ADD2AD_RUN_FILE%
+
+	:END_OF_ADD2AD_REMOVE
+goto :EOF
+
+:MONITOR_SETUP
+
+	set MONITOR_INSTALLER=.\tool\munin-node-installer-for-winroll.exe
+
+	echo %HR%
+	echo %NEXT_STEP% : %SETUP_MONITOR_SERVICE% 
+	echo %HR%
+
+	set ANSWER_IF_GO=n
+	echo %IF_INSTALL_MONITOR% [Y/n]
+	set /P ANSWER_IF_GO="[y/N]"
+	if "%ANSWER_IF_GO%" == "n" (
+		goto :END_OF_MONITOR_SETUP
+	)
+
+	echo .
+	echo ... %RUN_INSTALLER% : %MONITOR_INSTALLER%
+	pause
+	
+	%MONITOR_INSTALLER%
+
+	echo %PLEASE_INSTALL_MUNIN_AT_SERVER%
+	pause
+
+:END_OF_MONITOR_SETUP
+goto :EOF
+
+:MONITOR_REMOVE
+
+	set MONITOR_UNINSTALLER=%STARTMENU_PATH%\Cygwin\Munin Node for Windows\Uninstall.lnk
+
+	echo %HR%
+	echo %NEXT_STEP% : %REMOVE_MONITOR_SERVICE%
+	echo %HR%
+
+	echo .
+	echo ... %RUN_UNINSTALLER% : %MONITOR_UNINSTALLER%
+	pause
+
+	%MONITOR_UNINSTALLER%
+
+	:END_OF_MONITOR_REMOVE
+goto :EOF
 
 :AUTONEWSID_SETUP
 	echo %HR%
@@ -803,6 +862,7 @@ goto :EOF
 	call :AUTOHOSTNAME_SETUP
 	call :NETWORK_MODE_SETUP
 	call :ADD2AD_SETUP
+	call :MONITOR_SETUP
 	call :AUTONEWSID_SETUP
 	call :SSHD_SETUP
 	
@@ -840,6 +900,8 @@ goto :EOF
 	
 		call :SSHD_REMOVE
 		call :AUTONEWSID_REMOVE
+		call :MONITOR_REMOVE
+		call :ADD2AD_REMOVE
 		call :NETWORK_MODE_REMOVE
 		call :AUTOHOSTNAME_REMOVE
 		call :CYGWIN_UNINSTALL

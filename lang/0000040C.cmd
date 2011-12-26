@@ -167,3 +167,12 @@ set NOTE_NETDOM_NECESSITY=Please make sure netdom.exe does exist in system
 REM # Add from v1.3.0 , 20111108
 set _PASSWORD_OF_SYG_SERVER_STORED=The password of sshd runner 'cyg_server' is stored :
 set _DO_NOT_CHANGE_PASSWORD_OF_CYG_SERVER=Do not change cyg_server's password or disable it. That would lead to sshd be out of service .
+
+REM # Add from v1.3.1, 20111226
+set REMOVE_ADD2AD_SERVICE=Remove Auto add-to-AD service
+set SETUP_MONITOR_SERVICE=Setup Windows clients monitor service
+set RUN_INSTALLER=Run installer :
+set RUN_UNINSTALLER=Run uninstaller :
+set REMOVE_MONITOR_SERVICE=Remove Windows clients monitor service
+set PLEASE_INSTALL_MUNIN_AT_SERVER=You have to configure Munin correctly in server. Please refer to DRBL-winroll web site for details.
+set IF_INSTALL_MONITOR=If install system monitor daemon (via Munin Node)

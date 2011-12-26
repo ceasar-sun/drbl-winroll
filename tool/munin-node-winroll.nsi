@@ -12,7 +12,7 @@
 Name "Munin Node ${VERSION} for DRBL-winroll"
 
 ; The file to write
-OutFile "munin-node-winroll-${VERSION}-installer.exe"
+OutFile "munin-node-installer-for-winroll.exe"
 
 ; The default installation directory
 InstallDir "$PROGRAMFILES\Munin Node for Windows"
@@ -63,7 +63,7 @@ Section "Munin Node for Windows (required)"
   ; Write the uninstall keys for Windows
   WriteRegStr HKLM "Software\Microsoft\Windows\CurrentVersion\Uninstall\Munin Node for Windows" "DisplayName" "Munin Node for Windows"
   WriteRegStr HKLM "Software\Microsoft\Windows\CurrentVersion\Uninstall\Munin Node for Windows" "DisplayVersion" "${VERSION}"
-  WriteRegStr HKLM "Software\Microsoft\Windows\CurrentVersion\Uninstall\Munin Node for Windows" "UninstallString" '"$INSTDIR\uninstall.exe"'
+  WriteRegStr HKLM "Software\Microsoft\Windows\CurrentVersion\Uninstall\Munin Node for Windows" "UninstallString" '"$INSTDIR\munin-node-uninstall.exe"'
   WriteRegStr HKLM "Software\Microsoft\Windows\CurrentVersion\Uninstall\Munin Node for Windows" "DisplayIcon " '"$INSTDIR\munin-node.exe"'
   WriteRegStr HKLM "Software\Microsoft\Windows\CurrentVersion\Uninstall\Munin Node for Windows" "URLInfoAbout" "http://code.google.com/p/munin-node-win32/"
   WriteRegDWORD HKLM "Software\Microsoft\Windows\CurrentVersion\Uninstall\Munin Node for Windows" "NoModify" 1
@@ -72,7 +72,7 @@ Section "Munin Node for Windows (required)"
   IntFmt $0 "0x%08X" $0
   WriteRegDWORD HKLM "Software\Microsoft\Windows\CurrentVersion\Uninstall\Munin Node for Windows" "EstimatedSize" "$0"
  
-  WriteUninstaller "uninstall.exe"
+  WriteUninstaller "munin-node-uninstall.exe"
   
 SectionEnd
 
@@ -80,7 +80,7 @@ SectionEnd
 Section "Start Menu Shortcuts"
 
   CreateDirectory "$SMPROGRAMS\Cygwin\Munin Node for Windows"
-  CreateShortCut "$SMPROGRAMS\Cygwin\Munin Node for Windows\Uninstall.lnk" "$INSTDIR\uninstall.exe" "" "$INSTDIR\uninstall.exe" 0
+  CreateShortCut "$SMPROGRAMS\Cygwin\Munin Node for Windows\Uninstall.lnk" "$INSTDIR\munin-node-uninstall.exe" "" "$INSTDIR\munin-node-uninstall.exe" 0
   CreateShortCut "$SMPROGRAMS\Cygwin\Munin Node for Windows\Run munin-node in foreground.lnk" "$INSTDIR\munin-node.exe" "-run" "$INSTDIR\munin-node.exe" 0
   
 SectionEnd
@@ -123,8 +123,8 @@ Section "Uninstall"
 
   ; Remove files and uninstaller
   Delete $INSTDIR\munin-node.exe
-  ;Delete $INSTDIR\uninstall.exe
-  Delete $INSTDIR\*.*
+  Delete $INSTDIR\munin-node-uninstall.exe
+  Delete "$INSTDIR\*.*"
 
   ; Remove shortcuts, if any
   Delete "$SMPROGRAMS\Cygwin\Munin Node for Windows\*.*"

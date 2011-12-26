@@ -164,4 +164,11 @@ REM # Add from v1.3.0 , 20111108
 set _PASSWORD_OF_SYG_SERVER_STORED=SSHD 服务所使用的帐号 cyg_server 之密码被存放在
 set _DO_NOT_CHANGE_PASSWORD_OF_CYG_SERVER=请勿变更 cyg_server 帐号之密码或停用此帐号. 那会导致 ssh 服务启动失败
 
-
+REM # Add from v1.3.1, 20111226
+set REMOVE_ADD2AD_SERVICE=移除自动登入 AD 服务
+set SETUP_MONITOR_SERVICE=设定 Windows 用户端系统监测服务
+set RUN_INSTALLER=执行安装程式 :
+set RUN_UNINSTALLER=执行移除程式 :
+set REMOVE_MONITOR_SERVICE=移除 Windows 用户端系统监测服务
+set PLEASE_INSTALL_MUNIN_AT_SERVER=您必须在监视主机上正确设定 Munin 用户端才能取得系统资讯. 细节请参考 DRBL-winroll 网页.
+set IF_INSTALL_MONITOR=是否安装系统监测服务(由Munin Node提供)

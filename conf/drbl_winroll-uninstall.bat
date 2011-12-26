@@ -70,6 +70,18 @@ REM reg DELETE "HKEY_CURRENT_USER\Software\Cygnus Solutions" /f
 REM reg DELETE "HKEY_USERS\.DEFAULT\Software\Cygnus Solutions" /f 
 echo ============================================
 
+set MONITOR_UNINSTALLER=%STARTMENU_PATH%\Cygwin\Munin Node for Windows\Uninstall.lnk
+IF NOT EXIST "%MONITOR_UNINSTALLER%" (
+	goto :END_OF_REMOVE_MONITOR
+)
+echo .
+echo *** %REMOVE% Monitor Service
+
+echo ... %RUN_UNINSTALLER% : %MONITOR_UNINSTALLER%
+"%MONITOR_UNINSTALLER%"
+echo ============================================
+:END_OF_REMOVE_MONITOR
+
 echo .
 echo *** %REMOVE% CYGWIN %STARTMENU%
 echo rd /Q /S "%STARTMENU_PATH%"
