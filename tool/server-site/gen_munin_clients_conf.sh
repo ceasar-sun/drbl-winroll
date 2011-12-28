@@ -10,7 +10,15 @@ _DEFAULT_munin_clients_conf=munin-winroll-clients.conf
 [ -z "$SETCOLOR_WARNING" ] && SETCOLOR_WARNING="echo -en \\033[1;33m"
 [ -z "$SETCOLOR_NORMAL"  ] && SETCOLOR_NORMAL="echo -en \\033[0;39m"
 
-# Main
+####
+# Main :
+####
+
+if [ -z "$(which munin-cron 2>/dev/null)" ] ; then 
+	$SETCOLOR_WARNING; echo -n "No Munin installed yet, do you want to keep going ? [N/y]"; $SETCOLOR_NORMAL; read _answer
+	[ "$_answer" != "y" ] && exit 2 ;
+fi
+
 
 [ -x /opt/drbl/bin/get-client-ip-list ] && [ -n "$(/opt/drbl/bin/get-client-ip-list)" ] && ip_list="$(/opt/drbl/bin/get-client-ip-list)"
 
