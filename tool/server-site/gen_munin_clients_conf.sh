@@ -70,7 +70,7 @@ for ip in $ip_list; do
 	if [ "$get_host_from" = "Munin" ] ; then
 		#echo "perl -I ./cpan get_telent_result.pl -c 'nodes' $ip"		
 		hostname="$(perl -I ./cpan get_telent_result.pl -c 'nodes' $ip 2>/dev/null)"
-		if [ -z "$hostname"  && -z "$_allow_get_name_fail" ] ; then
+		if [ -z "$hostname"  -a -z "$_allow_get_name_fail" ] ; then
 			echo "No respondence from $ip !! Skip this ... " 
 		fi
 	else
@@ -95,10 +95,24 @@ EOF
 	fi
 done
 
-$SETCOLOR_WARNING
+$SETCOLOR_SUCCESS
 echo "Total $i record(s) done in '$_DEFAULT_munin_clients_conf' "
 echo "Please copy the file into correct folder for Munin (ex: /etc/munin/munin-conf.d) then restart munin daemon (ex: $ sudo -u munin munin-cron)"
 $SETCOLOR_NORMAL
+
+# ask user for setup  file into Munin server
+if [ -n "$(which munin-cron 2>/dev/null)" -a -d "/etc/munin/munin-conf.d" -a -e "$_DEFAULT_munin_clients_conf" ] ; then 
+	echo "Discover munin environment ready here"
+	$SETCOLOR_WARNING; echo -n "Do you want to setup and restart (need root privilege) munin cron service now ?[N/y]"; $SETCOLOR_NORMAL; read _answer
+	if [ "$_answer" = "y" ] ; then 
+		[ -e "/etc/munin/munin-conf.d/$_DEFAULT_munin_clients_conf" ] && sudo mv /etc/munin/munin-conf.d/$_DEFAULT_munin_clients_conf $_DEFAULT_munin_clients_conf.bak
+		[ "$?" = "0" ] && ( $SETCOLOR_SUCCESS; echo "Move the old config to here and rename as'$_DEFAULT_munin_clients_conf.bak' !! "; $SETCOLOR_NORMAL; ) 
+
+		echo "Copy munin configuration for nodes and restart munin cron ..."
+		sudo cp -v $_DEFAULT_munin_clients_conf /etc/munin/munin-conf.d && sudo -u munin munin-cron
+		[ "$?" = "0" ] && ( $SETCOLOR_SUCCESS; echo "Setup and restart munin cron service done !"; $SETCOLOR_NORMAL; ) || ( $SETCOLOR_FAILURE; echo "Setup and restart munin cron service failed, you have to fix it manual !! "; $SETCOLOR_NORMAL; )
+	fi
+fi
 
 exit 0;
 
