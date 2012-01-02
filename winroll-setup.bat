@@ -694,6 +694,12 @@ goto :EOF
 	echo ... %COPY_NEEDED_FILES% ...
 	copy %NEWSID_PROGRAM_PATH% %CYGWIN_ROOT%\bin
 
+	REM Windows Registry Editor Version 5.00 , this should be for SYSTEM account
+	REM [HKEY_USERS\S-1-5-18\Software\Sysinternals\NewSID]
+	REM "EulaAccepted"=dword:00000001
+
+	regedit -s .\%INIT_CONF%\Install-Newsid.reg
+
 	set IF_NEWSID_SERVICE=y
 	echo AUTONEWSID_PARAM = %NEWSID_PROGRAM_NAME% %NEWSID_PROGRAM_PARAMS%>> %WINROLL_CONFIG_FILE%
 	echo IF_NEWSID_SERVICE = y>>%WINROLL_CONFIG_FILE%
