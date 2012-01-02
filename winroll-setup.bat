@@ -857,7 +857,7 @@ goto :EOF
 	echo ... %START_TO% %INSTALL% DRBL-winRoll ...
 	echo .
 	pause
-	rem call :CYGWIN_INSTALL
+	call :CYGWIN_INSTALL
 	set PATH=%PATH%;%CYGWIN_ROOT%\bin;%CYGWIN_ROOT%\sbin;%CYGWIN_ROOT%\usr\sbin
 	call :AUTOHOSTNAME_SETUP
 	call :NETWORK_MODE_SETUP
