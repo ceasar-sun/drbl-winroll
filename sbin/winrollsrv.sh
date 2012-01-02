@@ -343,8 +343,6 @@ do_autohostname(){
 }
 fix_usersid_restart_sshd(){
 	echo "do fix_usersid_restart_sshd" 
-	mkpasswd -l >/etc/passwd
-	mkgroup -l >/etc/group
 
 	cygrunsrv -Q sshd 
 	if [ "$?" -eq "0" ]; then
@@ -433,6 +431,7 @@ do_add2ad(){
 		
 		ADD2AD_RUN_FILE="$(sed -e "s/\s*=\s*/=/g" $WINROLL_CONFIG | grep -e "^ADD2AD_RUN_FILE=" | sed -e "s/^ADD2AD_RUN_FILE=//" -e "s/(\s! )//g")"
 
+		echo "Run : $WINROLL_CONF_ROOT/$ADD2AD_RUN_FILE";
 		$WINROLL_CONF_ROOT/$ADD2AD_RUN_FILE
 
 		if [ "$?" = 0 ] ; then
