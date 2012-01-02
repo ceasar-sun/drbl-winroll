@@ -18,18 +18,28 @@ REPOS_URL="free:/home/gitpool/drbl-winroll.git"
 
 [ -z "$(which git 2/dev/null)" ] && echo 'Need git command installed !!' && exit 1;
 
+usage(){
+	echo "$0 [option]
+	-l, --localdb /local/git/respository
+				Use local as git repository
+	-d			debug mode
+	-k			keep temporary folder
+";
+}
+
+
 # Parse command-line options
 while [ $# -gt 0 ]; do
 	case "$1" in
-		--localdb) shift; REPOS_URL=$CURRENT_PATH/$1;
+		-l|--localdb) shift; REPOS_URL=$CURRENT_PATH/$1;
 			[ ! -d "$REPOS_URL" ] && echo "Local path error: $REPOS_URL , exit !!" && exit ;
 			 shift ;;
 		-d|--debug) shift ; _DEBUG=y ;;
-		-p|--purge) shift ; _PURGE="y" ;;
-		--help)	shift ; echo "man me !!" ;;
-		--)		shift ; break ;;
-		-*)		echo "${0}: ${1}: invalid option" ; do_print_help=y; 	shift ;;
-		*)	echo "man me !!" ; exit ;shift ;;
+		-k|--keep) shift ; _KEEP="y" ;;
+		-h|--help)	shift ; usage ; exit 0 ;;
+		--)		shift ; usage ; exit 0 ;;
+		-*)		echo "${0}: ${1}: invalid option" ; usage; exit; shift ;;
+		*)	usgae; exit ;shift ;;
 	esac
 done
 
@@ -58,6 +68,6 @@ if [ -d ../../doc/ ] && [ -w ../../doc/ ] ; then
 	rsync -a $WORKDIR/$PACKNAME/doc/ ../../doc/
 fi
 
-[ -d "$WORKDIR" ] && rm -rf $WORKDIR
+[ -d "$WORKDIR" -a -z "$_KEEP" ] && rm -rf $WORKDIR
 
 exit 0;
