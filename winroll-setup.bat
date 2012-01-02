@@ -679,7 +679,7 @@ goto :EOF
 	echo %PLEASE_INPUT_NEWSID_PROGRAM_PATH%
 	echo .
 	set /P NEWSID_PROGRAM_PATH="[%TMP%\newsid.exe]"
-	if NOT EXIST "%NEWSID_PROGRAM_PATH%" (
+	if NOT EXIST %NEWSID_PROGRAM_PATH% (
 		echo %PROGRAM_NOT_FOUND% !!
 		goto :IF_INSTALL_AUTONEWSID
 	)
@@ -690,7 +690,7 @@ goto :EOF
 	echo %PLEASE_INPUT_NEWSID_PROGRAM_PARAMS% 
 	set /P NEWSID_PROGRAM_PARAMS="[ex:/a /n (for newsid.exe)]"
 	echo %FULL_NEW_SID_COMMAND% : %NEWSID_PROGRAM_NAME% %NEWSID_PROGRAM_PARAMS%
-
+	pause
 	echo ... %COPY_NEEDED_FILES% ...
 	copy %NEWSID_PROGRAM_PATH% %CYGWIN_ROOT%\bin
 
@@ -857,7 +857,7 @@ goto :EOF
 	echo ... %START_TO% %INSTALL% DRBL-winRoll ...
 	echo .
 	pause
-	call :CYGWIN_INSTALL
+	rem call :CYGWIN_INSTALL
 	set PATH=%PATH%;%CYGWIN_ROOT%\bin;%CYGWIN_ROOT%\sbin;%CYGWIN_ROOT%\usr\sbin
 	call :AUTOHOSTNAME_SETUP
 	call :NETWORK_MODE_SETUP

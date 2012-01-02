@@ -350,6 +350,8 @@ fix_usersid_restart_sshd(){
 	if [ "$?" -eq "0" ]; then
 		cygrunsrv -E sshd
 		priv_sshd_user=$(cygrunsrv.exe -V -Q sshd | grep -e "^Account" | awk -F ":" '{print $2}' | sed -e "s/\.\\\//" -e "s/ //")
+		#echo "chown $priv_sshd_user.$_GID_Administrators /etc/ssh*"
+		# $priv_sshd_user is an knew issue in XP edition 
 		chown $priv_sshd_user.$_GID_Administrators /etc/ssh*
 		chmod 644 /var/log/sshd.log /etc/ssh_host*_key.pub /etc/sshd_config
 		chmod 600 /etc/ssh_host*_key
@@ -386,8 +388,8 @@ do_autonewsid(){
 		mv -f /etc/passwd /etc/passwd.old
 		mv -f /etc/group /etc/group.old
 		
-		AUTONEWSID_PARAM="$(sed -e "s/\s*=\s*/=/g" $WINROLL_CONFIG | grep -e "^AUTONEWSID_PARAM=" | sed -e "s/^IF_AUTOHOSTNAME_SERVICE=//" -e "s/(\s! )//g")"
-
+		AUTONEWSID_PARAM="$(sed -e "s/\s*=\s*/=/g" $WINROLL_CONFIG | grep -e "^AUTONEWSID_PARAM=" | sed -e "s/^AUTONEWSID_PARAM=//" -e "s/(\s! )//g")"
+		echo "Run: $AUTONEWSID_PARAM";
 		`$AUTONEWSID_PARAM`
 		while [ $(ps au| grep newsid | wc -l) -gt 0 ]
 		do
@@ -398,8 +400,9 @@ do_autonewsid(){
 		touch "$WINROLL_TMP/$FIX_SSHD_LOCKFILE"
 	fi
 	if [ "$NEED_TO_CHANGE" = "1" ] ; then
+		echo "chmod ug+rw $WINROLL_CONF_ROOT/*.conf"
 		chmod ug+rw $WINROLL_CONF_ROOT/*.conf
-		chmod ug+rx $WINROLL_FUNCTIONS
+		chmod ug+rx $WINROLL_LIBS
 		NEED_TO_REBOOT=1
 		echo `date` "AUTONEWSID need to reboot :" 
 	fi
@@ -444,11 +447,13 @@ do_add2ad(){
 #######################
 # Main function
 #######################
+[ -f "/etc/passwd" ] || mkpasswd -l >/etc/passwd
+[ -f "/etc/group" ] || mkgroup -l >/etc/group
+
 check_if_root_and_envi
 
-FIX_SSHD_LOCKFILE=fixsshd.lock
-
 # for fix sshd service 
+FIX_SSHD_LOCKFILE=fixsshd.lock
 [ -f "$WINROLL_TMP/$FIX_SSHD_LOCKFILE" ] && fix_usersid_restart_sshd
 
 do_config_network;

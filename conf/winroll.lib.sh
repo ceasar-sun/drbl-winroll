@@ -18,7 +18,7 @@ TEMP="/var/log"
 TMP="/var/log"
 
 #_GID_Administrators='Administrators'
-_GID_Administrators='root'
+_GID_Administrators='544'
 
 alias clear='echo -e -n "\E[2J"'
 
@@ -31,8 +31,8 @@ waiting_to_reboot(){
 }
 
 check_if_root_and_envi(){
-	if [ -z "$(id| grep -iE 'groups=.*\('$_GID_Administrators'\)')" ] ; then
-		id | tee -a $WINROLL_LOG
+	if [ -z "$(id| grep -iE "groups(=|=.*[[:punct:]])$_GID_Administrators\(")" ] ; then
+	id | tee -a $WINROLL_LOG
 		echo "You have no privilege to change, abort !!!" 
 		exit 1
 	fi
