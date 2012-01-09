@@ -72,9 +72,15 @@ do_config_network(){
 		#_devname_str=$(ipconfig /all | grep "$_Ethernet_Adapter_KEYWORD"| dos2unix |  sed -e "s/$_Ethernet_Adapter_KEYWORD//g" )
 		for ((i=1;i<`echo ${_devname_str} | awk -F ":" '{print NF}'`;i++)) ; do
 			_devname="$(echo $_devname_str | awk -F ":" '{print $'$i'}' | sed -e 's/^\s*//g')"
-			netsh interface ip set address name="$_devname" source=dhcp
-			netsh interface ip set dns name="$_devname" source=dhcp
-			netsh interface ip set wins name="$_devname" source=dhcp
+			echo "Gen network adapter '$_devname' cmd into : TEMP/set_network_adapter.cmd"
+			cat >$TEMP/set_network_adapter.cmd<<EOF
+REM This cmd is create by winrollsrv.sh
+netsh interface ip set address name="$_devname" source=dhcp
+netsh interface ip set dns name="$_devname" source=dhcp
+netsh interface ip set wins name="$_devname" source=dhcp
+EOF
+			unix2dos $TEMP/set_network_adapter.cmd
+			cmd /Q /C `cygpath -d $TEMP/set_network_adapter.cmd`
 			echo "Set NIC:'$_devname' as dhcp mode"
 		done
 		ipconfig /renew >/dev/null ; ipconfig /release >/dev/null; ipconfig /renew >/dev/null
@@ -119,10 +125,16 @@ do_config_network(){
 			
 			# use "dhcp" for this mac address 
 			if [ "$thisip"  = "dhcp" ] ; then
-				echo "$_devname ,$mac => dhcp"
-				netsh interface ip set address name="$_devname" source=dhcp >/dev/null
-				netsh interface ip set dns name="$_devname" source=dhcp
-				netsh interface ip set wins name="$_devname" source=dhcp
+				echo "Gen network adapter '$_devname' cmd into : $TEMP/set_network_adapter.cmd"
+				cat >$TEMP/set_network_adapter.cmd<<EOF
+REM This cmd is create by winrollsrv.sh
+netsh interface ip set address name="$_devname" source=dhcp
+netsh interface ip set dns name="$_devname" source=dhcp
+netsh interface ip set wins name="$_devname" source=dhcp
+EOF
+				unix2dos $TEMP/set_network_adapter.cmd
+				cmd /Q /C `cygpath -d $TEMP/set_network_adapter.cmd`
+
 				ipconfig /release "$_devname" >/dev/null; ipconfig /renew "$_devname" >/dev/null
 				IF_IPRENEW=1
 				continue
@@ -163,26 +175,60 @@ do_config_network(){
 
 			# netsh int ip set address <nicsname> static <ipaddress> <subnetmask> <gateway> <metric>
 			# netsh -c interface  ip set address name="°Ï°ì³s½u" static 172.16.91.12 255.255.255.0 172.16.91.2 1
-			netsh -c interface ip set address name="$_devname" source=static addr=$_THIS_IP mask=$_THIS_NETMASK gateway=$_THIS_GATEWAY 1
+			echo "Gen network adapter '$_devname' cmd into : $TEMP/set_network_adapter.cmd"
+			cat >$TEMP/set_network_adapter.cmd<<EOF
+REM This cmd is create by winrollsrv.sh
+netsh -c interface ip set address name="$_devname" source=static addr=$_THIS_IP mask=$_THIS_NETMASK gateway=$_THIS_GATEWAY 1
+EOF
+				unix2dos $TEMP/set_network_adapter.cmd
+				cmd /Q /C `cygpath -d $TEMP/set_network_adapter.cmd`
 			
 			# delete all previous dns records
-			[ -n "$_THIS_DNS" ] && netsh interface ip del dns "$_devname" all
+			if [ -n "$_THIS_DNS" ] ; then
+				echo "Gen adapter '$_devname' cmd for delete dns : $TEMP/set_network_del_dns.cmd"
+				cat >$TEMP/set_network_del_dns.cmd<<EOF
+REM This cmd is create by winrollsrv.sh
+netsh interface ip del dns "$_devname" all
+EOF
+				unix2dos $TEMP/set_network_del_dns.cmd
+				cmd /Q /C `cygpath -d $TEMP/set_network_del_dns.cmd`
+			fi
 			# add a dns record 
 			for dns in $(echo $_THIS_DNS | tr , ' ') ; do
 				# skip illegal ip
 				[ -n "$(ipcalc $dns | grep 'INVALID ADDRESS')" ]  && echo "Illegal dns ip :$dns" && continue
-				echo netsh interface ip add dns \"$_devname\" $dns
-				netsh interface ip add dns "$_devname" $dns
+				echo "Gen adapter '$_devname' cmd for DNS '$dns' : $TEMP/set_network_dns.cmd"
+				cat >$TEMP/set_network_dns.cmd<<EOF
+REM This cmd is create by winrollsrv.sh
+netsh interface ip add dns "$_devname" $dns
+EOF
+				unix2dos $TEMP/set_network_dns.cmd
+				cmd /Q /C `cygpath -d $TEMP/set_network_dns.cmd`
+				#netsh interface ip add dns "$_devname" $dns
 			done
 
 			# delete all previous wins records
-			[ -n "$_THIS_WINS" ] && netsh interface ip del wins "$_devname" all
+			if [ -n "$_THIS_WINS" ] ; then 
+				echo "Gen adapter '$_devname' cmd for delete wins : $TEMP/set_network_del_wins.cmd"
+				cat >$TEMP/set_network_del_wins.cmd<<EOF
+REM This cmd is create by winrollsrv.sh
+netsh interface ip del wins "$_devname" all
+EOF
+				unix2dos $TEMP/set_network_del_wins.cmd
+				cmd /Q /C `cygpath -d $TEMP/set_network_del_wins.cmd`
+			fi
+			
 			# add a wins record 
 			for wins in $(echo $_THIS_WINS | tr , ' ') ; do
 				# skip illegal ip
 				[ -n "$(ipcalc $wins | grep 'INVALID ADDRESS')" ]  && echo "Illegal wins ip :$wins" && continue
-				echo "netsh interface ip add wins \"$_devname\" $wins"
-				netsh interface ip add wins "$_devname" $wins
+				echo "Gen adapter '$_devname' cmd for add wins : $TEMP/set_network_add_wins.cmd"
+				cat >$TEMP/set_network_add_wins.cmd<<EOF
+REM This cmd is create by winrollsrv.sh
+netsh interface ip add wins "$_devname" $wins
+EOF
+				unix2dos $TEMP/set_network_add_wins.cmd
+				cmd /Q /C `cygpath -d $TEMP/set_network_add_wins.cmd`
 			done
 			
 			# For setup dns suffix search list
