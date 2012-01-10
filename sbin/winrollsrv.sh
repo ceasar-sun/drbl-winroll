@@ -30,25 +30,27 @@ fi
 touch $WINROLL_TMP/$LOCKFILE;
 echo `date` "$SERVICE_NAME: start lock:" 
 
-DEFAULT_DEVICE_KEYWORD_CONF="$WINROLL_CONF_ROOT/keyword-conf/_legacy/_default.conf"
+#DEFAULT_DEVICE_KEYWORD_CONF="$WINROLL_CONF_ROOT/keyword-conf/_legacy/_default.conf"
 	
-OS_VERSION=$(detect_win_version)
-LOCALEID=$(detect_locale_code)
+#OS_VERSION=$(detect_win_version)
+#LOCALEID=$(detect_locale_code)
 
-if [ "$OS_VERSION" == "win2000" ] || [ "$OS_VERSION" == "xp" ] || [ "$OS_VERSION" == "win2003" ]; then
-	OS_KEYWORD_CONF=_legacy
-else
-	OS_KEYWORD_CONF=$OS_VERSION
-fi 
+#if [ "$OS_VERSION" == "win2000" ] || [ "$OS_VERSION" == "xp" ] || [ "$OS_VERSION" == "win2003" ]; then
+#	OS_KEYWORD_CONF=_legacy
+#else
+#	OS_KEYWORD_CONF=$OS_VERSION
+#fi 
 
-if [ -e  $WINROLL_CONF_ROOT/keyword-conf/$OS_KEYWORD_CONF/$LOCALEID.conf ] ; then
-	. $WINROLL_CONF_ROOT/keyword-conf/$OS_KEYWORD_CONF/$LOCALEID.conf
-else
-	echo "No match keyword for your OS:$OS_VERSION and locale code in path :$WINROLL_CONF_ROOT/keyword-conf/$OS_KEYWORD_CONF/$LOCALEID.conf"
-	echo "use $DEFAULT_DEVICE_KEYWORD_CONF as default keyword"
-	. $DEFAULT_DEVICE_KEYWORD_CONF
-fi 
+#if [ -e  $WINROLL_CONF_ROOT/keyword-conf/$OS_KEYWORD_CONF/$LOCALEID.conf ] ; then
+#	. $WINROLL_CONF_ROOT/keyword-conf/$OS_KEYWORD_CONF/$LOCALEID.conf
+#else
+#	echo "No match keyword for your OS:$OS_VERSION and locale code in path :$WINROLL_CONF_ROOT/keyword-conf/$OS_KEYWORD_CONF/$LOCALEID.conf"
+#	echo "use $DEFAULT_DEVICE_KEYWORD_CONF as default keyword"
+#	. $DEFAULT_DEVICE_KEYWORD_CONF
+#fi 
 
+_NIC_INFO=$TMP/_nic_info.conf
+cscript //nologo `cygpath.exe -w /bin/get_nic_info.vbs` > $_NIC_INFO
 
 NEED_TO_REBOOT=0
 
@@ -56,7 +58,7 @@ NEED_TO_REBOOT=0
 # Sun function
 #######################
 do_config_network(){
-	SERVICE_NAME="CONFIG_NETWORK"
+	#SERVICE_NAME="CONFIG_NETWORK"
 	DEFAULT_CLIENT_MAC_NETWORK="$WINROLL_CONF_ROOT/client-mac-network.conf"
 	
 	# CONFIG_NETWORK_MODE = none ; do nothing
@@ -68,10 +70,10 @@ do_config_network(){
 		echo "CONFIG_NETWORK_MODE : none"
 		return 3;
 	elif [ "$CONFIG_NETWORK_MODE" = "dhcp" ] ; then
-		_devname_str=$(get_nic_name_str)
-		#_devname_str=$(ipconfig /all | grep "$_Ethernet_Adapter_KEYWORD"| dos2unix |  sed -e "s/$_Ethernet_Adapter_KEYWORD//g" )
-		for ((i=1;i<`echo ${_devname_str} | awk -F ":" '{print NF}'`;i++)) ; do
-			_devname="$(echo $_devname_str | awk -F ":" '{print $'$i'}' | sed -e 's/^\s*//g')"
+		#_devname_str=$(get_nic_name_str)
+		#for ((i=1;i<`echo ${_devname_str} | awk -F ":" '{print NF}'`;i++)) ; do
+		awk -F "\t" '{print $2}' $_NIC_INFO | while read dev; do
+			_devname=${dev}
 			echo "Gen network adapter '$_devname' cmd into : TEMP/set_network_adapter.cmd"
 			cat >$TEMP/set_network_adapter.cmd<<EOF
 REM This cmd is create by winrollsrv.sh
@@ -94,8 +96,6 @@ EOF
 		
 		# get network default configuration
 		nw_conf_tmp=nic-conf.tmp
-		# grep -e "^_DEFAULT" $CLIENT_MAC_NETWORK | sed -e "s/\s*=\s*/=/g" -e "s/\s\{1,\}/,/g" -e "s/,\{1,\}/,/g"  -e "s/\#/ #/" -e "s/^_DEFAULT_/export _DEFAULT_/g" > $WINROLL_TMP/$nw_conf_tmp
-		# use comma "," to be separate sign 
 		grep -e "^_DEFAULT" $CLIENT_MAC_NETWORK | sed -e "s/\s\{1,\}//g" -e "s/,\{1,\}/,/g"  -e "s/\#/ #/" -e "s/^_DEFAULT_/export _DEFAULT_/g" > $WINROLL_TMP/$nw_conf_tmp
 		. $WINROLL_TMP/$nw_conf_tmp
 
@@ -104,18 +104,19 @@ EOF
 		[ -n "$_DEFAULT_NETWORK" ] && network_domain_list="$_DEFAULT_NETWORK $network_domain_list"
 		
 		# get mac address of itself machine
-		mac_address_list="$(ipconfig /all | dos2unix  | awk -F ":" "/ [0-9A-F]+-[0-9A-F]+-[0-9A-F]+-[0-9A-F]+-[0-9A-F]+-[0-9A-F]+$/{print \$2}" | sed -e 's/\s//g' )"
-		
+		#mac_address_list="$(ipconfig /all | dos2unix  | awk -F ":" "/ [0-9A-F]+-[0-9A-F]+-[0-9A-F]+-[0-9A-F]+-[0-9A-F]+-[0-9A-F]+$/{print \$2}" | sed -e 's/\s//g' )"
+		mac_address_list=$(awk -F "\t" "{print \$1}" $_NIC_INFO )
+
 		for mac in $mac_address_list ; do
 			this_nw_conf_tmp=this-nic-conf.tmp
-			#thisip=$(grep $mac $CLIENT_MAC_NETWORK 2>/dev/null | grep - |awk -F '=' '{print $2}'| sed -e "s/\s//g" )
+			thisip=
 			grep -i $mac $CLIENT_MAC_NETWORK 2>/dev/null | sed -e "s/\s//g" -e "s/$mac/export thisip/ig" > $WINROLL_TMP/this-nic-conf.tmp
 			. $WINROLL_TMP/$this_nw_conf_tmp
 			
 			# To get nic device name 
 			#line_nm_rev=$(ipconfig /all | grep -n "$mac"| head -n 1 | awk -F ":" '{print $1}')
 			#_devname=$(ipconfig /all | head -n $line_nm_rev | tac | grep "$_Ethernet_Adapter_KEYWORD"| head -n 1| dos2unix |  sed -e "s/$_Ethernet_Adapter_KEYWORD//g" -e "s/^\s*//g" -e "s/:$//g" )
-			_devname=$(get_nic_name_str $mac)
+			_devname=$(awk -F "\t" "\$1 ~/^$mac/  {print \$2}" $_NIC_INFO)
 
 			# can't find match mac address for itself
 			[ -z "$thisip" ] && echo "No match item for '$_devname' :$mac ," && continue
@@ -180,42 +181,38 @@ EOF
 REM This cmd is create by winrollsrv.sh
 netsh -c interface ip set address name="$_devname" source=static addr=$_THIS_IP mask=$_THIS_NETMASK gateway=$_THIS_GATEWAY 1
 EOF
-				unix2dos $TEMP/set_network_adapter.cmd
-				cmd /Q /C `cygpath -d $TEMP/set_network_adapter.cmd`
+				#unix2dos $TEMP/set_network_adapter.cmd
+				#cmd /Q /C `cygpath -d $TEMP/set_network_adapter.cmd`
 			
 			# delete all previous dns records
 			if [ -n "$_THIS_DNS" ] ; then
 				echo "Gen adapter '$_devname' cmd for delete dns : $TEMP/set_network_del_dns.cmd"
-				cat >$TEMP/set_network_del_dns.cmd<<EOF
-REM This cmd is create by winrollsrv.sh
+				cat >>$TEMP/set_network_adapter.cmd<<EOF
 netsh interface ip del dns "$_devname" all
 EOF
-				unix2dos $TEMP/set_network_del_dns.cmd
-				cmd /Q /C `cygpath -d $TEMP/set_network_del_dns.cmd`
+				#unix2dos $TEMP/set_network_del_dns.cmd
+				#cmd /Q /C `cygpath -d $TEMP/set_network_del_dns.cmd`
 			fi
 			# add a dns record 
 			for dns in $(echo $_THIS_DNS | tr , ' ') ; do
 				# skip illegal ip
 				[ -n "$(ipcalc $dns | grep 'INVALID ADDRESS')" ]  && echo "Illegal dns ip :$dns" && continue
 				echo "Gen adapter '$_devname' cmd for DNS '$dns' : $TEMP/set_network_dns.cmd"
-				cat >$TEMP/set_network_dns.cmd<<EOF
-REM This cmd is create by winrollsrv.sh
+				cat >>$TEMP/set_network_adapter.cmd<<EOF
 netsh interface ip add dns "$_devname" $dns
 EOF
-				unix2dos $TEMP/set_network_dns.cmd
-				cmd /Q /C `cygpath -d $TEMP/set_network_dns.cmd`
-				#netsh interface ip add dns "$_devname" $dns
+				#unix2dos $TEMP/set_network_dns.cmd
+				#cmd /Q /C `cygpath -d $TEMP/set_network_dns.cmd`
 			done
 
 			# delete all previous wins records
 			if [ -n "$_THIS_WINS" ] ; then 
 				echo "Gen adapter '$_devname' cmd for delete wins : $TEMP/set_network_del_wins.cmd"
-				cat >$TEMP/set_network_del_wins.cmd<<EOF
-REM This cmd is create by winrollsrv.sh
+				cat >>$TEMP/set_network_adapter.cmd<<EOF
 netsh interface ip del wins "$_devname" all
 EOF
-				unix2dos $TEMP/set_network_del_wins.cmd
-				cmd /Q /C `cygpath -d $TEMP/set_network_del_wins.cmd`
+				#unix2dos $TEMP/set_network_del_wins.cmd
+				#cmd /Q /C `cygpath -d $TEMP/set_network_del_wins.cmd`
 			fi
 			
 			# add a wins record 
@@ -223,13 +220,14 @@ EOF
 				# skip illegal ip
 				[ -n "$(ipcalc $wins | grep 'INVALID ADDRESS')" ]  && echo "Illegal wins ip :$wins" && continue
 				echo "Gen adapter '$_devname' cmd for add wins : $TEMP/set_network_add_wins.cmd"
-				cat >$TEMP/set_network_add_wins.cmd<<EOF
-REM This cmd is create by winrollsrv.sh
+				cat >>$TEMP/set_network_adapter.cmd<<EOF
 netsh interface ip add wins "$_devname" $wins
 EOF
-				unix2dos $TEMP/set_network_add_wins.cmd
-				cmd /Q /C `cygpath -d $TEMP/set_network_add_wins.cmd`
+				#unix2dos $TEMP/set_network_add_wins.cmd
+				#cmd /Q /C `cygpath -d $TEMP/set_network_add_wins.cmd`
 			done
+			unix2dos $TEMP/set_network_adapter.cmd
+			cmd /Q /C `cygpath -d $TEMP/set_network_adapter.cmd`	
 			
 			# For setup dns suffix search list
 			_current_dns_suffix="$(cat /proc/registry/HKEY_LOCAL_MACHINE/SYSTEM/CurrentControlSet/Services/Tcpip/Parameters/SearchList 2>/dev/null)"
@@ -241,10 +239,9 @@ EOF
 SET WSHShell = CreateObject("WScript.Shell")
 WSHShell.RegWrite"HKLM\System\CurrentControlSet\Services\TCPIP\Parameters\SearchList","$_THIS_DNS_SUFFIX","REG_SZ"
 EOF
-				unix2dos set_dns_suffix.vbs
+				unix2dos $WINROLL_TMP/set_dns_suffix.vbs
 				wscript `cygpath -d $WINROLL_TMP/set_dns_suffix.vbs`
 			fi
-
 		done
 		
 	else 
@@ -308,10 +305,6 @@ do_autohostname(){
 	else 
 		#  If configuration error or other reason to setup hostname fial , use default parameter 
 		echo "Error:$WS_RETURN_CODE Use default parameter !!"
-		#if [ -n "$(echo $HN_WSNAME_DEF_PARAM | grep -e '$IP' 2> /dev/null)" ] ; then
-		#	ipconfig /renew; ipconfig /release; ipconfig /renew
-		#	IF_IPRENEW=1
-		#fi
 		NEED_TO_CHANGE=0
 		wsname.exe $HN_WSNAME_DEF_PARAM
 		WS_RETURN_CODE=$(tail -n 1 $WSNAME_LOG | tr -d "\r")
@@ -319,9 +312,9 @@ do_autohostname(){
 		if [ -n "$(echo $WS_RETURN_CODE | grep -e 'Exit code 4' 2> /dev/null )" ] ; then
 			NEED_TO_CHANGE=0
 			echo "No ip release ,Please check $HN_WSNAME_PARAM for more detail !!";
-		elif [ -z "$(echo $WS_RETURN_CODE | grep -e 'Exit code 7' 2> /dev/null )" ] ; then
+		elif [ -n "$(echo $WS_RETURN_CODE | grep -e 'Exit code 7' 2> /dev/null )" ] ; then
 			NEED_TO_CHANGE=0
-		elif [ -n "$(echo $WS_RETURN_CODE | grep -e 'Rename Successful - reboot ' 2> /dev/null )" ] ; then
+		elif [ -n "$(echo $WS_RETURN_CODE | grep -e ' reboot ' 2> /dev/null )" ] ; then
 			NEED_TO_CHANGE=1
 		fi
 	fi
@@ -334,14 +327,11 @@ do_autohostname(){
 	echo WG_WSNAME_PARAM="$WG_WSNAME_PARAM"
 
 	if [ -n "$WG_WSNAME_PARAM" ] ;then
-		#if [ "$IF_IPRENEW" != "1" ] ; then
-		#	ipconfig /renew; ipconfig /release; ipconfig /renew
-		#fi
-		
-		#NM="$(ipconfig | grep "$_NETMASK_KEYWORD" | head -n 1 | cut -d ":" -f 2 | sed -e "s/\s*//g" )"
-		NM="$(ipconfig | dos2unix | awk -F ":" "\$2 ~/ [0-9]+.[0-9]+.[0-9]+.[0-9]+$/ {print \$2}" | sed -e 's/\s//g' | awk -F "." "\$1 == 255 {print \$0}"  | head -n 1 )"
-		IP="$(get_ip_str |awk -F. '{print $1+1000"-"$2+1000"-"$3+1000"-"$4+1000 }' | sed -e 's/^1//' -e 's/\-1/-/g' )"
-		#IP="$(ipconfig | grep "$_IPV4_ADDRESS_KEYWORD" | head -n 1 | cut -d ":" -f 2 | sed -e "s/\s*//g" |awk -F. '{print $1+1000"-"$2+1000"-"$3+1000"-"$4+1000 }' | sed -e 's/^1//' -e 's/\-1/-/g' )"
+		#NM="$(ipconfig | dos2unix | awk -F ":" "\$2 ~/ [0-9]+.[0-9]+.[0-9]+.[0-9]+$/ {print \$2}" | sed -e 's/\s//g' | awk -F "." "\$1 == 255 {print \$0}"  | head -n 1 )"
+		NM=$(awk -F "\t" "\$3 !~/^169.254/ && \$4 !~/^255.255.0.0,64$/  {print \$4}" $_NIC_INFO | awk -F ","  '{print $1}' | head -n 1)
+		#IP="$(get_ip_str |awk -F. '{print $1+1000"-"$2+1000"-"$3+1000"-"$4+1000 }' | sed -e 's/^1//' -e 's/\-1/-/g' )"
+		IP=$(awk -F "\t" "\$3 !~/^169.254/ && \$4 !~/^255.255.0.0,64$/  {print \$3}" $_NIC_INFO | awk -F ","  '{print $1}' | head -n 1)
+		refine_IP=$(echo $IP |awk -F. '{print $1+1000"-"$2+1000"-"$3+1000"-"$4+1000 }' | sed -e 's/^1//' -e 's/\-1/-/g')
 
 		#DNS_SUFF="$(ipconfig /all | grep "$_DNS_SEARCH_SUFFIX_KEYWORD" 2>/dev/null |head -n 1 | cut -d ":" -f 2 | cut -d "." -f 1,2 |sed -e "s/\./-/g" -e "s/\s*//g" )"
 		_DNS_SUFFIX_REGISTRY_KeyList="HKEY_LOCAL_MACHINE/SYSTEM/CurrentControlSet/Services/Tcpip/Parameters/DhcpDomain HKEY_LOCAL_MACHINE/SYSTEM/CurrentControlSet/Services/Tcpip/Parameters/SearchList"
@@ -354,9 +344,9 @@ do_autohostname(){
 		[ -n "$_DNS_SUFFIX_REGISTRY_Value" ] && DNS_SUFF="$(echo $_DNS_SUFFIX_REGISTRY_Value | awk -F '.' '{ printf "%s.%s",$1,$2}' )"
 		
 		if [ "$NM" = "255.255.255.0" ] ;then
-			NM_STR=$(echo $IP| cut -d "-" -f 3)
+			NM_STR=$(echo $refine_IP| cut -d "-" -f 3)
 		else
-			NM_STR=$(echo $IP| cut -d "-" -f 2,3)
+			NM_STR=$(echo $refine_IP| cut -d "-" -f 2,3)
 		fi
 		
 		WG_STR=$(echo $WG_WSNAME_PARAM | sed -e "s/\$DNS_SUFFIX/$DNS_SUFF/g" -e "s/\$NM/$NM_STR/g" -e 's/\s//g')
@@ -414,7 +404,7 @@ do_autonewsid(){
 
 	[ ! -f "$SID_MD5CHK_FILE" ] && touch $SID_MD5CHK_FILE;
 
-	NICMAC_ADDR_MD5="$(ipconfig /all | dos2unix | awk -F ":" "/ [0-9A-F]+-[0-9A-F]+-[0-9A-F]+-[0-9A-F]+-[0-9A-F]+-[0-9A-F]+$/{print \$2}" | sed -e 's/\s//g' | head -n 1 | md5sum | awk '{print $1}')"
+	NICMAC_ADDR_MD5=$(awk -F "\t" "{print \$1}" $_NIC_INFO | head -n 1 | md5sum | awk '{print $1}' )
 	NEED_TO_CHANGE=0
 
 	echo $NICMAC_ADDR_MD5 
@@ -458,15 +448,14 @@ do_add2ad(){
 	ADD2AD_MD5CHK_FILE="$WINROLL_CONF_ROOT/add2ad.md5"
 	ADD2AD_RUN_FILE="$WINROLL_CONF_ROOT/add2ad.bat"
 	NICMAC_ADDR_MD5=""
-	#NEED_TO_CHANGE=0
-
+	
 	if [ "$NEED_TO_REBOOT" = "1" ]; then
 		return;
 	fi
 
 	[ ! -f "$ADD2AD_MD5CHK_FILE" ] && touch $ADD2AD_MD5CHK_FILE;
 
-	NICMAC_ADDR_MD5="$(ipconfig /all | dos2unix | awk -F ":" "/ [0-9A-F]+-[0-9A-F]+-[0-9A-F]+-[0-9A-F]+-[0-9A-F]+-[0-9A-F]+$/{print \$2}" | sed -e 's/\s//g' | head -n 1 | md5sum | awk '{print $1}')"
+	NICMAC_ADDR_MD5=$(awk -F "\t" "{print \$1}" $_NIC_INFO | head -n 1 | md5sum | awk '{print $1}' )
 	NEED_TO_CHANGE=0
 
 	echo $NICMAC_ADDR_MD5 

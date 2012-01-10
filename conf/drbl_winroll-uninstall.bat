@@ -1,7 +1,7 @@
 @echo off
 
 REM ####################################################################
-REM # Uninstall drbl-winRoll 
+REM # Uninstall drbl-winroll 
 REM #
 REM # License: GPL
 REM # Author	: Ceasar Sun Chen-kai <ceasar@nchc.narl.org.tw>
