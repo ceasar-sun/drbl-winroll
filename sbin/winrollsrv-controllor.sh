@@ -32,15 +32,6 @@ declare SSHD_SERVER_PW=
 declare SYSINT_LINCESE_URL="http://drbl.nchc.org.tw/drbl-winroll/download/newsid-licence.php"
 declare NEWSID_DOWNLOAD_URL="http://drbl.nchc.org.tw/drbl-winroll/download/newsid-download.php"
 
-OS_VERSION="$(detect_win_version)"
-LOCALEID="$(detect_locale_code)"
-
-if [ "$OS_VERSION" == "win2000" ] || [ "$OS_VERSION" == "xp" ] || [ "$OS_VERSION" == "win2003" ]; then
-	SSHD_SERVER_PW_OPT="-w $SSHD_SERVER_PW"
-else
-	SSHD_SERVER_PW_OPT=
-fi
-
 config_sshd(){
 	chmod u+w,a+r /etc/passwd /etc/group
 	chmod a+x /var
