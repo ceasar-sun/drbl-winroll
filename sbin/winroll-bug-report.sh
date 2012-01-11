@@ -1,7 +1,7 @@
 #!/bin/bash
 
 ###########################################################################
-#  drbl-winroll service
+#  drbl-winroll Bug report
 #
 # License: GPL
 # Author	: Ceasar Sun Chen-kai <ceasar@nchc.narl.org.tw> , Steven steven@nchc.narl.org.tw
@@ -10,8 +10,7 @@
 # Usage:  %CYGWIN_ROOT%\bin\winroll-bug-report.sh -e "CYGWIN=${_cygwin}"
 #
 ###########################################################################
-#WINROLL_CONFIG="/drbl_winRoll-config/winRoll.txt"
-WINROLL_FUNCTIONS="/drbl_winRoll-config/winroll.lib.sh"
+WINROLL_FUNCTIONS="/drbl_winroll-config/winroll.lib.sh"
 . $WINROLL_FUNCTIONS
 
 # Local service paremeter 
@@ -46,6 +45,11 @@ echo "DONE-----------------" | tee -a $report_tmpdir/pc-info.txt
 echo "Get pc informations by 'systeminfo' ..." | tee -a $report_tmpdir/pc-info.txt
 systeminfo 2>/dev/null >> $report_tmpdir/pc-info.txt
 echo "DONE-----------------" | tee -a $report_tmpdir/pc-info.txt
+
+echo "Get nic informations by 'cscript //nologo `cygpath.exe -w /bin/get_nic_info.vbs`' ..." | tee -a $report_tmpdir/pc-info.txt
+cscript //nologo `cygpath.exe -w /bin/get_nic_info.vbs` >> $report_tmpdir/pc-info.txt
+echo "DONE-----------------" | tee -a $report_tmpdir/pc-info.txt
+
 
 unix2dos --force $report_tmpdir/pc-info.txt
 cd `dirname $report_tmpdir`; zip -r -q `basename $report_tmpdir`.zip `basename $report_tmpdir`; mv `basename $report_tmpdir`.zip  /winroll-bug-report.`date +%Y%m%d`.zip

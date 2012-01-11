@@ -30,26 +30,7 @@ fi
 touch $WINROLL_TMP/$LOCKFILE;
 echo `date` "$SERVICE_NAME: start lock:" 
 
-#DEFAULT_DEVICE_KEYWORD_CONF="$WINROLL_CONF_ROOT/keyword-conf/_legacy/_default.conf"
-	
-#OS_VERSION=$(detect_win_version)
-#LOCALEID=$(detect_locale_code)
-
-#if [ "$OS_VERSION" == "win2000" ] || [ "$OS_VERSION" == "xp" ] || [ "$OS_VERSION" == "win2003" ]; then
-#	OS_KEYWORD_CONF=_legacy
-#else
-#	OS_KEYWORD_CONF=$OS_VERSION
-#fi 
-
-#if [ -e  $WINROLL_CONF_ROOT/keyword-conf/$OS_KEYWORD_CONF/$LOCALEID.conf ] ; then
-#	. $WINROLL_CONF_ROOT/keyword-conf/$OS_KEYWORD_CONF/$LOCALEID.conf
-#else
-#	echo "No match keyword for your OS:$OS_VERSION and locale code in path :$WINROLL_CONF_ROOT/keyword-conf/$OS_KEYWORD_CONF/$LOCALEID.conf"
-#	echo "use $DEFAULT_DEVICE_KEYWORD_CONF as default keyword"
-#	. $DEFAULT_DEVICE_KEYWORD_CONF
-#fi 
-
-_NIC_INFO=$TMP/_nic_info.conf
+_NIC_INFO=$WINROLL_TMP/_nic_info.conf
 cscript //nologo `cygpath.exe -w /bin/get_nic_info.vbs` > $_NIC_INFO
 
 NEED_TO_REBOOT=0
@@ -243,11 +224,12 @@ EOF
 				wscript `cygpath -d $WINROLL_TMP/set_dns_suffix.vbs`
 			fi
 		done
-		
 	else 
 		echo "CONFIG_NETWORK_MODE :$CONFIG_NETWORK_MODE ?? " 
 	fi
-
+	
+	# Due to refresh network config , so re-gen nic information 
+	cscript //nologo `cygpath.exe -w /bin/get_nic_info.vbs` > $_NIC_INFO
 }
 do_autohostname(){
 

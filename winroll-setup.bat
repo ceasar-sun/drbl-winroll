@@ -18,13 +18,6 @@ REM # [3] DRBL : Note for drbl4win, Dec. 2005.
 REM #     http://www.ceasar.tw/modules/news/article.php?storyid=98
 REM ####################################################################
 
-REM # identify your OS language 
-REM # use registry 'HKEY_CURRENT_USER\Control Panel\International\Locale' value  
-REM set ENG_OS_PATH=%USERPROFILE%\Desktop
-REM set ZHTW_OS_PATH=%USERPROFILE%\орн▒
-REM set FR_OS_PATH=%USERPROFILE%\Bureau
-REM set NL_OS_PATH=%USERPROFILE%\Bureaublad
-
 REM # Global parameter
 set LANG=
 set OS_VERSION=
@@ -56,9 +49,10 @@ set CYGWIN_LOCAL_MIRROR=
 set LOCAL_REPOSITORY=%SOURCE_DIR%
 set INIT_DOC_FOLDER=doc
 
-call :CHECK_OS_VERSION
-call :SET_LANGUAGE
-set ROOT_NAME=%ADMIN%
+call :INIT_OS_LANG_INFO
+REM call :CHECK_OS_VERSION
+REM call :SET_LANGUAGE
+REM set ROOT_NAME=%ADMIN%
 cls
 call :PRINTHEAD
 echo %YOUR_OS_VERSION_IS% :"%OS_VERSION%"
@@ -92,21 +86,16 @@ call :CREAT_SETUP_LOG
 
 if "%ACTION%" == "i" (
 	call :DRBL-WINROLL_INSTALL
-	rem call .\doc\Faq.%LOCALE_CODE%.txt
 	)
 if "%ACTION%" == "f" (
 	call :DRBL-WINROLL_INSTALL
-	rem call .\doc\Faq.%LOCALE_CODE%.txt
 )
 if "%ACTION%" == "r" (
 	call :DRBL-WINROLL_REINSTALL
-	rem call .\doc\Faq.%LOCALE_CODE%.txt
 )
 if "%ACTION%" == "u" (
 	call :DRBL-WINROLL_UNINSTALL
-	rem call .\doc\Faq.%LOCALE_CODE%.txt
 )
-REM explorer %WINROLL_WEB_FAQ_URL%?localecode=%LOCALE_CODE%
 
 if  "%IF_NEWSID_SERVICE%" == "y" (
 	call :STARTUP_AUTONEWSID
@@ -116,68 +105,17 @@ goto :EOF
 REM #####################################
 REM # Sub function
 REM #####################################
-:CHECK_OS_VERSION
-	set OS_VERSION=NONE
+:INIT_OS_LANG_INFO
+	set OS_VERSION=
+	set LOCALE_CODE=
+	set STARTMENU_PATH=
+	set ROOT_NAME=
 	
-	cscript %INIT_CONF%\reg_query.vbs //Nologo "HKEY_LOCAL_MACHINE\SOFTWARE\Microsoft\Windows NT\CurrentVersion\ProductName" > OS-version.txt
+	cscript //nologo %INIT_CONF%\get_os_info.vbs > lang\os_info.cmd
+	CALL lang\os_info.cmd
 
-	type OS-version.txt | find "2000"
-	if "%ERRORLEVEL%" == "0" (
-		set OS_VERSION=WIN2000
-		goto :END_OF_CHECK_OS_VERSION
-	)
-
-	type OS-version.txt | find "XP"
-	if "%ERRORLEVEL%" == "0" (
-		set OS_VERSION=WINXP
-		goto :END_OF_CHECK_OS_VERSION
-	)
-
-	type OS-version.txt | find "2003"
-	if "%ERRORLEVEL%" == "0"  (
-		set OS_VERSION=WIN2003
-		goto :END_OF_CHECK_OS_VERSION
-	)
-
-	type OS-version.txt | find "2008"
-	if "%ERRORLEVEL%" == "0"  (
-		set OS_VERSION=WIN2008
-		goto :END_OF_CHECK_OS_VERSION
-	)
-
-	type OS-version.txt | find "Vista"
-	if "%ERRORLEVEL%" == "0"  (
-		set OS_VERSION=Vista
-		goto :END_OF_CHECK_OS_VERSION
-	)
-
-	type OS-version.txt | find "Windows 7"
-	if "%ERRORLEVEL%" == "0"  (
-		set OS_VERSION=WIN7
-		goto :END_OF_CHECK_OS_VERSION
-	)
-	
-	if "%OS_VERSION%" == "NONE" (
-		echo .
-		echo !!! Unknow your OS version ... !!!
-		echo !!! Please attach "OS-version.txt" file at installation folder and email to "ceasar@nchc.org.tw" !!!
-		echo !!! Program EXIT !!!
-		pause
-		exit 1
-		goto :EOF
-	)
-	:END_OF_CHECK_OS_VERSION
-goto :EOF
-
-REM # To decide language during installation
-:SET_LANGUAGE
-	set LOCALE_CODE=0
-
-	cscript %INIT_CONF%\reg_query.vbs //Nologo "HKEY_CURRENT_USER\Control Panel\International\Locale" > Locale.txt
-	for /F "tokens=* delims=" %%S in ('type Locale.txt') do set LOCALE_CODE=%%S
-
-	IF NOT EXIST "lang\%LOCALE_CODE%.cmd" (
-		rem set LOCALE_CODE=default
+	IF NOT EXIST "lang\0000%LOCALE_CODE%.cmd" (
+		REM set LOCALE_CODE=default
 		copy /Y lang\default.cmd lang\%LOCALE_CODE%.cmd
 		echo *** Warning !! ****
 		echo !! Your currnet language not be supported complete yet,
@@ -186,18 +124,11 @@ REM # To decide language during installation
 		echo .
 		echo !! [Ctrl+C] to exit, any key to continue.
 		pause
-	)
-	
-	:BEFORE_OF_CALL_LANGUAGE
+	) else (
+		CALL lang\0000%LOCALE_CODE%.cmd
+	)	
 
-	CALL lang\%LOCALE_CODE%.cmd
-	
-	REM # assign "STARTMENU_PATH" from registry value
-	REM cygpath -A -P -w : it can get the same result
-	cscript %INIT_CONF%\reg_query.vbs //Nologo "HKEY_LOCAL_MACHINE\SOFTWARE\Microsoft\Windows\CurrentVersion\Explorer\Shell Folders\Common Programs" > program-path.txt
-	for /F "tokens=* delims=" %%S in ('type program-path.txt') do set STARTMENU_PATH=%%S\cygwin
-
-	:END_OF_SET_LANGUAGE
+	:INIT_OS_LANG_INFO
 goto :EOF
 
 :PRINTHEAD
@@ -334,11 +265,10 @@ goto :EOF
 	echo %CREATE_WINROLL_CONFIG%
 	if not exist "%WINROLL_CONFIG_FOLDER%" ( mkdir "%WINROLL_CONFIG_FOLDER%" )
 	if not exist "%WINROLL_DOC_FOLDER%" ( mkdir "%WINROLL_DOC_FOLDER%" )
-	if not exist "%WINROLL_CONFIG_FOLDER%\keyword-conf" ( mkdir "%WINROLL_CONFIG_FOLDER%\keyword-conf" )
+	REM if not exist "%WINROLL_CONFIG_FOLDER%\keyword-conf" ( mkdir "%WINROLL_CONFIG_FOLDER%\keyword-conf" )
 	
 	copy /V "%INIT_CONF%\*.conf" "%WINROLL_CONFIG_FOLDER%"
-	xcopy  /Y /E "%INIT_CONF%\keyword-conf" "%WINROLL_CONFIG_FOLDER%\keyword-conf"
-
+	REM xcopy  /Y /E "%INIT_CONF%\keyword-conf" "%WINROLL_CONFIG_FOLDER%\keyword-conf"
 	copy /Y "%INIT_CONF%\*.lib.sh" "%WINROLL_CONFIG_FOLDER%"
 	xcopy /Y /E "%INIT_DOC_FOLDER%" "%WINROLL_DOC_FOLDER%"
 	copy /Y ".\sbin\*.*" "%CYGWIN_ROOT%\bin"
