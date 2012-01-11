@@ -3,12 +3,6 @@
 REM ############################
 REM # Global parameter
 REM ############################
-rem set NIC_NAME=Local Area Connection
-rem set STARTMENU_PATH=%ALLUSERSPROFILE%\Start Menu\Programs\Cygwin
-set ROOT_PASSWORD=
-set USER_NAME=
-set USER_PASSWORD=
-set ADMIN=Administrator
 
 REM ############################
 REM # Language descripation

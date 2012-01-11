@@ -389,8 +389,6 @@ do_autonewsid(){
 	NICMAC_ADDR_MD5=$(awk -F "\t" "{print \$1}" $_NIC_INFO | head -n 1 | md5sum | awk '{print $1}' )
 	NEED_TO_CHANGE=0
 
-	echo $NICMAC_ADDR_MD5 
-
 	if [ "$(cat $SID_MD5CHK_FILE)" != "$NICMAC_ADDR_MD5" ] ; then
 		echo "Renew sid for: $NICMAC_ADDR_MD5 " 
 		rm -rf $SID_MD5CHK_FILE;
@@ -414,7 +412,11 @@ do_autonewsid(){
 		done
 		echo "$NICMAC_ADDR_MD5" > $SID_MD5CHK_FILE
 		touch "$WINROLL_TMP/$FIX_SSHD_LOCKFILE"
+	else
+		echo "Sid already renewed in $NICMAC_ADDR_MD5, skip this !"
 	fi
+	
+
 	if [ "$NEED_TO_CHANGE" = "1" ] ; then
 		echo "chmod ug+rw $WINROLL_CONF_ROOT/*.conf"
 		chmod ug+rw $WINROLL_CONF_ROOT/*.conf

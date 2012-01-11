@@ -3,12 +3,7 @@
 REM ############################
 REM # Global parameter
 REM ############################
-rem set NIC_NAME=區域連線
-rem set STARTMENU_PATH=%ALLUSERSPROFILE%\「開始」功能表\程式集\Cygwin
-set ROOT_PASSWORD=
-set USER_NAME=
-set USER_PASSWORD=
-set ADMIN=Administrator
+
 REM ############################
 REM # Language descripation
 

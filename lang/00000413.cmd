@@ -3,12 +3,7 @@
 REM ############################
 REM # Global parameter
 REM ############################
-rem set NIC_NAME=LAN-verbinding
-rem set STARTMENU_PATH=%ALLUSERSPROFILE%\Menu Start\Programma's\Cygwin
-set ROOT_PASSWORD=
-set USER_NAME=
-set USER_PASSWORD=
-set ADMIN=Administrator
+
 REM ############################
 REM # TAAL OMSCHRIJVING
 
