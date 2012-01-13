@@ -34,7 +34,6 @@ set IF_NEWSID_SERVICE=n
 set IF_AUTOHOSTNAME_SERVICE=n
 set SSHD_SERVICE=sshd
 set SSHD_SERVER_PW=
-REM # Define ROOT_NAME atfer include language file
 set ROOT_NAME=
 set INIT_CONF=conf
 set WINROLL_LOCAL_BACKUP=%USERPROFILE%\drbl-winroll.bak
@@ -50,9 +49,6 @@ set LOCAL_REPOSITORY=%SOURCE_DIR%
 set INIT_DOC_FOLDER=doc
 
 call :INIT_OS_LANG_INFO
-REM call :CHECK_OS_VERSION
-REM call :SET_LANGUAGE
-REM set ROOT_NAME=%ADMIN%
 cls
 call :PRINTHEAD
 echo %YOUR_OS_VERSION_IS% :"%OS_VERSION%"
@@ -110,23 +106,34 @@ REM #####################################
 	set LOCALE_CODE=
 	set STARTMENU_PATH=
 	set ROOT_NAME=
-	
+	set UserPerms=
+	set UACTurnedOn=
+
 	cscript //nologo %INIT_CONF%\get_os_info.vbs > lang\os_info.cmd
 	CALL lang\os_info.cmd
 
-	IF NOT EXIST "lang\0000%LOCALE_CODE%.cmd" (
+	IF NOT EXIST "lang\%LOCALE_CODE%.cmd" (
 		REM set LOCALE_CODE=default
 		copy /Y lang\default.cmd lang\%LOCALE_CODE%.cmd
-		echo *** Warning !! ****
-		echo !! Your currnet language not be supported complete yet,
-		echo !! But you still can install it under this release.
-		echo !! Let me know if any problem. Email :ceasar@nchc.org.tw !!
-		echo .
-		echo !! [Ctrl+C] to exit, any key to continue.
+		echo **********************
+		echo **       Note       **
+		echo **********************
+		echo * The used language of installation is not be translated perfectly yet,
+		echo * But you still can install and make it work via this.
+		echo *
+		echo **********************
+		echo ** How to TRANSLATE **
+		echo **********************
+		echo * Please edit ~drbl-winroll/lang/%LOCALE_CODE%.cmd 
+		echo * 
+		echo * Let me know if any problem or new translation file.
+		echo * Email :ceasar@nchc.org.tw !!
+		echo **********************
+		echo *
+		echo [Ctrl+C] to exit or any key to continue.
 		pause
-	) else (
-		CALL lang\0000%LOCALE_CODE%.cmd
-	)	
+	)
+	CALL lang\%LOCALE_CODE%.cmd	
 
 	:INIT_OS_LANG_INFO
 goto :EOF
@@ -263,6 +270,7 @@ goto :EOF
 	copy /Y "%INIT_CONF%\*.lnk" "%STARTMENU_PATH%"
 	
 	echo %CREATE_WINROLL_CONFIG%
+
 	if not exist "%WINROLL_CONFIG_FOLDER%" ( mkdir "%WINROLL_CONFIG_FOLDER%" )
 	if not exist "%WINROLL_DOC_FOLDER%" ( mkdir "%WINROLL_DOC_FOLDER%" )
 	REM if not exist "%WINROLL_CONFIG_FOLDER%\keyword-conf" ( mkdir "%WINROLL_CONFIG_FOLDER%\keyword-conf" )
@@ -281,6 +289,7 @@ goto :EOF
 	echo. >>"%APPDATA%\%WINROLL_UNINSTALL_PARA%"
 	echo set CYGWIN_ROOT=%CYGWIN_ROOT%>>"%APPDATA%\%WINROLL_UNINSTALL_PARA%"
 	echo set STARTMENU_PATH=%STARTMENU_PATH%>>"%APPDATA%\%WINROLL_UNINSTALL_PARA%"
+	echo set LOCALE_CODE=%SLOCALE_CODE%>>"%APPDATA%\%WINROLL_UNINSTALL_PARA%"
 
 	REM Add cygwin binary path into current path
 	set PATH=%CYGWIN_ROOT%\bin;%PATH%
@@ -544,6 +553,7 @@ goto :EOF
 	echo ... %REMOVE_NEEDED_FILES% ...
 
 	del /F /Q %WINROLL_CONFIG_FOLDER%\%ADD2AD_RUN_FILE%
+
 
 	:END_OF_ADD2AD_REMOVE
 goto :EOF
@@ -862,3 +872,4 @@ goto :EOF
 
 :EOF
 exit /B 1
+
