@@ -45,9 +45,11 @@ S2. Run ~drbl-winroll/winroll-setup.bat. It will show as Q1 mentioned message if
 * Let me know if any problem or new translation file.
 * Email :ceasar@nchc.org.tw !!
 **********************
+Please interrupt installation via [Ctrl]+[C].
+(Note: ~/lana/xxxx.cmd , the number in file name would depend on your system locale )
 
 S3. Translate the file to your phrasal and save it (Don't modify the file name)
-	Note: Make sure to use Windows new line character in ~/lang/*.cmd file
+	Note: Make sure to use Windows new line character in your translation file
 
 S4. Test it: To run ~drbl-winroll/winroll-setup.bat again and you should get a translated-done installation.
 
