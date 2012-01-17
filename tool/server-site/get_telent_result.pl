@@ -3,7 +3,7 @@
 ##
 ## Author	: Ceasar Sun , 2011/12/27
 ## Descript	: get command result from Munin win32 nodes (via DRBL-winroll project)
-## Limiation: Not able to get 'list' result 
+## Limiation: Not be able to get 'list' result 
 ## Usage	:
 ##	#get 'nodes' result from sinle ip
 ##	 perl -I ~path/for-Net-pm-lib/ this-script --command nodes -ip 192.168.1.1 
