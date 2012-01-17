@@ -1,64 +1,60 @@
-******* DRBL-winroll Translation How To Document ********
+******* DRBL-winroll Translation - How To Document ********
 
     NCHC Free Software Labs, NCHC ,Taiwan
-    Date	:	2010/8/2
+    Date	:	2012/1/17
     License	:	GPL      
-    Author	:	Ceasar Sun  <ceasar at nchc.org.tw>
+    Author	:	Ceasar Sun  <ceasar dot sun at gmail dot com>
 
 *********************************************************
 
-The guide is for how to translate drbl-winroll (for version 1.2.x or later) to suit for your language and how to test. Please let me know if any problem and thanks in advanced for your great contribution !!!
+The guide is for how to translate drbl-winroll (for version 1.3.2 or later) to suit for your language and how to test. Please let me know if any problem and thanks in advanced for your great contribution !!!
 
 --------------------------------------------------------------------------------------------------------------------------------------------
-Prepare:
-Download the latest version with zip format then extract the zip file. You can download drbl-winroll form https://sourceforge.net/projects/drbl-winroll/files/
+Please read the follow FAQ first :
+
+Q1: How to know if the language of my locale is prepared ?
+A: When you try to install drbl-winroll then it shows the follow :
+**********************
+**       Note       **
+**********************
+* The used language of installation is not be translated perfectly yet,
+* But you still can install and make it work via this.
+*
+**********************
+It means DRBL-winroll don't have the translation for your environemnt.
+
+Q2: Can I install and work well if DRBL-winroll doesn't have translation for my current environment ?
+A: Yes, it would use English for installation as default. Furthermore, DRBL-winroll workd as daemon , so it is locale independence.  
+
+Q3: So, which part of translation be needed and used in DRBL-winroll ?
+A: DRBL-winroll only use the translation file for installation because it's locale independenc for work as daemon.
+
+--------------------------------------------------------------------------------------------------------------------------------------------
 
 *** Here to start ***
 
-Get current system locale number:
-	Before to translate, system locale RFC1766 number must be identified. It can get form Windows registry , 
-	\\HKEY_CURRENT_USER\Control Panel\International\Locale
-	* It must has 8 characters, ex: zh_TW : 00000404, en-US :00000409, Nederlands:00000413, france: 0000040C, Svenska :0000041D, ....
+S1. Prepare:
+Download the latest version with zip format then extract the zip file. You can download drbl-winroll form https://sourceforge.net/projects/drbl-winroll/files/ 
 
-1. Translate 1 keyword file for winroll service running (Essential !!)
-	1.1 Make a copy from ~/drbl-winroll/conf/keyword-conf/_legacy/_default.conf to ~/drbl-winroll/conf/keyword-conf/[os-version]/[your-locale-number].conf
-	* For Windows 2000, XP, 2003 , [os-version] directory is "_legacy"
-	* After installation, whole keyword folder should be copy to "c:\cygwin\drbl_winroll-config\keyword-conf"
+S2. Run ~drbl-winroll/winroll-setup.bat. It will show as Q1 mentioned message if DRBL-winroll doesn't have the correct translation for your system environemnt. DRBL-winroll would create a default translation file for you automatically and locate as the follow message :
+**********************
+** How to TRANSLATE **
+**********************
+* Please edit ~drbl-winroll/lang/0404.cmd
+*
+* Let me know if any problem or new translation file.
+* Email :ceasar@nchc.org.tw !!
+**********************
 
-	1.2  Translate it and USE unix new-line in conf file (Remember to convert to UNIX format via your text editor)
-	* On keyword file, only 2 items need to translate and they are high-dependence with your locale system. Please see the file that you cpoy for more deatil.
+S3. Translate the file to your phrasal and save it (Don't modify the file name)
+	Note: Make sure to use Windows new line character in ~/lang/*.cmd file
 
+S4. Test it: To run ~drbl-winroll/winroll-setup.bat again and you should get a translated-done installation.
 
-2. Translate file for installation (Optional, but suggest to do for be friendly during installation )
-	2.1 Make a copy from ~/drbl-winroll/lang/default.cmd to ~/drbl-winroll/lang/[your-locale-number].cmd
-	2.2 Translate it and DO NOT use unix new-line in cmd file.
+S5. Translate FAQ (Optional)
+	Translate ~/drbl-winroll/doc/Faq.en.txt to ~/drbl-winroll/doc/Faq.[your-language].txt
 
-* Translate Faq (Optional, it has no impact during installation and service running)
-Translate ~/drbl-winroll/doc/Faq.en.txt to ~/drbl-winroll/doc/Faq.[your-language].txt
-
---------------------------------------------------------------------------------------------------------------------------------------------
-* Phase 2: Test your language patch
-
-1. Make sure the translation files be stored correctly before install
-	1.1 For installation : ~/drbl-winroll/lang/[your-locale-number].cmd
-	1.2 For service running : ~/drbl-winroll/conf/keyword-conf/[os-version]/[your-locale-number].conf
-
-2. Finish installation. Check if your keyword file be stored into "c:\cygwin\drbl_winroll-config\keyword-conf" (This should be no problem) 
-
-3. Start a "Cygwin Batch Shell", run keyword-check.sh, it should get some information , include: OS version, locale number, keyword file, all of NIC name and ip address
-if the nics are available. The follow is the result on en-Us environment with 3 NIC device :
->>>>>>>>>>>>>>>>>>>>>>>>>>>>>>>>>>>>>>>>>>>>>>>>>>>>>>>>>>>>>>>>>>>>>>>>>>>>>>>>
-OS verion: 'xp', Locale number: '00000409'
-Use keyword config: '/drbl_winroll-config/keyword-conf/_legacy/00000409.conf'
-Get NIC ->'Local Area Connection'
-Get NIC ->'Local Area Connection 2'
-Get NIC ->'Local Area Connection 3'
-Extarct IP: '10.0.2.15'
-Extarct IP: '169.254.41.40'
-Extarct IP: '169.254.74.88'
-Fill-up mode for first ip:
-010-000-002-015
->>>>>>>>>>>>>>>>>>>>>>>>>>>>>>>>>>>>>>>>>>>>>>>>>>>>>>>>>>>>>>>>>>>>>>>>>>>>>>>>
+S6. Please sned the translation file back to us <ceasar.sun@gmail.com> if you want to share. We appreciate a lot about that in advanced.
 --------------------------------------------------------------------------------------------------------------------------------------------
 
 
