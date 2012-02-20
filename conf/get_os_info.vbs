@@ -84,6 +84,10 @@ Function Print_System_Information()
 			OS_VERSION = "Vista"
 		elseif ( Instr( objOperatingSystem.Caption, "Windows 7") > 0 ) then
 			OS_VERSION = "WIN7"
+		elseif ( Instr( objOperatingSystem.Caption, "Developer Preview") > 0 ) then
+			OS_VERSION = "WIN8"
+		elseif ( Instr( objOperatingSystem.Caption, "Windows 8") > 0 ) then
+			OS_VERSION = "WIN8"
 		else
 			OS_VERSION = "NONE"
 		End If		
