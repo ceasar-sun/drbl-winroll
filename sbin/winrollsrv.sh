@@ -162,8 +162,6 @@ EOF
 REM This cmd is create by winrollsrv.sh
 netsh -c interface ip set address name="$_devname" source=static addr=$_THIS_IP mask=$_THIS_NETMASK gateway=$_THIS_GATEWAY 1
 EOF
-				#unix2dos $TEMP/set_network_adapter.cmd
-				#cmd /Q /C `cygpath -d $TEMP/set_network_adapter.cmd`
 			
 			# delete all previous dns records
 			if [ -n "$_THIS_DNS" ] ; then
@@ -171,9 +169,8 @@ EOF
 				cat >>$TEMP/set_network_adapter.cmd<<EOF
 netsh interface ip del dns "$_devname" all
 EOF
-				#unix2dos $TEMP/set_network_del_dns.cmd
-				#cmd /Q /C `cygpath -d $TEMP/set_network_del_dns.cmd`
 			fi
+
 			# add a dns record 
 			for dns in $(echo $_THIS_DNS | tr , ' ') ; do
 				# skip illegal ip
@@ -182,8 +179,6 @@ EOF
 				cat >>$TEMP/set_network_adapter.cmd<<EOF
 netsh interface ip add dns "$_devname" $dns
 EOF
-				#unix2dos $TEMP/set_network_dns.cmd
-				#cmd /Q /C `cygpath -d $TEMP/set_network_dns.cmd`
 			done
 
 			# delete all previous wins records
@@ -192,8 +187,7 @@ EOF
 				cat >>$TEMP/set_network_adapter.cmd<<EOF
 netsh interface ip del wins "$_devname" all
 EOF
-				#unix2dos $TEMP/set_network_del_wins.cmd
-				#cmd /Q /C `cygpath -d $TEMP/set_network_del_wins.cmd`
+
 			fi
 			
 			# add a wins record 
@@ -204,11 +198,10 @@ EOF
 				cat >>$TEMP/set_network_adapter.cmd<<EOF
 netsh interface ip add wins "$_devname" $wins
 EOF
-				#unix2dos $TEMP/set_network_add_wins.cmd
-				#cmd /Q /C `cygpath -d $TEMP/set_network_add_wins.cmd`
 			done
 			unix2dos $TEMP/set_network_adapter.cmd
 			cmd /Q /C `cygpath -d $TEMP/set_network_adapter.cmd`	
+			sleep 10;
 			
 			# For setup dns suffix search list
 			_current_dns_suffix="$(cat /proc/registry/HKEY_LOCAL_MACHINE/SYSTEM/CurrentControlSet/Services/Tcpip/Parameters/SearchList 2>/dev/null)"
