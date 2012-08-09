@@ -18,7 +18,7 @@
 
 ; 用到的 MSIS-plugin dll 目錄
 !addplugindir ".\nsis-plugin"
-!include LogicLib.nsh
+;!include LogicLib.nsh
 !include MUI2.nsh
 !include ".\nsis-plugin\UAC.nsh"
 
@@ -42,7 +42,7 @@ XPstyle on
 !macro Init thing
 uac_tryagain:
 !insertmacro UAC_RunElevated
-MessageBox MB_OK "Shloud not be here :$0,$1,$3" 
+MessageBox MB_OK "UAC_RunElevated return :0=$0,1=$1,2=$3" 
 ${Switch} $0
 ${Case} 0
 	${IfThen} $1 = 1 ${|} Quit ${|} ;we are the outer process, the inner process has done its work, we are done
@@ -109,8 +109,7 @@ Section "Install" SEC01
 	SetOutPath $TEMP
 
 	;貼上你所要包裝在安裝程式裡的檔案
-	;File /r ..\..\drbl-winroll\**
-	File /r /x ../.git/* ../../drbl-winroll/*
+	File /r /x .git ../../drbl-winroll/*
 
 	ExecWait '"$TEMP\winroll-setup.bat"'
 SectionEnd
