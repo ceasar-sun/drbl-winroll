@@ -1,84 +1,52 @@
 ;***************  drbl-winRoll NSIS script **************
 ;
-;     °êºô¤¤¤ß¦Û¥Ñ³nÅé¹êÅç«Ç  , NCHC ,Taiwan
+;     åœ‹ç¶²ä¸­å¿ƒè‡ªç”±è»Ÿé«”å¯¦é©—å®¤  , NCHC ,Taiwan
 ;     License	:	GPL      
 ;     Author	:	ceasar at nchc_org_tw , steven at nchc_org_tw
 ;
 ;    Note: Please put the file and drbl-winroll root dircetory on same path
 ;*********************************************************
 
-;«Å§i³nÅé¦WºÙ¡A«á­±¥i¥H§Q¥Î ${NAME} ½Õ¥Î³o­Ó¦W¦r
-!define NAME "drbl-winroll"
+; HM NIS Edit Wizard helper defines
+!define PRODUCT_NAME "DRBL-Winroll"
+!define PRODUCT_VERSION "2.0.0"
+!define PRODUCT_PUBLISHER "Free Software Lab, NCHC"
+!define PRODUCT_WEB_SITE "http://drbl-winroll.org/"
+!define PRODUCT_DIR_REGKEY "Software\Microsoft\Windows\CurrentVersion\App Paths\cyg-setup.exe"
+!define PRODUCT_UNINST_KEY "Software\Microsoft\Windows\CurrentVersion\Uninstall\${PRODUCT_NAME}"
+!define PRODUCT_UNINST_ROOT_KEY "HKLM"
 
-;³]©w¦r«¬
-SetFont ·s²Ó©úÅé 9
-
-;¨Ï¥Î WindowsXP µøÄ±¼Ë¦¡
-XPstyle on
-
-; ¥Î¨ìªº MSIS-plugin dll ¥Ø¿ı
-!addplugindir .\nsis-plugin
+; ç”¨åˆ°çš„ MSIS-plugin dll ç›®éŒ„
+!addplugindir ".\nsis-plugin"
 !include LogicLib.nsh
+!include MUI2.nsh
 !include ".\nsis-plugin\UAC.nsh"
 
-RequestExecutionLevel user
+RequestExecutionLevel user ; << Required, you cannot use admin!
 
-;¦w¸Ëµøµ¡ªº¼ĞÃD¦WºÙ
-;Caption  "¦w¸Ë drbl-winRoll ¥\¯à"
-Caption  "Install drbl-winroll package"
+; MUI Settings
+!define MUI_ABORTWARNING
+;!define MUI_ICON "${NSISDIR}\Contrib\Graphics\Icons\modern-install.ico"
+;!define MUI_UNICON "${NSISDIR}\Contrib\Graphics\Icons\modern-uninstall.ico"
+;è¨­å®šå­—å‹
+SetFont æ–°ç´°æ˜é«” 9
+;ä½¿ç”¨ WindowsXP è¦–è¦ºæ¨£å¼
+XPstyle on
 
-;´À´«¹w³]ªº«ö¶s¤å¦r
-;MiscButtonText "< ¤W¤@¨B" "¤U¤@¨B >" "¨ú®ø" "Ãö³¬"
-MiscButtonText "< Last" "Next >" "Cancel" "Close"
+; Language Selection Dialog Settings
+!define MUI_LANGDLL_REGISTRY_ROOT "${PRODUCT_UNINST_ROOT_KEY}"
+!define MUI_LANGDLL_REGISTRY_KEY "${PRODUCT_UNINST_KEY}"
+!define MUI_LANGDLL_REGISTRY_VALUENAME "NSIS:Language"
 
-;´À´«¹w³]ªº«ö¶s¤å¦r
-InstallButtonText "¦w¸Ë"
-
-;´À´«¹w³]ªº«ö¶s¤å¦r
-UninstallButtonText "¤Ï¦w¸Ë"
-
-;´À´«¤Ï¦w¸Ëµ{§Çªº¤å¦r
-;DirText "Åwªï±z¦w¸Ë ${NAME} ³o¬O­Ó" "½Ğ¿ï¾Ü±ı¦w¸Ë ${NAME} ªº¥Ø¿ı¡G" "ÂsÄı..."
-
-;´À´«¤Ï¦w¸Ëµ{§Çªº¤å¦r
-UninstallText "²{¦b±N±q§Aªº¨t²Î¤¤¤Ï¦w¸Ë ${NAME} ¡C"
-
-;´À´«¤Ï¦w¸Ëµ{§Ç¼ĞÃDªº¤å¦r
-UninstallCaption "¤Ï¦w¸Ë ${NAME}"
-
-;´À´«¤Ï¦w¸Ëµ{§Çªº¤å¦r
-;DetailsButtonText "Åã¥Ü¸Ô²Ó¹Lµ{"
-DetailsButtonText "Show detail"
-
-;´À´«¤Ï¦w¸Ë«ö¶sªº¤å¦r
-UninstallButtonText "¤Ï¦w¸Ë"
-
-;¤Ï¦w¸Ëµ{§ÇÅã¥Ü¤è¦¡ ¹w³]¬OÁôÂÃ
-ShowUninstDetails hide
-
-;´À´«ªÅ¶¡ªº¤å¦r
-SpaceTexts "©Ò»İªºªÅ¶¡ " "¥i¥ÎªºªÅ¶¡ "
-
-;³o­Ó¦w¸Ëµ{¦¡ªº¦WºÙ
-Name "DRBL-winroll-setup"
-
-;¿é¥X»s§@§¹¦¨ªº¦w¸Ëµ{¦¡ÀÉ®×
-OutFile "..\..\drbl-winroll-setup.exe"
-
-; »İ­nºŞ²zªÌÅv­­
-RequestExecutionLevel user
-
-;¹w³]ªº¦w¸Ëµ{¦¡¥Ø¿ı¦b Program Files ¸Ì
-InstallDir "$TEMP"
-;InstallDir "c:\.tmp.winroll"
 
 !macro Init thing
 uac_tryagain:
 !insertmacro UAC_RunElevated
+MessageBox MB_OK "Shloud not be here :$0,$1,$3" 
 ${Switch} $0
 ${Case} 0
 	${IfThen} $1 = 1 ${|} Quit ${|} ;we are the outer process, the inner process has done its work, we are done
-	${IfThen} $3 <> 0 ${|} MessageBox MB_OK "Shloud not be here :'$0'" ${Break} ${|} ;we are admin, let the show go on
+	${IfThen} $3 <> 0 ${|} ${Break} ${|} ;we are admin, let the show go on
 	${If} $1 = 3 ;RunAs completed successfully, but with a non-admin user
 		MessageBox mb_YesNo|mb_IconExclamation|mb_TopMost|mb_SetForeground "This ${thing} requires admin privileges, try again" /SD IDNO IDYES uac_tryagain IDNO 0
 	${EndIf}
@@ -97,28 +65,58 @@ ${EndSwitch}
 SetShellVarContext all
 !macroend
 
-; End here
-!macro Quit thing
-	Quit
-!macroend
+
+; Welcome page
+!insertmacro MUI_PAGE_WELCOME
+; License page
+!insertmacro MUI_PAGE_LICENSE "..\..\drbl-winroll\doc\LICENSE.cygwin"
+; Directory page
+!insertmacro MUI_PAGE_DIRECTORY
+; Instfiles page
+!insertmacro MUI_PAGE_INSTFILES
+; Finish page
+;!define MUI_FINISHPAGE_RUN "$INSTDIR\sbin\wsname.exe"
+;!insertmacro MUI_PAGE_FINISH
+
+; Uninstaller pages
+;!insertmacro MUI_UNPAGE_INSTFILES
+
+; Language files
+!insertmacro MUI_LANGUAGE "Dutch"
+!insertmacro MUI_LANGUAGE "English"
+!insertmacro MUI_LANGUAGE "French"
+!insertmacro MUI_LANGUAGE "Spanish"
+!insertmacro MUI_LANGUAGE "Swedish"
+!insertmacro MUI_LANGUAGE "TradChinese"
+; MUI end ------
+
+Name "${PRODUCT_NAME} ${PRODUCT_VERSION}"
+OutFile "..\..\${PRODUCT_NAME}-${PRODUCT_VERSION}-setup.exe"
+InstallDir "c:\cygwin"
+InstallDirRegKey HKLM "${PRODUCT_DIR_REGKEY}" ""
+ShowInstDetails show
+ShowUnInstDetails show
 
 
-;©³¤U¶}©l¬O¦w¸Ëµ{¦¡©Ò­n°õ¦æªº
-Section "Install"
+Function .onInit
+!insertmacro Init "installer"
+!insertmacro MUI_LANGDLL_DISPLAY
+FunctionEnd
+ 
+;åº•ä¸‹é–‹å§‹æ˜¯å®‰è£ç¨‹å¼æ‰€è¦åŸ·è¡Œçš„
+Section "Install" SEC01
+	;è¨­å®šè¼¸å‡ºçš„è·¯å¾‘åœ¨å®‰è£ç¨‹å¼çš„ç›®éŒ„
+	SetOutPath $TEMP
 
-;³]©w¿é¥Xªº¸ô®|¦b¦w¸Ëµ{¦¡ªº¥Ø¿ı
-SetOutPath $INSTDIR
+	;è²¼ä¸Šä½ æ‰€è¦åŒ…è£åœ¨å®‰è£ç¨‹å¼è£¡çš„æª”æ¡ˆ
+	;File /r ..\..\drbl-winroll\**
+	File /r /x ../.git/* ../../drbl-winroll/*
 
-;¶K¤W§A©Ò­n¥]¸Ë¦b¦w¸Ëµ{¦¡¸ÌªºÀÉ®×
-File /r "..\..\drbl-winroll\*"
-
-;!insertmacro UAC_RunElevated
-ExecWait '"$INSTDIR\winroll-setup.bat"'
-
+	ExecWait '"$TEMP\winroll-setup.bat"'
 SectionEnd
-;¦w¸Ëµ{¦¡¹Lµ{¨ì¦¹µ²§ô
+;å®‰è£ç¨‹å¼éç¨‹åˆ°æ­¤çµæŸ
 
-; ¶}±Ò TCP 22 for sshd at personal firewall
+; é–‹å•Ÿ TCP 22 for sshd at personal firewall
 Section "CheckFirewall" SEC02
 	SimpleFC::AddPort 22 "Cygwin sshd" 6 0 2 "" 1
 	Pop $0 ; return error(1)/success(0)
@@ -130,5 +128,10 @@ Section "CheckFirewall" SEC02
 		MessageBox MB_OK "Shloud not be here :'$0'"
 	${EndIf}
 SectionEnd
-; eof
 
+; End here
+!macro Quit thing
+	Quit
+!macroend
+
+; EOF

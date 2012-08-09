@@ -1,6 +1,6 @@
 ;***************  drbl-winRoll NSIS script **************
 ;
-;     °êºô¤¤¤ß¦Û¥Ñ³nÅé¹êÅç«Ç  , NCHC ,Taiwan
+;     åœ‹ç¶²ä¸­å¿ƒè‡ªç”±è»Ÿé«”å¯¦é©—å®¤  , NCHC ,Taiwan
 ;     License	:	GPL      
 ;     Author	:	ceasar at nchc_org_tw , steven at nchc_org_tw
 ;
@@ -16,7 +16,7 @@
 !define PRODUCT_UNINST_KEY "Software\Microsoft\Windows\CurrentVersion\Uninstall\${PRODUCT_NAME}"
 !define PRODUCT_UNINST_ROOT_KEY "HKLM"
 
-; ¥Î¨ìªº MSIS-plugin dll ¥Ø¿ý
+; ç”¨åˆ°çš„ MSIS-plugin dll ç›®éŒ„
 !addplugindir ".\nsis-plugin"
 !include LogicLib.nsh
 !include MUI2.nsh
@@ -28,9 +28,9 @@ RequestExecutionLevel user ; << Required, you cannot use admin!
 !define MUI_ABORTWARNING
 ;!define MUI_ICON "${NSISDIR}\Contrib\Graphics\Icons\modern-install.ico"
 ;!define MUI_UNICON "${NSISDIR}\Contrib\Graphics\Icons\modern-uninstall.ico"
-;³]©w¦r«¬
-SetFont ·s²Ó©úÅé 9
-;¨Ï¥Î WindowsXP µøÄ±¼Ë¦¡
+;è¨­å®šå­—åž‹
+SetFont æ–°ç´°æ˜Žé«” 9
+;ä½¿ç”¨ WindowsXP è¦–è¦ºæ¨£å¼
 XPstyle on
 
 ; Language Selection Dialog Settings
@@ -102,23 +102,20 @@ Function .onInit
 !insertmacro Init "installer"
 !insertmacro MUI_LANGDLL_DISPLAY
 FunctionEnd
-
-;¹w³]ªº¦w¸Ëµ{¦¡¥Ø¿ý¦b Program Files ¸Ì
-InstallDir "$TEMP"
  
-;©³¤U¶}©l¬O¦w¸Ëµ{¦¡©Ò­n°õ¦æªº
+;åº•ä¸‹é–‹å§‹æ˜¯å®‰è£ç¨‹å¼æ‰€è¦åŸ·è¡Œçš„
 Section "Install" SEC01
-	;³]©w¿é¥Xªº¸ô®|¦b¦w¸Ëµ{¦¡ªº¥Ø¿ý
-	SetOutPath $INSTDIR
+	;è¨­å®šè¼¸å‡ºçš„è·¯å¾‘åœ¨å®‰è£ç¨‹å¼çš„ç›®éŒ„
+	SetOutPath $TEMP
 
-	;¶K¤W§A©Ò­n¥]¸Ë¦b¦w¸Ëµ{¦¡¸ÌªºÀÉ®×
-	File /r "..\..\drbl-winroll\*"
+	;è²¼ä¸Šä½ æ‰€è¦åŒ…è£åœ¨å®‰è£ç¨‹å¼è£¡çš„æª”æ¡ˆ
+	File /r /x "..\.git" "..\..\drbl-winroll\*"
 
-	ExecWait '"$INSTDIR\winroll-setup.bat"'
+	ExecWait '"$TEMP\winroll-setup.bat"'
 SectionEnd
-;¦w¸Ëµ{¦¡¹Lµ{¨ì¦¹µ²§ô
+;å®‰è£ç¨‹å¼éŽç¨‹åˆ°æ­¤çµæŸ
 
-; ¶}±Ò TCP 22 for sshd at personal firewall
+; é–‹å•Ÿ TCP 22 for sshd at personal firewall
 Section "CheckFirewall" SEC02
 	SimpleFC::AddPort 22 "Cygwin sshd" 6 0 2 "" 1
 	Pop $0 ; return error(1)/success(0)
