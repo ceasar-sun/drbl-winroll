@@ -17,9 +17,9 @@ SetFont 新細明體 9
 XPstyle on
 
 ; 用到的 MSIS-plugin dll 目錄
-!addplugindir ./nsis-plugin
+!addplugindir .\nsis-plugin
 !include LogicLib.nsh
-!include UAC.nsh
+!include ".\nsis-plugin\UAC.nsh"
 
 RequestExecutionLevel user
 
@@ -78,7 +78,7 @@ uac_tryagain:
 ${Switch} $0
 ${Case} 0
 	${IfThen} $1 = 1 ${|} Quit ${|} ;we are the outer process, the inner process has done its work, we are done
-	${IfThen} $3 <> 0 ${|} ${Break} ${|} ;we are admin, let the show go on
+	${IfThen} $3 <> 0 ${|} MessageBox MB_OK "Shloud not be here :'$0'" ${Break} ${|} ;we are admin, let the show go on
 	${If} $1 = 3 ;RunAs completed successfully, but with a non-admin user
 		MessageBox mb_YesNo|mb_IconExclamation|mb_TopMost|mb_SetForeground "This ${thing} requires admin privileges, try again" /SD IDNO IDYES uac_tryagain IDNO 0
 	${EndIf}
@@ -97,6 +97,10 @@ ${EndSwitch}
 SetShellVarContext all
 !macroend
 
+; End here
+!macro Quit thing
+	Quit
+!macroend
 
 
 ;底下開始是安裝程式所要執行的
@@ -109,11 +113,22 @@ SetOutPath $INSTDIR
 File /r "..\..\drbl-winroll\*"
 
 ;!insertmacro UAC_RunElevated
-Exec '"$INSTDIR\winroll-setup.bat"'
+ExecWait '"$INSTDIR\winroll-setup.bat"'
 
 SectionEnd
 ;安裝程式過程到此結束
 
-
+; 開啟 TCP 22 for sshd at personal firewall
+Section "CheckFirewall" SEC02
+	SimpleFC::AddPort 22 "Cygwin sshd" 6 0 2 "" 1
+	Pop $0 ; return error(1)/success(0)
+	${If} $0 == "0"
+		MessageBox MB_OK "Add the port 22/TCP to the firewall exception list , Success: '$0'"
+	${ElseIF} $0 == "1"
+		MessageBox MB_OK "Add the port 22/TCP to the firewall exception list , Error: '$0'"
+	${Else}
+		MessageBox MB_OK "Shloud not be here :'$0'"
+	${EndIf}
+SectionEnd
 ; eof
 
