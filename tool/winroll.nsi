@@ -28,10 +28,6 @@ RequestExecutionLevel user ; << Required, you cannot use admin!
 !define MUI_ABORTWARNING
 ;!define MUI_ICON "${NSISDIR}\Contrib\Graphics\Icons\modern-install.ico"
 ;!define MUI_UNICON "${NSISDIR}\Contrib\Graphics\Icons\modern-uninstall.ico"
-;設定字型
-SetFont 新細明體 9
-;使用 WindowsXP 視覺樣式
-XPstyle on
 
 ; Language Selection Dialog Settings
 !define MUI_LANGDLL_REGISTRY_ROOT "${PRODUCT_UNINST_ROOT_KEY}"
@@ -42,7 +38,7 @@ XPstyle on
 !macro Init thing
 uac_tryagain:
 !insertmacro UAC_RunElevated
-MessageBox MB_OK "UAC_RunElevated return :0=$0,1=$1,2=$3" 
+;MessageBox MB_OK "UAC_RunElevated return :0=$0,1=$1,2=$3" 
 ${Switch} $0
 ${Case} 0
 	${IfThen} $1 = 1 ${|} Quit ${|} ;we are the outer process, the inner process has done its work, we are done
@@ -65,18 +61,22 @@ ${EndSwitch}
 SetShellVarContext all
 !macroend
 
-
 ; Welcome page
 !insertmacro MUI_PAGE_WELCOME
 ; License page
-!insertmacro MUI_PAGE_LICENSE "..\..\drbl-winroll\doc\LICENSE.cygwin"
+!insertmacro MUI_PAGE_LICENSE "..\..\drbl-winroll\doc\LICENSE.drbl-winroll"
+; Components page
+!insertmacro MUI_PAGE_COMPONENTS
 ; Directory page
 !insertmacro MUI_PAGE_DIRECTORY
 ; Instfiles page
 !insertmacro MUI_PAGE_INSTFILES
 ; Finish page
-;!define MUI_FINISHPAGE_RUN "$INSTDIR\sbin\wsname.exe"
-;!insertmacro MUI_PAGE_FINISH
+!define MUI_FINISHPAGE_RUN
+!define MUI_FINISHPAGE_RUN_TEXT "Visit ${PRODUCT_NAME} web site "
+!define MUI_FINISHPAGE_RUN_NOTCHECKED
+!define MUI_FINISHPAGE_RUN_FUNCTION PageFinishRun
+!insertmacro MUI_PAGE_FINISH
 
 ; Uninstaller pages
 ;!insertmacro MUI_UNPAGE_INSTFILES
@@ -97,26 +97,30 @@ InstallDirRegKey HKLM "${PRODUCT_DIR_REGKEY}" ""
 ShowInstDetails show
 ShowUnInstDetails show
 
-
 Function .onInit
-!insertmacro Init "installer"
-!insertmacro MUI_LANGDLL_DISPLAY
+	!insertmacro Init "installer"
+	!insertmacro MUI_LANGDLL_DISPLAY
 FunctionEnd
- 
+
+Function PageFinishRun
+	; You would run "$InstDir\MyApp.exe" here but this example has no application to execute...
+	!insertmacro UAC_AsUser_ExecShell "" "${PRODUCT_WEB_SITE}" "" "" ""
+FunctionEnd
+
 ;底下開始是安裝程式所要執行的
-Section "Install" SEC01
+Section "Main" SEC01
+	SectionIn RO
 	;設定輸出的路徑在安裝程式的目錄
 	SetOutPath $TEMP
 
 	;貼上你所要包裝在安裝程式裡的檔案
-	File /r /x .git ../../drbl-winroll/*
-
+	File /r /x .git ..\..\drbl-winroll\*
 	ExecWait '"$TEMP\winroll-setup.bat"'
 SectionEnd
 ;安裝程式過程到此結束
 
 ; 開啟 TCP 22 for sshd at personal firewall
-Section "CheckFirewall" SEC02
+Section "Add ssh exception at firewall" SEC02
 	SimpleFC::AddPort 22 "Cygwin sshd" 6 0 2 "" 1
 	Pop $0 ; return error(1)/success(0)
 	${If} $0 == "0"
@@ -127,10 +131,5 @@ Section "CheckFirewall" SEC02
 		MessageBox MB_OK "Shloud not be here :'$0'"
 	${EndIf}
 SectionEnd
-
-; End here
-!macro Quit thing
-	Quit
-!macroend
 
 ; EOF
