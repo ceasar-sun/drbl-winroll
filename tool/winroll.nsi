@@ -9,7 +9,7 @@
 
 ; HM NIS Edit Wizard helper defines
 !define PRODUCT_NAME "DRBL-Winroll"
-!define PRODUCT_VERSION "1.4.0"
+!define PRODUCT_VERSION "1.5.0"
 !define PRODUCT_PUBLISHER "Free Software Lab, NCHC"
 !define PRODUCT_WEB_SITE "http://drbl-winroll.org/"
 !define PRODUCT_DIR_REGKEY "Software\Microsoft\Windows\CurrentVersion\App Paths\cyg-setup.exe"
