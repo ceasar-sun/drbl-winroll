@@ -1,0 +1,26 @@
+* openssh
+* ipcalc
+* bc
+* shutdown
+* cygrunsrv
+* zip
+* dos2unix2do
+* tftp
+* wget
+
+* sed "s/[cC]ategory:.*/Category: Base/" < setup.ini > setup.ini.fix
+
+Todo ist: 
+
+1. Win server 2008 需要密碼複雜度
+2. bat 安裝帳號權限檢查
+3. 寫 dev.note 
+4. 新增的帳號不顯示在登入畫面
+
+# README ###################################
+#
+# Use the follow command to update http://www.drbl-winroll.org/ content
+#
+# README ###################################
+
+# cd ~/www/drbl-winroll.web.en/ && rsync -avP --delete -e ssh --exclude=CVS/ --exclude=.svn/ --exclude=.htaccess --exclude=count.txt ./* diskless@www.drbl-winroll.org:/home/diskless/drbl-winroll

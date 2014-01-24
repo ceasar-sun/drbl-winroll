@@ -114,7 +114,7 @@ Section "Main" SEC01
 	SetOutPath $TEMP
 
 	;貼上你所要包裝在安裝程式裡的檔案
-	File /r /x .git ..\..\drbl-winroll\*
+	File /r /x .git /x _dev  ..\..\drbl-winroll\*
 	ExecWait '"$TEMP\winroll-setup.bat"'
 SectionEnd
 ;安裝程式過程到此結束
