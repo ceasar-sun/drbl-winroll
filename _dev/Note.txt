@@ -1,34 +1,29 @@
+﻿********  Welcome to drbl-winroll developement note  ******************
+     NCHC Free Software Lab, NCHC ,Taiwan
+     Author : Ceasar Sun <ceasar@nchc.org.tw> 
+*********************************************************
 
 * How to repack a cygwin auto-installation 
-1. Download setup-x86.exe (or setup-x86_64.exe) from Cygwin web site, http://www.cygwin.com/
-2. Run set-x86*.exe and chose "Download Without Installing" 
-3. Chose appropriate mirror site and include the follow necessary packages:
-	* openssh
-	* ipcalc
-	* bc
-	* shutdown
-	* cygrunsrv
-	* zip
-	* dos2unix2do
-	* tftp
-	* wget
-4. Modify setup.ini via Linux 'sed' command:
-	~$ cp setup.ini setup.ini.bak && sed "s/[cC]ategory:.*/Category: Base/" < setup.ini > setup.ini.fix && mv setup.ini.fix setup.ini
-5. Run the follow batch command in Windows CMD mode
-	set-x86*.exe -q -d -L -l "%LOCAL_REPOSITORY_INCLUDE_SETUP.INI%" -R "%CYGWIN_ROOT%"
+	1. Download setup-x86.exe (or setup-x86_64.exe) from Cygwin web site, http://www.cygwin.com/
+	2. Run set-x86*.exe and chose "Download Without Installing" 
+	3. Chose appropriate mirror site and include the follow necessary packages:
+		* openssh
+		* ipcalc
+		* bc
+		* shutdown
+		* cygrunsrv
+		* zip
+		* dos2unix2do
+		* tftp
+		* wget
+	4. Modify setup.ini via Linux 'sed' command:
+		~$ cp setup.ini setup.ini.bak && sed "s/[cC]ategory:.*/Category: Base/" < setup.ini > setup.ini.fix && mv setup.ini.fix setup.ini
+	5. Run the follow batch command in Windows CMD mode
+		set-x86*.exe -q -d -L -l "%LOCAL_REPOSITORY_INCLUDE_SETUP.INI%" -R "%CYGWIN_ROOT%"
 
+* How to packe as NSIS package in Linux :
+	1. sudo apt-get install nsis
+	2. cd ~/drbl-winroll/tool ; makensis ./winroll.nsi
 
-Todo ist: 
-
-1. Win server 2008 需要密碼複雜度 (done :v1.5.0)
-2. bat 安裝帳號權限檢查
-3. 寫 dev.note  (done :v1.5.0)
-4. 新增的帳號不顯示在登入畫面  (done :v1.5.0)
-
-# README ###################################
-#
-# Use the follow command to update http://www.drbl-winroll.org/ content
-#
-# README ###################################
-
-# cd ~/www/drbl-winroll.web.en/ && rsync -avP --delete -e ssh --exclude=CVS/ --exclude=.svn/ --exclude=.htaccess --exclude=count.txt ./* diskless@www.drbl-winroll.org:/home/diskless/drbl-winroll
+* How to update http://www.drbl-winroll.org/ web content
+	~$ cd ~/www/drbl-winroll.web.en/ && rsync -avP --delete -e ssh --exclude=CVS/ --exclude=.svn/ --exclude=.htaccess --exclude=count.txt ./* diskless@www.drbl-winroll.org:/home/diskless/drbl-winroll

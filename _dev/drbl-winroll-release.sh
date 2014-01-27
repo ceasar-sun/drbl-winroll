@@ -45,23 +45,25 @@ done
 pushd $WORKDIR
 git clone $REPOS_URL
 pushd $PACKNAME
+
 #PACKVER="$(svn info $REPOS_URL | grep 'Last Changed Rev'| awk -F ": " '{print $2}' )"
 PACKVER="$(git log | grep -E '^commit' | wc -l)"
-echo "Packaging $PACKNAME version: $PACKVER ..."
-
 RELVER="$(grep 'drbl-winroll.VERSION' ./conf/winroll.conf | awk -F '=' '{print $2}' | sed -e 's/\s//g')"
-
+echo "Packaging $PACKNAME version: $PACKVER-$RELVER ..."
 echo "write version information into config file:  $PACKNAME/conf/winroll.conf"
 sed -i -e "s/^rc.VERSION\s*=\s*.*/rc.VERSION = $PACKVER/g" ./conf/winroll.conf
-rm -rf .git
+sed -i -e "s/^\!define PRODUCT_VERSION\s*.*/!define PRODUCT_VERSION \"$RELVER-$PACKVER\"/g" ./tool/winroll.nsi
+rm -rf .git _dev
 popd
 
 echo "run : zip -r -q drbl-winroll-v$RELVER-$PACKVER-setup.zip $PACKNAME"
 zip -r -q $PACKNAME-v$RELVER-$PACKVER-setup.zip $PACKNAME
+echo "run : makensis drbl-winroll/tool/winroll.nsi"
+makensis -V2 drbl-winroll/tool/winroll.nsi
 popd
 
-mv $WORKDIR/$PACKNAME-v$RELVER-$PACKVER-setup.zip $CURRENT_PATH
-md5sum $PACKNAME-*-setup.zip > MD5SUMS
+mv $WORKDIR/$PACKNAME-v$RELVER-$PACKVER-setup.* $CURRENT_PATH
+md5sum $PACKNAME-*-setup.* > MD5SUMS
 
 if [ -d ../../doc/ ] && [ -w ../../doc/ ] ; then
 	rsync -a $WORKDIR/$PACKNAME/doc/ ../../doc/

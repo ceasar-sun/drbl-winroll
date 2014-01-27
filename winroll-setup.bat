@@ -111,9 +111,9 @@ REM #####################################
 	set OS_TYPE=
 
 	if  "%ProgramW6432%" == "%ProgramFiles%" (
-		OS_TYPE=x64
+		set OS_TYPE=x64
 	) else (
-		OS_TYPE=x86
+		set OS_TYPE=x86
 	)
 	echo *** Information collecting ....
 	cscript //nologo %INIT_CONF%\get_os_info.vbs > lang\os_info.cmd
@@ -166,6 +166,7 @@ goto :EOF
 :CREAT_SETUP_LOG
 	date /T >%WINROLL_SETUP_LOG%
 	echo OS_VERSION=%OS_VERSION%>>%WINROLL_SETUP_LOG%
+	echo OS_TYPE=%OS_TYPE%>>%WINROLL_SETUP_LOG%
 	echo LOCALE_CODE=%LOCALE_CODE%>>%WINROLL_SETUP_LOG%
 	echo STARTMENU_PATH=%STARTMENU_PATH%>>%WINROLL_SETUP_LOG%
 	echo SURCE_DIR=%cd%>>%WINROLL_SETUP_LOG%

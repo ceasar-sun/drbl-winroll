@@ -9,7 +9,8 @@
 
 ; HM NIS Edit Wizard helper defines
 !define PRODUCT_NAME "DRBL-Winroll"
-!define PRODUCT_VERSION "1.5.0"
+!define PRODUCT_PACK_NAME "drbl-winroll"
+!define PRODUCT_VERSION "pack-in-win"
 !define PRODUCT_PUBLISHER "Free Software Lab, NCHC"
 !define PRODUCT_WEB_SITE "http://drbl-winroll.org/"
 !define PRODUCT_DIR_REGKEY "Software\Microsoft\Windows\CurrentVersion\App Paths\cyg-setup.exe"
@@ -91,7 +92,7 @@ SetShellVarContext all
 ; MUI end ------
 
 Name "${PRODUCT_NAME} ${PRODUCT_VERSION}"
-OutFile "..\..\${PRODUCT_NAME}-${PRODUCT_VERSION}-setup.exe"
+OutFile "..\..\${PRODUCT_PACK_NAME}-${PRODUCT_VERSION}-setup.exe"
 InstallDir "c:\cygwin"
 InstallDirRegKey HKLM "${PRODUCT_DIR_REGKEY}" ""
 ShowInstDetails show
