@@ -56,13 +56,13 @@ sed -i -e "s/^\!define PRODUCT_VERSION\s*.*/!define PRODUCT_VERSION \"$RELVER-$P
 rm -rf .git _dev
 popd
 
-echo "run : zip -r -q drbl-winroll-v$RELVER-$PACKVER-setup.zip $PACKNAME"
-zip -r -q $PACKNAME-v$RELVER-$PACKVER-setup.zip $PACKNAME
+echo "run : zip -r -q drbl-winroll-$RELVER-$PACKVER-setup.zip $PACKNAME"
+zip -r -q $PACKNAME-$RELVER-$PACKVER-setup.zip $PACKNAME
 echo "run : makensis drbl-winroll/tool/winroll.nsi"
 makensis -V2 drbl-winroll/tool/winroll.nsi
 popd
 
-mv $WORKDIR/$PACKNAME-v$RELVER-$PACKVER-setup.* $CURRENT_PATH
+mv $WORKDIR/$PACKNAME-$RELVER-$PACKVER-setup.* $CURRENT_PATH
 md5sum $PACKNAME-*-setup.* > MD5SUMS
 
 if [ -d ../../doc/ ] && [ -w ../../doc/ ] ; then
