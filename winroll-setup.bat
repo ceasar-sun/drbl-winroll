@@ -108,7 +108,14 @@ REM #####################################
 	set ROOT_NAME=
 	set UserPerms=
 	set UACTurnedOn=
+	set OS_TYPE=
 
+	if  "%ProgramW6432%" == "%ProgramFiles%" (
+		OS_TYPE=x64
+	) else (
+		OS_TYPE=x86
+	)
+	echo *** Information collecting ....
 	cscript //nologo %INIT_CONF%\get_os_info.vbs > lang\os_info.cmd
 	CALL lang\os_info.cmd
 
@@ -193,7 +200,7 @@ goto :EOF
 
 :CHECK_ACTION
 	echo .
-	echo ... DRBL-winRoll %INSTALLED% %PLZ_CHOOSE% ...
+	echo ... DRBL-Winroll %INSTALLED% %PLZ_CHOOSE% ...
 	
 	set ACTION=u
 	echo [r]: %REINSTALL%
@@ -281,7 +288,7 @@ goto :EOF
 	xcopy /Y /E "%INIT_DOC_FOLDER%" "%WINROLL_DOC_FOLDER%"
 	copy /Y ".\sbin\*.*" "%CYGWIN_ROOT%\bin"
 
-	copy /Y "%INIT_CONF%\*.reg" "%WINROLL_UNINSTALL_FOLDER%"
+	copy /Y "%INIT_CONF%\Uninstall*.reg" "%WINROLL_UNINSTALL_FOLDER%"
 	copy /Y "%INIT_CONF%\drbl_winroll-uninstall.bat" "%APPDATA%"
 	REM # copy language file for uninstall usage
 	copy /Y "lang\%LOCALE_CODE%.cmd" "%APPDATA%\%WINROLL_UNINSTALL_PARA%"
@@ -674,7 +681,8 @@ goto :EOF
 		goto :END_OF_SSHD_SETUP
 	)
 
-	%CYGWIN_ROOT%\bin\bash.exe -c "/usr/bin/perl -le 'print map+(A..Z,a..z,0..9)[rand 62],0..7'" >SSHD_SERVER_PW.txt
+	rem %CYGWIN_ROOT%\bin\bash.exe -c "/usr/bin/perl -le 'print map+(A..Z,a..z,0..9)[rand 62],0..7'" >SSHD_SERVER_PW.txt
+	%CYGWIN_ROOT%\bin\bash.exe -c "/usr/bin/cat /dev/urandom | tr -cd "[:graph:]" | head -c 10" >SSHD_SERVER_PW.txt
 	for /F "tokens=* delims=" %%S in ('type SSHD_SERVER_PW.txt') do set SSHD_SERVER_PW=%%S
 	set SSHD_SERVER_PW_OPT=-w %SSHD_SERVER_PW%
 
@@ -700,6 +708,17 @@ goto :EOF
 	%CYGWIN_ROOT%\bin\cygrunsrv.exe -S %SSHD_SERVICE%
 	%CYGWIN_ROOT%\bin\cygrunsrv.exe -E %SSHD_SERVICE%
 	
+	REM # hide cyg_server account on MS login window
+	if  "%OS_TYPE%" == "x64" (
+		rem # OS is 64bit
+		regedit.exe /s .\%INIT_CONF%\h_cyg_acc64.reg
+	) else if "%OS_TYPE%" == "x86" (
+		rem # OS is 32bit
+		regedit.exe /s .\%INIT_CONF%\h_cyg_acc32.reg
+	) else (
+		rem # should not be here
+		regedit.exe /s .\%INIT_CONF%\h_cyg_acc32.reg
+	)
 	if "%OS_VERSION%" == "WINXP" (
 		echo .
 		echo """ %OPEN_SSHD_PORTON_FIREWALL% """

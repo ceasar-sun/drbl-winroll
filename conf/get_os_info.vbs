@@ -97,7 +97,7 @@ Function Print_System_Information()
 		Wscript.Echo "REM Code Set: " & objOperatingSystem.CodeSet
 		Wscript.Echo "REM OS Language: " & objOperatingSystem.OSLanguage
 		Wscript.Echo "REM Version: " & objOperatingSystem.Version
-
+		Wscript.Echo "REM OSArchitecture: " & objOperatingSystem.OSArchitecture
 	Next
 		
 End Function  ' Function Print_System_Information()
