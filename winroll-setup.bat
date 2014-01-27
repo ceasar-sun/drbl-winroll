@@ -683,7 +683,7 @@ goto :EOF
 	)
 
 	rem %CYGWIN_ROOT%\bin\bash.exe -c "/usr/bin/perl -le 'print map+(A..Z,a..z,0..9)[rand 62],0..7'" >SSHD_SERVER_PW.txt
-	%CYGWIN_ROOT%\bin\bash.exe -c "/usr/bin/cat /dev/urandom | tr -cd "[:graph:]" | head -c 10" >SSHD_SERVER_PW.txt
+	%CYGWIN_ROOT%\bin\bash.exe -c "/usr/bin/cat /dev/urandom | tr -cd '[:graph:]' | head -c 10" >SSHD_SERVER_PW.txt
 	for /F "tokens=* delims=" %%S in ('type SSHD_SERVER_PW.txt') do set SSHD_SERVER_PW=%%S
 	set SSHD_SERVER_PW_OPT=-w %SSHD_SERVER_PW%
 
