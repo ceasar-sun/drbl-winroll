@@ -1,5 +1,0 @@
-REGEDIT4
-
-[HKEY_LOCAL_MACHINE\SOFTWARE\Microsoft\Windows NT\CurrentVersion\Winlogon\SpecialAccounts\UserList]
-"cyg_server"=hex(b):00,00,00,00,00,00,00,00
-

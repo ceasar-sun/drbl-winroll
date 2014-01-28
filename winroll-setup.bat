@@ -110,7 +110,7 @@ REM #####################################
 	set UACTurnedOn=
 	set OS_TYPE=
 
-	if  "%ProgramW6432%" == "%ProgramFiles%" (
+	if exist "%systemroot%\syswow64\regedit.exe" (
 		set OS_TYPE=x64
 	) else (
 		set OS_TYPE=x86
@@ -166,6 +166,8 @@ goto :EOF
 :CREAT_SETUP_LOG
 	date /T >%WINROLL_SETUP_LOG%
 	echo OS_VERSION=%OS_VERSION%>>%WINROLL_SETUP_LOG%
+	echo ProgramW6432=%ProgramW6432%>>%WINROLL_SETUP_LOG%
+	echo ProgramFiles=%ProgramFiles%>>%WINROLL_SETUP_LOG%
 	echo OS_TYPE=%OS_TYPE%>>%WINROLL_SETUP_LOG%
 	echo LOCALE_CODE=%LOCALE_CODE%>>%WINROLL_SETUP_LOG%
 	echo STARTMENU_PATH=%STARTMENU_PATH%>>%WINROLL_SETUP_LOG%
@@ -397,10 +399,10 @@ goto :EOF
 	)
 
 	rem set WG_PREFIX=$(nbtstat.exe -n | grep -E "<00>.+GROUP" | sed -r "s/\s+/ /g" | cut -d " " -f 2)
-	set WG_PREFIX=WG
+	set WG_PREFIX=%WORKGROUP%
 	set WG_PARA=
 	if "%WG_PREFIX%" == "" (
-		set WG_PREFIX=WG
+		set WG_PREFIX=WORKGROUP
 	)
 	set ANSWER=1
 	echo %SELECT_WORKGROUP_FORMAT%
@@ -709,17 +711,16 @@ goto :EOF
 	%CYGWIN_ROOT%\bin\cygrunsrv.exe -S %SSHD_SERVICE%
 	%CYGWIN_ROOT%\bin\cygrunsrv.exe -E %SSHD_SERVICE%
 	
-	REM # hide cyg_server account on MS login window
-	if  "%OS_TYPE%" == "x64" (
-		rem # OS is 64bit
-		regedit.exe /s .\%INIT_CONF%\h_cyg_acc64.reg
-	) else if "%OS_TYPE%" == "x86" (
-		rem # OS is 32bit
-		regedit.exe /s .\%INIT_CONF%\h_cyg_acc32.reg
-	) else (
-		rem # should not be here
-		regedit.exe /s .\%INIT_CONF%\h_cyg_acc32.reg
+	REM # Use 64bit regedit to register but Server 2008 (x64) use regedit
+	if exist "%systemroot%\syswow64\regedit.exe" (
+		%systemroot%\syswow64\regedit.exe /s %INIT_CONF%\h_cyg_acc.reg
 	)
+	if exist "%systemroot%\system32\regedt32.exe " (
+		%systemroot%\system32\regedt32.exe /s %INIT_CONF%\h_cyg_acc.reg
+	)
+	regedit.exe /s %INIT_CONF%\h_cyg_acc.reg
+	
+
 	if "%OS_VERSION%" == "WINXP" (
 		echo .
 		echo """ %OPEN_SSHD_PORTON_FIREWALL% """
@@ -832,7 +833,8 @@ goto :EOF
 	call :AUTONEWSID_SETUP
 	call :SSHD_SETUP
 	
-	echo copy %WINROLL_SETUP_LOG% %CYGWIN_ROOT%
+	copy /Y %WINROLL_SETUP_LOG% %CYGWIN_ROOT%
+	
 pause
 	echo %FOOTER01%
 	echo %FOOTER02%

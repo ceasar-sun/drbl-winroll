@@ -99,5 +99,10 @@ Function Print_System_Information()
 		Wscript.Echo "REM Version: " & objOperatingSystem.Version
 		Wscript.Echo "REM OSArchitecture: " & objOperatingSystem.OSArchitecture
 	Next
+	
+	Set colItems = objWMIService.ExecQuery("Select * from Win32_ComputerSystem",,48)
+	For Each objItem in colItems
+		Wscript.Echo "set WORKGROUP=" & objItem.Domain
+	Next
 		
 End Function  ' Function Print_System_Information()
