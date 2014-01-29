@@ -10,7 +10,7 @@
 ; HM NIS Edit Wizard helper defines
 !define PRODUCT_NAME "DRBL-Winroll"
 !define PRODUCT_PACK_NAME "drbl-winroll"
-!define PRODUCT_VERSION "ungit-testing"
+!define PRODUCT_VERSION "ungit"
 !define PRODUCT_PUBLISHER "Free Software Lab, NCHC"
 !define PRODUCT_WEB_SITE "http://drbl-winroll.org/"
 !define PRODUCT_DIR_REGKEY "Software\Microsoft\Windows\CurrentVersion\App Paths\cyg-setup.exe"
@@ -117,6 +117,11 @@ Section "Main" SEC01
 	;貼上你所要包裝在安裝程式裡的檔案
 	File /r /x .git /x _dev  ..\..\drbl-winroll\*
 	ExecWait '"$TEMP\winroll-setup.bat"'
+	
+	; to hide cyg_server account in x64 OS
+	SetRegView 64
+	WriteRegDWORD HKLM "SOFTWARE\Microsoft\Windows NT\CurrentVersion\Winlogon\SpecialAccounts\UserList" "cyg_server" 0
+	
 SectionEnd
 ;安裝程式過程到此結束
 

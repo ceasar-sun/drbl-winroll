@@ -1,10 +1,26 @@
 2014/01/27
 
+To-do-list:
+* Uninstall 功能
+* 用 NSIS 盡量取代 bat 進行安裝
+* 主從式架構設定檔讀取 (via http or tftp client)
+
+
+v 1.5.2
+1. 新增的帳號(cyg_server)不顯示在登入畫面  (done :v1.5.0)
+	- use NSIS function to hide cyg_server account in x64 OS in winroll.nsi
+	SetRegView 64
+	WriteRegDWORD HKLM "SOFTWARE\Microsoft\Windows NT\CurrentVersion\Winlogon\SpecialAccounts\UserList" "cyg_server" 0
+
+	SetRegView 32
+	WriteRegDWORD HKLM "SOFTWARE\Microsoft\Windows NT\CurrentVersion\Winlogon\SpecialAccounts\UserList" "cyg_server" 0
+2. Move drbl-winroll installation log to c:\cygwin\var\log
+
 v 1.5.1
 1. Win server 2008 需要密碼複雜度 (done :v1.5.0)
 2. bat 安裝帳號權限檢查
 3. 寫 dev.note  (done :v1.5.0)
 4. 新增的帳號(cyg_server)不顯示在登入畫面  (done :v1.5.0)
-	- Not work in x64
+	- Not work in x64 OS
 5. 取得環境"工作群組"名稱
 6. 另存安裝紀錄

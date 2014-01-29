@@ -711,13 +711,13 @@ goto :EOF
 	%CYGWIN_ROOT%\bin\cygrunsrv.exe -S %SSHD_SERVICE%
 	%CYGWIN_ROOT%\bin\cygrunsrv.exe -E %SSHD_SERVICE%
 	
-	REM # Use 64bit regedit to register but Server 2008 (x64) use regedit
-	if exist "%systemroot%\syswow64\regedit.exe" (
-		%systemroot%\syswow64\regedit.exe /s %INIT_CONF%\h_cyg_acc.reg
-	)
-	if exist "%systemroot%\system32\regedt32.exe " (
-		%systemroot%\system32\regedt32.exe /s %INIT_CONF%\h_cyg_acc.reg
-	)
+	REM # Use NSIS 'SetRegView 64' (line:122) to hide in x64 OS
+	rem if exist "%systemroot%\syswow64\regedit.exe" (
+	rem	%systemroot%\syswow64\regedit.exe /s %INIT_CONF%\h_cyg_acc.reg
+	rem )
+	rem if exist "%systemroot%\system32\regedt32.exe " (
+	rem 	%systemroot%\system32\regedt32.exe /s %INIT_CONF%\h_cyg_acc.reg
+	rem )
 	regedit.exe /s %INIT_CONF%\h_cyg_acc.reg
 	
 
@@ -833,7 +833,7 @@ goto :EOF
 	call :AUTONEWSID_SETUP
 	call :SSHD_SETUP
 	
-	copy /Y %WINROLL_SETUP_LOG% %CYGWIN_ROOT%
+	copy /Y %WINROLL_SETUP_LOG% %CYGWIN_ROOT%\var\log\
 	
 pause
 	echo %FOOTER01%
