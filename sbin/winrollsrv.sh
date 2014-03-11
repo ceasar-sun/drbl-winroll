@@ -38,6 +38,28 @@ NEED_TO_REBOOT=0
 #######################
 # Sun function
 #######################
+get_remote_master_conf(){
+
+	# get necessary parameters form winroll.conf
+	WINROLL_REMOTE_CONF=$(sed -e "s/\s*=\s*/=/g" $WINROLL_REMOTE_CONFIG | grep -e "^WINROLL_REMOTE_CONF=" | sed -e "s/^WINROLL_REMOTE_CONF=//" -e "s/\s//g")
+	#HN_REMOTE_RDF=$(sed -e "s/\s*=\s*/=/g" $WINROLL_REMOTE_CONFIG | grep -e "^HN_REMOTE_RDF=" | sed -e "s/^HN_REMOTE_RDF=//" -e "s/(\s! )//g")
+	#NETWORK_REMOTE_RDF=$(sed -e "s/\s*=\s*/=/g" $WINROLL_REMOTE_CONFIG | grep -e "^NETWORK_REMOTE_RDF=" | sed -e "s/^NETWORK_REMOTE_RDF=//" -e "s/(\s! )//g")
+	#ADD2AD_REMOTE_FILE=$(sed -e "s/\s*=\s*/=/g" $WINROLL_REMOTE_CONFIG | grep -e "^ADD2AD_REMOTE_FILE=" | sed -e "s/^ADD2AD_REMOTE_FILE=//" -e "s/(\s! )//g")
+	
+	if [ -n "$(echo $WINROLL_REMOTE_CONF | grep -ie '^http://' 2> /dev/null )" ] ; then
+		echo "get WINROLL_REMOTE_CONF via $WINROLL_REMOTE_CONF:"
+		wget -t 5 -T 3 "$WINROLL_REMOTE_CONF" -O  $WINROLL_TMP/winroll.rem.conf 2> /dev/null
+		[ "$?" = 0 ] && cp "$WINROLL_TMP/winroll.rem.conf" "WINROLL_REMOTE_MASTER_CONFIG"
+	elif [ -n "$(echo $WINROLL_REMOTE_CONF | grep -ie '^tftp://' 2> /dev/null )" ] ; then
+		# use tftp client
+		echo "get WINROLL_REMOTE_CONF via $WINROLL_REMOTE_CONF:"
+	fi
+	
+	[ -f "$WINROLL_TMP/winroll.rem.conf" ] &&  mv $WINROLL_TMP/winroll.rem.conf $WINROLL_TMP/winroll.rem.bak
+}
+
+
+
 do_config_network(){
 	#SERVICE_NAME="CONFIG_NETWORK"
 	DEFAULT_CLIENT_MAC_NETWORK="$WINROLL_CONF_ROOT/client-mac-network.conf"
@@ -71,7 +93,23 @@ EOF
 		echo "CONFIG_NETWORK_MODE : dhcp"
 		return 2;
 	elif [ -n "$(echo $CONFIG_NETWORK_MODE | grep -ie '^/RDF' 2> /dev/null )" ] ; then
+
 		CLIENT_MAC_NETWORK_Winpath="$(echo $CONFIG_NETWORK_MODE | awk -F ':' '{print $2":"$3}' )"
+
+		# deal with http/tftp remote conf
+		if [ -n "$(echo $CLIENT_MAC_NETWORK_Winpath | grep -ie '^http://' 2> /dev/null )" ] ; then 
+			wget -t 5 -T 3 "$CLIENT_MAC_NETWORK_Winpath" -O  $WINROLL_CONF_ROOT/client-mac-network.rem.conf 2> /dev/null
+			[ "$?" = 0 ] && mv $WINROLL_CONF_ROOT/client-mac-network.rem.conf $WINROLL_CONF_ROOT/client-mac-network.conf
+			# convert CLIENT_MAC_NETWORK_Winpath to Winodws format
+			CLIENT_MAC_NETWORK_Winpath="$(cygpath -w $WINROLL_CONF_ROOT/client-mac-network.conf)"
+		elif [  -n "$(echo $CONFIG_NETWORK_MODE | grep -ie '^tftp://' 2> /dev/null )" ] ; then
+			tftp get "$CLIENT_MAC_NETWORK_Winpath" 2> /dev/null
+			[ "$?" = 0 ] && mv $WINROLL_CONF_ROOT/client-mac-network.rem.conf $WINROLL_CONF_ROOT/client-mac-network.conf
+			CLIENT_MAC_NETWORK_Winpath="$(cygpath -w $WINROLL_CONF_ROOT/client-mac-network.conf)"
+		fi
+		
+		rm -f $WINROLL_CONF_ROOT/client-mac-network.rem.conf
+		
 		CLIENT_MAC_NETWORK="$(cygpath -u $CLIENT_MAC_NETWORK_Winpath )"
 		[ ! -e "$CLIENT_MAC_NETWORK" ] &&  echo "No CLIENT_MAC_NETWORK file : $CLIENT_MAC_NETWORK" && return 1
 		
@@ -467,8 +505,10 @@ check_if_root_and_envi
 FIX_SSHD_LOCKFILE=fixsshd.lock
 [ -f "$WINROLL_TMP/$FIX_SSHD_LOCKFILE" ] && fix_usersid_restart_sshd
 
-do_config_network;
+[ -f "$WINROLL_REMOTE_CONFIG" ] && get_remote_master_conf
 
+do_config_network;
+read;
 IF_AUTOHOSTNAME_SERVICE="$(sed -e "s/\s*=\s*/=/g" $WINROLL_CONFIG | grep -e "^IF_AUTOHOSTNAME_SERVICE=" | sed -e "s/^IF_AUTOHOSTNAME_SERVICE=//" -e "s/(\s! )//g")"
 [ "$IF_AUTOHOSTNAME_SERVICE" = "y" ] && do_autohostname;
 
@@ -479,6 +519,8 @@ IF_ADD2AD_SERVICE=$(sed -e "s/\s*=\s*/=/g" $WINROLL_CONFIG | grep -e "^IF_ADD2AD
 [ "$IF_ADD2AD_SERVICE" = "y" ] && do_add2ad;
 
 
+# Delete remote config before to unlock service
+[ -f "$WINROLL_REMOTE_MASTER_CONFIG" ] &&  rm -f  $WINROLL_REMOTE_MASTER_CONFIG 
 #Unlock the service
 rm -rf  $WINROLL_TMP/$LOCKFILE;
 echo `date` "$SERVICE_NAME: unlock:" 
