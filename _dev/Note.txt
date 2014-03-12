@@ -22,6 +22,10 @@
 	5. Run the follow batch command in Windows CMD mode
 		set-x86*.exe -q -d -L -l "%LOCAL_REPOSITORY_INCLUDE_SETUP.INI%" -R "%CYGWIN_ROOT%"
 
+	Note:
+	2014/3/12 :
+		* 測試只有 setup-x86 v2.831 以 unattended mode 可行, v 2.844 會有問題
+
 * How to packe as NSIS package in Linux :
 	1. sudo apt-get install nsis
 	2. cd ~/drbl-winroll/tool ; makensis ./winroll.nsi

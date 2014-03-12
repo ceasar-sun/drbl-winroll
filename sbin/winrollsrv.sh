@@ -41,24 +41,29 @@ NEED_TO_REBOOT=0
 get_remote_master_conf(){
 
 	# get necessary parameters form winroll.conf
-	WINROLL_REMOTE_CONF=$(sed -e "s/\s*=\s*/=/g" $WINROLL_REMOTE_CONFIG | grep -e "^WINROLL_REMOTE_CONF=" | sed -e "s/^WINROLL_REMOTE_CONF=//" -e "s/\s//g")
-	#HN_REMOTE_RDF=$(sed -e "s/\s*=\s*/=/g" $WINROLL_REMOTE_CONFIG | grep -e "^HN_REMOTE_RDF=" | sed -e "s/^HN_REMOTE_RDF=//" -e "s/(\s! )//g")
-	#NETWORK_REMOTE_RDF=$(sed -e "s/\s*=\s*/=/g" $WINROLL_REMOTE_CONFIG | grep -e "^NETWORK_REMOTE_RDF=" | sed -e "s/^NETWORK_REMOTE_RDF=//" -e "s/(\s! )//g")
-	#ADD2AD_REMOTE_FILE=$(sed -e "s/\s*=\s*/=/g" $WINROLL_REMOTE_CONFIG | grep -e "^ADD2AD_REMOTE_FILE=" | sed -e "s/^ADD2AD_REMOTE_FILE=//" -e "s/(\s! )//g")
+	WINROLL_REMOTE_CONF=$(sed -e "s/\s*=\s*/=/g" $WINROLL_REMOTE_MASTER | grep -e "^WINROLL_REMOTE_CONF=" | sed -e "s/^WINROLL_REMOTE_CONF=//" -e "s/\s//g")
 	
 	if [ -n "$(echo $WINROLL_REMOTE_CONF | grep -ie '^http://' 2> /dev/null )" ] ; then
 		echo "get WINROLL_REMOTE_CONF via $WINROLL_REMOTE_CONF:"
-		wget -t 5 -T 3 "$WINROLL_REMOTE_CONF" -O  $WINROLL_TMP/winroll.rem.conf 2> /dev/null
-		[ "$?" = 0 ] && cp "$WINROLL_TMP/winroll.rem.conf" "WINROLL_REMOTE_MASTER_CONFIG"
+		wget -t 5 -T 3 "$WINROLL_REMOTE_CONF" -O  $WINROLL_TMP/winroll_remote_master.conf 2> /dev/null
+		[ "$?" = 0 ] && sed -e "s/^\s*//g" -e "s/^#.*//g" -e "s/\s*$//g"  -e "s/^.*\s*\=\s*$//g" -e "s/\s*=\s*/=/g"  -e "/^$/d" -i $WINROLL_TMP/winroll_remote_master.conf
 	elif [ -n "$(echo $WINROLL_REMOTE_CONF | grep -ie '^tftp://' 2> /dev/null )" ] ; then
 		# use tftp client
 		echo "get WINROLL_REMOTE_CONF via $WINROLL_REMOTE_CONF:"
 	fi
 	
-	[ -f "$WINROLL_TMP/winroll.rem.conf" ] &&  mv $WINROLL_TMP/winroll.rem.conf $WINROLL_TMP/winroll.rem.bak
+	# Add a newline if without it in winroll.conf
+	[[ $(tail -c1 $WINROLL_CONFIG) && -f $WINROLL_CONFIG ]] && echo ''>>$WINROLL_CONFIG
+	
+	while read -r line
+	do
+		KEY="$(echo $line | awk -F "=" '{print $1}' )"
+		sed -e "s|^\s*${KEY}\s*=.*|$(echo ${line} | sed 's|\\|\\\\|g')|g" -i $WINROLL_CONFIG
+		[ -z "$( grep -E "^\s*$KEY\s*=.*" $WINROLL_CONFIG 2> /dev/null )" ] && (echo $line >> $WINROLL_CONFIG)
+	done < $WINROLL_TMP/winroll_remote_master.conf
+	[ -f "$WINROLL_TMP/winroll_remote_master.conf" ] &&  mv $WINROLL_TMP/winroll_remote_master.conf $WINROLL_TMP/winroll_remote_master.conf.bak
+	read
 }
-
-
 
 do_config_network(){
 	#SERVICE_NAME="CONFIG_NETWORK"
@@ -274,10 +279,35 @@ do_autohostname(){
 	HN_WSNAME_DEF_PARAM=$(sed -e "s/\s*=\s*/=/g" $WINROLL_CONFIG | grep -e "^HN_WSNAME_DEF_PARAM=" | sed -e "s/^HN_WSNAME_DEF_PARAM=//" -e "s/\s//g")
 	HN_WSNAME_PARAM=$(sed -e "s/\s*=\s*/=/g" $WINROLL_CONFIG | grep -e "^HN_WSNAME_PARAM=" | sed -e "s/^HN_WSNAME_PARAM=//" -e "s/(\s! )//g")
 	
+	# deal with http/tftp remote conf
+	if [ -n "$(echo $HN_WSNAME_PARAM | grep -ie '^/RDF:http://' 2> /dev/null )" ] ; then
+		HN_WSNAME_REMOTE_RDF=$(echo $HN_WSNAME_PARAM | awk -F " " '{print $1}'| sed -e "s/^\/RDF://g")
+		wget -t 5 -T 3 "$HN_WSNAME_REMOTE_RDF" -O  $WINROLL_CONF_ROOT/hosts.rem.conf 2> /dev/null
+		
+		[ "$?" = 0 ] && mv $WINROLL_CONF_ROOT/hosts.rem.conf $WINROLL_CONF_ROOT/hosts.conf
+		# system would use hosts.conf that be left last time if failed to get remote config file
+		
+		# convert  to Winodws format
+		HN_WSNAME_LOCAL_RDF="$(cygpath -w $WINROLL_CONF_ROOT/hosts.conf)"
+		HN_WSNAME_PARAM=$(echo $HN_WSNAME_PARAM | sed -e "s|$(echo ${HN_WSNAME_REMOTE_RDF})|$(echo ${HN_WSNAME_LOCAL_RDF} | sed 's|\\|\\\\|g')|")
+	elif [  -n "$(echo $CONFIG_NETWORK_MODE | grep -ie '^/RDF:tftp://' 2> /dev/null )" ] ; then
+		tftp get "$CLIENT_MAC_NETWORK_Winpath" 2> /dev/null
+		
+		[ "$?" = 0 ] && mv $WINROLL_CONF_ROOT/hosts.rem.conf $WINROLL_CONF_ROOT/hosts.conf
+		# system would use hosts.conf that be left last time if failed to get remote config file
+		
+		# convert to Winodws format
+		HN_WSNAME_LOCAL_RDF="$(cygpath -w $WINROLL_CONF_ROOT/hosts.conf)"
+		HN_WSNAME_PARAM=$(echo $HN_WSNAME_PARAM | sed -e "s/$HN_WSNAME_REMOTE_RDF/$HN_WSNAME_LOCAL_RDF/")
+	fi
+	
+	rm -f $WINROLL_CONF_ROOT/hosts.rem.conf
+	
 	[ ! -f "$WSNAME_LOG" ] && touch $WSNAME_LOG;
 	if [ -z "$HN_WSNAME_PARAM" ] ; then	HN_WSNAME_PARAM=$HN_WSNAME_DEF_PARAM; fi
 	echo "" > $WSNAME_LOG		# Clean advanced log
 	echo "'$HN_WSNAME_DEF_PARAM','$WSNAME_LOG','$HN_WSNAME_PARAM','$HNAME'" #| tee -a  $WINROLL_LOG
+	#read
 	wsname.exe $HN_WSNAME_PARAM	# use /TEST to pre-test the hostname assigned by wsname
 
 	#2006/4/14 ¤W¤È 12:21:32 : Could not determine local IP address. - Rename request aborted!
@@ -505,10 +535,10 @@ check_if_root_and_envi
 FIX_SSHD_LOCKFILE=fixsshd.lock
 [ -f "$WINROLL_TMP/$FIX_SSHD_LOCKFILE" ] && fix_usersid_restart_sshd
 
-[ -f "$WINROLL_REMOTE_CONFIG" ] && get_remote_master_conf
+[ -f "$WINROLL_REMOTE_MASTER" ] && get_remote_master_conf
 
 do_config_network;
-read;
+
 IF_AUTOHOSTNAME_SERVICE="$(sed -e "s/\s*=\s*/=/g" $WINROLL_CONFIG | grep -e "^IF_AUTOHOSTNAME_SERVICE=" | sed -e "s/^IF_AUTOHOSTNAME_SERVICE=//" -e "s/(\s! )//g")"
 [ "$IF_AUTOHOSTNAME_SERVICE" = "y" ] && do_autohostname;
 
@@ -520,7 +550,7 @@ IF_ADD2AD_SERVICE=$(sed -e "s/\s*=\s*/=/g" $WINROLL_CONFIG | grep -e "^IF_ADD2AD
 
 
 # Delete remote config before to unlock service
-[ -f "$WINROLL_REMOTE_MASTER_CONFIG" ] &&  rm -f  $WINROLL_REMOTE_MASTER_CONFIG 
+[ -f "$WINROLL_REMOTE_MAIN_CONFIG" ] &&  rm -f  $WINROLL_REMOTE_MAIN_CONFIG 
 #Unlock the service
 rm -rf  $WINROLL_TMP/$LOCKFILE;
 echo `date` "$SERVICE_NAME: unlock:" 

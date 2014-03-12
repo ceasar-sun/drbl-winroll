@@ -65,7 +65,7 @@ set IF_INSTALL_AUTOHOSTNAME=是否安裝『自動主機名稱』服務
 set SELECT_HOSTNAME_FORMAT%=請選擇您想要主機名稱樣式
 set BY_IP=ip (取後面6碼數字, ex: XXX-001-001)
 set BY_MAC=Mac address (取後面6碼字元,  ex: XXX-3D9C51)
-set BY_HOSTS_FILE=由本地端檔案決定
+set BY_HOSTS_FILE=由本地端或網路(http)檔案決定
 set MORE_DETAIIL_TO_REFER=詳細設定請參考
 set SET_HOSTNAME_PREFIX=設定主機名稱的前置字元(如果由本地端檔案決定則不受影響，且全部字串不可超過 15個字元)
 
@@ -133,7 +133,7 @@ set ANY_KEY_TO_EXIT=任意鍵離開
 REM # Add from v1.2.0-2, 20090909
 set SETUP_NETWORK_MODE=設定網路模式
 set SELECT_NETWORK_MODE=選擇網路模式
-set BY_FILE=由本地端檔案決定
+set BY_FILE=由本地端或網路(http)檔案決定
 set SKIP=忽略
 set DO_NOTHIMG_FOR_NETWORK=不處理網路設定
 set USE_NETWORK_MODE_IS=網路設定模式為

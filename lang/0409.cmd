@@ -57,7 +57,7 @@ set IF_INSTALL_AUTOHOSTNAME=If intall auto-hostname function
 set SELECT_HOSTNAME_FORMAT%=Select the hostname format as you want
 set BY_IP=IP  (Use the last 6 characters, ex: XXX-001-001)
 set BY_MAC=Mac address (Use the last 6 characters, ex: XXX-3D9C51)
-set BY_HOSTS_FILE=Determine hostname by local file
+set BY_HOSTS_FILE=Determine hostname by local or network (http) file
 set MORE_DETAIIL_TO_REFER=More detail please read 
 set SET_HOSTNAME_PREFIX=Setup hostname prefix(No effect if you select 3 in advance, and the total size can't be over 15 characters)
 
@@ -129,7 +129,7 @@ set ANY_KEY_TO_EXIT=Any key to exit
 REM # Add from v1.2.0-2, 20090909
 set SETUP_NETWORK_MODE=Setup network mode
 set SELECT_NETWORK_MODE=Select network mode
-set BY_FILE=By local file
+set BY_FILE=By local or network (http) file
 set SKIP=skip
 set DO_NOTHIMG_FOR_NETWORK=Do nothing for network configuration
 set USE_NETWORK_MODE_IS=network mode is

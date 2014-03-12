@@ -47,6 +47,7 @@ set CYGWIN_ROOT=%SystemDrive%\cygwin
 set CYGWIN_LOCAL_MIRROR=
 set LOCAL_REPOSITORY=%SOURCE_DIR%
 set INIT_DOC_FOLDER=doc
+set INIT_REMOTE_TEMPLET_FOLDER=winroll.cfg
 
 call :INIT_OS_LANG_INFO
 cls
@@ -283,10 +284,10 @@ goto :EOF
 
 	if not exist "%WINROLL_CONFIG_FOLDER%" ( mkdir "%WINROLL_CONFIG_FOLDER%" )
 	if not exist "%WINROLL_DOC_FOLDER%" ( mkdir "%WINROLL_DOC_FOLDER%" )
-	REM if not exist "%WINROLL_CONFIG_FOLDER%\keyword-conf" ( mkdir "%WINROLL_CONFIG_FOLDER%\keyword-conf" )
-	
+	if not exist "%WINROLL_CONFIG_FOLDER%/%INIT_REMOTE_TEMPLET_FOLDER%" ( mkdir "%WINROLL_CONFIG_FOLDER%/%INIT_REMOTE_TEMPLET_FOLDER%" )
+		
 	copy /V "%INIT_CONF%\*.conf" "%WINROLL_CONFIG_FOLDER%"
-	REM xcopy  /Y /E "%INIT_CONF%\keyword-conf" "%WINROLL_CONFIG_FOLDER%\keyword-conf"
+	xcopy  /Y /E "%INIT_CONF%\%INIT_REMOTE_TEMPLET_FOLDER%" "%WINROLL_CONFIG_FOLDER%/%INIT_REMOTE_TEMPLET_FOLDER%"
 	copy /Y "%INIT_CONF%\*.lib.sh" "%WINROLL_CONFIG_FOLDER%"
 	xcopy /Y /E "%INIT_DOC_FOLDER%" "%WINROLL_DOC_FOLDER%"
 	copy /Y ".\sbin\*.*" "%CYGWIN_ROOT%\bin"

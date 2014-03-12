@@ -17,7 +17,7 @@ WINROLL_LOG="$WINROLL_TMP/winrollsrv.log"
 TEMP="/var/log"
 TMP="/var/log"
 
-WINROLL_REMOTE_CONFIG="$WINROLL_CONF_ROOT/winroll_remote.conf"
+WINROLL_REMOTE_MASTER="$WINROLL_CONF_ROOT/remote_master.conf"
 
 
 #_GID_Administrators='Administrators'
