@@ -25,6 +25,7 @@
 	Note:
 	2014/3/12 :
 		* 測試只有 setup-x86 v2.831 以 unattended mode 可行, v 2.844 會有問題
+		* wsname 在 Windows 8 (x32, x64) 無法使用 $MAC 變數
 
 * How to packe as NSIS package in Linux :
 	1. sudo apt-get install nsis
