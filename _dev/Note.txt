@@ -33,3 +33,11 @@
 
 * How to update http://www.drbl-winroll.org/ web content
 	~$ cd ~/www/drbl-winroll.web.en/ && rsync -avP --delete -e ssh --exclude=CVS/ --exclude=.svn/ --exclude=.htaccess --exclude=count.txt ./* diskless@www.drbl-winroll.org:/home/diskless/drbl-winroll
+
+* 新增的帳號(cyg_server)不顯示在登入畫面  (done :v1.5.0)
+	- use NSIS function to hide cyg_server account in x64 OS in winroll.nsi
+	SetRegView 64
+	WriteRegDWORD HKLM "SOFTWARE\Microsoft\Windows NT\CurrentVersion\Winlogon\SpecialAccounts\UserList" "cyg_server" 0
+
+	SetRegView 32
+	WriteRegDWORD HKLM "SOFTWARE\Microsoft\Windows NT\CurrentVersion\Winlogon\SpecialAccounts\UserList" "cyg_server" 0

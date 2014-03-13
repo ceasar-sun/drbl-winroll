@@ -4,6 +4,21 @@ See also http://drbl-winroll.nchc.org.tw/doc/History.txt
 ---------------------------------------------------------------------------------------------------
 Change log:
 
+version 1.6.0
+	* Upgrade cygwin to 1.7.28 
+	* Add openssl package
+	* Support use configuration file or parameters (ex: /RDF) via network, ex: http. read the follow fils for details:
+		* c:\cygwin\drbl-winroll_config\remote_master.conf (for remote master config)
+		* c:\cygwin\drbl-winroll_config\winroll.conf (for /RDF)
+	! Known issue:
+		1.$MAC is useless in Winodws 8 serial OS due to wsname.exe not suppurt yet
+
+version 1.5.2
+	* Hide the new account (cyg_server, for ssh daemon) (done :v1.5.0)
+	* Move drbl-winroll installation log to c:\cygwin\var\log
+	* To accord the password policy with Windows Server 2008 for cyg_server account creating
+	* Get workgroup infomation for installation
+
 version 1.3.2-181
 	Diff from 1.3.1-*
 	* New : Use VB script to get Windows system, User, network interface information
