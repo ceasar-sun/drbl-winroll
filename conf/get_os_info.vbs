@@ -9,6 +9,7 @@ UserPerms("admin")
 UACTurnedOn()
 Print_System_Administrator_Account()
 Print_System_Information()
+Print_OnlyEnabled_NICAdapter_information()
 
 '' Sub function ''
 Function Print_System_Startmenu_Path()
@@ -106,3 +107,35 @@ Function Print_System_Information()
 	Next
 		
 End Function  ' Function Print_System_Information()
+
+Function Print_OnlyEnabled_NICAdapter_information()
+	strComputer = "." 
+	Set objWMIService = GetObject("winmgmts:\\" & strComputer & "\root\CIMV2") 
+	Set colItems = objWMIService.ExecQuery("SELECT * FROM Win32_NetworkAdapter WHERE NetConnectionId IS NOT NULL")
+	i = 0
+	For Each objItem in colItems 
+        i = i + 1
+		Set devItems = objWMIService.ExecQuery("SELECT * FROM Win32_NetworkAdapterConfiguration where IPEnabled=TRUE AND MACAddress='" & objItem.MACAddress & "'" ,,48)
+		j = 0
+		For Each devItem in devItems
+			j = j + 1
+			'Wscript.Echo devItem.MACAddress
+			strIPAddress = GetMultiString_FromArray(devItem.IPAddress, ",")
+			strIPSubnet = GetMultiString_FromArray(devItem.IPSubnet, ",")
+			Wscript.Echo "set NIC_MAC_ADDR=" & Replace(objItem.MACAddress, ":", "-")
+			Wscript.Echo "set NIC_ID=" & objItem.NetConnectionId
+			Wscript.Echo "set NIC_IPADDR=" & strIPAddress
+			Wscript.Echo "set NIC_NETMASK=" & strIPSubnet
+		Next
+	Next
+End Function ' Function PrintOnlyEnabled_NICAdapter_Information()
+
+Function GetMultiString_FromArray( ArrayString, Seprator)
+    If IsNull ( ArrayString ) Then
+        StrMultiArray = ArrayString
+    else
+        StrMultiArray = Join( ArrayString, Seprator )
+   end if
+   GetMultiString_FromArray = StrMultiArray
+  
+End Function

@@ -167,3 +167,6 @@ set RUN_UNINSTALLER=執行移除程式 :
 set REMOVE_MONITOR_SERVICE=移除 Windows 用戶端系統監測服務
 set PLEASE_INSTALL_MUNIN_AT_SERVER=您必須在監視主機上正確設定 Munin 用戶端才能取得系統資訊. 細節請參考 DRBL-winroll 網頁.
 set IF_INSTALL_MONITOR=是否安裝系統監測服務(由Munin Node提供)
+
+REM # Add from v1.6.1, 20140314
+set IF_INSTALL_AS_TEMPLETE=設本機為範本模式(auto-sid ,auto-add2ad 功能不在此作用)

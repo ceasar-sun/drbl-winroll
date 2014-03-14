@@ -168,3 +168,6 @@ set RUN_UNINSTALLER=Run uninstaller :
 set REMOVE_MONITOR_SERVICE=Remove Windows clients monitor service
 set PLEASE_INSTALL_MUNIN_AT_SERVER=You have to configure Munin correctly in server. Please refer to DRBL-winroll web site for details.
 set IF_INSTALL_MONITOR=If install system monitor daemon (via Munin Node)
+
+REM # Add from v1.6.1, 20140314
+set IF_INSTALL_AS_TEMPLETE=Set as templete mode (auto-add2ad function wouold be skip)
