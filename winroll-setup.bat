@@ -187,7 +187,7 @@ goto :EOF
 	echo CYGWIN_ROOT=%CYGWIN_ROOT%>>%WINROLL_SETUP_LOG%
 	echo LOCAL_REPOSITORY=%LOCAL_REPOSITORY%>>%WINROLL_SETUP_LOG%
 	echo INIT_DOC_FOLDER=%INIT_DOC_FOLDER%>>%WINROLL_SETUP_LOG%
-	echo ---- Include parameter by 'os_info.cmd' ----
+	echo ---- Include parameter by 'os_info.cmd' ---- >>%WINROLL_SETUP_LOG%
 	type lang\os_info.cmd >>%WINROLL_SETUP_LOG%
 goto :EOF
 
@@ -310,13 +310,14 @@ goto :EOF
 	echo ... %INSTALL_WINROLL_SERVICE% ...
 	"%CYGWIN_ROOT%\bin\cygrunsrv.exe" -I "%WINROLL_SERVICE%" -d "DRBL-winroll auto-config service" -p "/bin/winrollsrv.sh" -e "CYGWIN=${_cygwin}" -i
 
-	set ANSWER_IF_GO=y
+	echo %HR%
+	set ANSWER_IF_GO=n
 	echo %IF_INSTALL_AS_TEMPLETE% [y/N]
 	set /P ANSWER_IF_GO="[y/N]"
 	if "%ANSWER_IF_GO%" == "y" (
-		goto :END_OF_CYGWIN_SETUP
+		cscript //nologo %CYGWIN_ROOT%\bin\get_nic_info.vbs > %WINROLL_CONFIG_FOLDER%\_nic_info.conf 
+		"%CYGWIN_ROOT%\bin\bash.exe" -c "cat `cygpath -u '%WINROLL_CONFIG_FOLDER%\_nic_info.conf'`  | awk '{print $1}' | head -n 1 | md5sum | awk '{print $1}'" > %WINROLL_CONFIG_FOLDER%\as_templete.md5
 	)
-	"%CYGWIN_ROOT%\bin\bash.exe" --login -c "echo %NIC_MAC_ADDR% | md5sum | awk '{print $1}'" > %WINROLL_CONFIG_FOLDER%\as_templete.md5
 		
 :END_OF_CYGWIN_SETUP
 goto :EOF

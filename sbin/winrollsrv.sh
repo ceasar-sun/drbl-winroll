@@ -30,10 +30,9 @@ fi
 touch $WINROLL_TMP/$LOCKFILE;
 echo `date` "$SERVICE_NAME: start lock:" 
 
-_NIC_INFO=$WINROLL_TMP/_nic_info.conf
-cscript //nologo `cygpath.exe -w /bin/get_nic_info.vbs` > $_NIC_INFO
-
 NEED_TO_REBOOT=0
+IF_AS_TEMPLETE_MODE=n
+SKIP_SERVICE_AS_TEMPLETE=
 
 #######################
 # Sun function
@@ -54,15 +53,16 @@ get_remote_master_conf(){
 	
 	# Add a newline if without it in winroll.conf
 	[[ $(tail -c1 $WINROLL_CONFIG) && -f $WINROLL_CONFIG ]] && echo ''>>$WINROLL_CONFIG
-	
-	while read -r line
-	do
-		KEY="$(echo $line | awk -F "=" '{print $1}' )"
-		sed -e "s|^\s*${KEY}\s*=.*|$(echo ${line} | sed 's|\\|\\\\|g')|g" -i $WINROLL_CONFIG
-		[ -z "$( grep -E "^\s*$KEY\s*=.*" $WINROLL_CONFIG 2> /dev/null )" ] && (echo $line >> $WINROLL_CONFIG)
-	done < $WINROLL_TMP/winroll_remote_master.conf
+	if [ -f "$WINROLL_TMP/winroll_remote_master.conf" ]  ; then
+		while read -r line
+		do
+			KEY="$(echo $line | awk -F "=" '{print $1}' )"
+			sed -e "s|^\s*${KEY}\s*=.*|$(echo ${line} | sed 's|\\|\\\\|g')|g" -i $WINROLL_CONFIG
+			[ -z "$( grep -E "^\s*$KEY\s*=.*" $WINROLL_CONFIG 2> /dev/null )" ] && (echo $line >> $WINROLL_CONFIG)
+		done < $WINROLL_TMP/winroll_remote_master.conf
+	fi
 	[ -f "$WINROLL_TMP/winroll_remote_master.conf" ] &&  mv $WINROLL_TMP/winroll_remote_master.conf $WINROLL_TMP/winroll_remote_master.conf.bak
-	read
+	
 }
 
 do_config_network(){
@@ -530,6 +530,9 @@ do_add2ad(){
 [ -f "/etc/group" ] || mkgroup -l >/etc/group
 
 check_if_root_and_envi
+if_as_templete_mode;
+
+[ "$IF_AS_TEMPLETE_MODE" == "y" ] && SKIP_SERVICE_AS_TEMPLETE=$(sed -e "s/\s*=\s*/=/g" $WINROLL_CONFIG | grep -e "^SKIP_SERVICE_AS_TEMPLETE=" | sed -e "s/^SKIP_SERVICE_AS_TEMPLETE=//" -e "s/(\s! )//g")
 
 # for fix sshd service 
 FIX_SSHD_LOCKFILE=fixsshd.lock
@@ -537,17 +540,17 @@ FIX_SSHD_LOCKFILE=fixsshd.lock
 
 [ -f "$WINROLL_REMOTE_MASTER" ] && get_remote_master_conf
 
-do_config_network;
+CONFIG_NETWORK_MODE="$(sed -e "s/\s*=\s*/=/g" $WINROLL_CONFIG | grep -e "^CONFIG_NETWORK_MODE=" | sed -e "s/^CONFIG_NETWORK_MODE=//" -e "s/(\s! )//g" -e "s/\s*$//g")"
+[ "$CONFIG_NETWORK_MODE" != "none" -a -n "$CONFIG_NETWORK_MODE" -a -z "$(echo $SKIP_SERVICE_AS_TEMPLETE | grep config_network 2>/dev/null)" ] && do_config_network;
 
 IF_AUTOHOSTNAME_SERVICE="$(sed -e "s/\s*=\s*/=/g" $WINROLL_CONFIG | grep -e "^IF_AUTOHOSTNAME_SERVICE=" | sed -e "s/^IF_AUTOHOSTNAME_SERVICE=//" -e "s/(\s! )//g")"
-[ "$IF_AUTOHOSTNAME_SERVICE" = "y" ] && do_autohostname;
+[ "$IF_AUTOHOSTNAME_SERVICE" = "y" -a -z "$(echo $SKIP_SERVICE_AS_TEMPLETE | grep autohostname 2>/dev/null)" ] && do_autohostname;
 
 IF_NEWSID_SERVICE=$(sed -e "s/\s*=\s*/=/g" $WINROLL_CONFIG | grep -e "^IF_NEWSID_SERVICE=" | sed -e "s/^IF_NEWSID_SERVICE=//" -e "s/(\s! )//g")
-[ "$IF_NEWSID_SERVICE" = "y" ] && do_autonewsid;
+[ "$IF_NEWSID_SERVICE" = "y" -a -z "$(echo $SKIP_SERVICE_AS_TEMPLETE | grep autonewsid 2>/dev/null)"  ] && do_autonewsid;
 
 IF_ADD2AD_SERVICE=$(sed -e "s/\s*=\s*/=/g" $WINROLL_CONFIG | grep -e "^IF_ADD2AD_SERVICE=" | sed -e "s/^IF_ADD2AD_SERVICE=//" -e "s/(\s! )//g")
-[ "$IF_ADD2AD_SERVICE" = "y" ] && do_add2ad;
-
+[ "$IF_ADD2AD_SERVICE" = "y" -a -z "$(echo $SKIP_SERVICE_AS_TEMPLETE | grep add2ad 2>/dev/null)" ] && do_add2ad;
 
 # Delete remote config before to unlock service
 [ -f "$WINROLL_REMOTE_MAIN_CONFIG" ] &&  rm -f  $WINROLL_REMOTE_MAIN_CONFIG 

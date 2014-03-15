@@ -19,6 +19,8 @@ TMP="/var/log"
 
 WINROLL_REMOTE_MASTER="$WINROLL_CONF_ROOT/remote_master.conf"
 
+_NIC_INFO=$WINROLL_TMP/_nic_info.conf
+cscript //nologo `cygpath.exe -w /bin/get_nic_info.vbs` > $_NIC_INFO
 
 #_GID_Administrators='Administrators'
 _GID_Administrators='544'
@@ -44,4 +46,9 @@ check_if_root_and_envi(){
 	chmod g+w $WINROLL_CONF_ROOT/*.conf
 }
 
+if_as_templete_mode(){
 
+	NICMAC_ADDR_MD5=$(awk -F "\t" "{print \$1}" $_NIC_INFO | head -n 1 | md5sum | awk '{print $1}' )
+	[ "$(cat $WINROLL_CONF_ROOT/as_templete.md5)" == "$NICMAC_ADDR_MD5" ] && IF_AS_TEMPLETE_MODE=y
+
+}
