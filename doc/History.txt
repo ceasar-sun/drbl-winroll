@@ -4,6 +4,13 @@ See also http://drbl-winroll.nchc.org.tw/doc/History.txt
 ---------------------------------------------------------------------------------------------------
 Change log:
 
+version 1.6.1
+	* Add AS_TEMPLETE_MODE function : 
+		* To Define what action during winrollsrv running when pc be setup as templete mode
+		* Skip some action , ex: auto add2ad , would be useful for administrator to rebuild templete machie
+		* Be define via 'SKIP_SERVICE_AS_TEMPLETE="autonewsid add2ad"' in winroll.conf
+
+
 version 1.6.0
 	* Upgrade cygwin to 1.7.28 
 	* Add openssl package
