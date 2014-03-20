@@ -1,0 +1,829 @@
+Q170620
+
+/*++
+
+   Copyright (c) 1997  Microsoft Corporation
+
+   Module Name:
+
+       wksacct.c
+
+   Description:
+
+       This sample illustrates how to manage Windows NT domain membership
+       at the workstation level.  This sample duplicates what takes place
+       when changing domain membership via the network control panel
+       applet.
+
+       The first command line argument indicates the name of the domain to
+       which you want the computer to belong (or trust).
+
+       The second command line argument should be equal to the password for
+       a newly created computer account. This password is typically the
+       machine name converted to all lowercase.
+
+       Note that this sample will not allow this operation on a Domain
+       Controller.
+
+       TODO: Delete any existing domain trust accounts
+             Remove any previous Domain Admin groups from local groups
+             Add Domain Administrators to local Administrators group
+             Add Domain Users group to the local Users group.
+             Change NetLogon Service to start automatically
+
+       Note:  Lan Manager NetXxx API are Unicode only.
+       Note:  Windows NT LSA API are Unicode only.
+
+       The following import libraries are required:
+           netapi32.lib
+           advapi32.lib
+
+   --*/ 
+
+#define UNICODE
+#define _UNICODE
+#define WINNT
+
+#include <windows.h>
+#include <lm.h>
+#include "ntsecapi.h"
+
+#include <stdio.h>
+
+#define RTN_OK 0
+#define RTN_USAGE 1
+#define RTN_ERROR 13
+
+// 
+// if you have the ddk, include ntstatus.h
+// 
+#ifndef STATUS_SUCCESS
+#define STATUS_SUCCESS                  ((NTSTATUS)0x00000000L)
+#define STATUS_OBJECT_NAME_NOT_FOUND    ((NTSTATUS)0xC0000034L)
+#define STATUS_OBJECT_NAME_COLLISION    ((NTSTATUS)0xC0000035L)
+#define STATUS_INVALID_SID              ((NTSTATUS)0xC0000078L)
+#endif
+
+BOOL
+GetDomainDCName(
+   LPWSTR Domain,
+   LPWSTR *pPrimaryDC
+   );
+
+
+BOOL
+EstablishSession(
+   LPCWSTR Server,
+   BOOL bEstablish,
+   LPWSTR DomainName,
+   LPWSTR UserName,
+   LPWSTR Password
+   );
+
+BOOL
+DoesAccountExist(
+   LPWSTR Domain,
+   LPWSTR Account
+   );
+
+void
+InitLsaString(
+   PLSA_UNICODE_STRING LsaString,
+   LPWSTR String
+   );
+
+NTSTATUS
+OpenPolicy(
+   LPWSTR ComputerName,
+   DWORD DesiredAccess,
+   PLSA_HANDLE PolicyHandle
+   );
+
+BOOL
+GetDomainSid(
+   LPWSTR DomainName,  // domain name to acquire Sid of
+   PSID *pDomainSid    // points to allocated Sid on success
+   );
+
+NTSTATUS
+SetWorkstationTrustedDomainInfo(
+   LSA_HANDLE PolicyHandle,
+   PSID DomainSid,             // Sid of domain to manipulate
+   LPWSTR TrustedDomainName,   // trusted domain name to add/update
+   LPWSTR Password             // new trust password for trusted domain
+   );
+
+NTSTATUS
+SetPrimaryDomain(
+   LSA_HANDLE PolicyHandle,
+   PSID DomainSid,
+   LPWSTR TrustedDomainName
+   );
+
+void
+DisplayNtStatus(
+   LPSTR szAPI,    // ansi string containing API name
+   NTSTATUS Status
+   );
+
+void
+DisplayError(
+   LPSTR szAPI,    // pointer to failed API name
+   DWORD dwLastError
+   );
+
+// 
+// Unicode entry point and argv
+// 
+int
+__cdecl
+wmain(
+   int argc,
+   WCHAR *argv[]
+   )
+{
+   LSA_HANDLE PolicyHandle;
+   LPWSTR Workstation;       // target machine of policy update
+   PSID DomainSid=NULL;      // Sid representing domain to trust
+   WCHAR TrustedDomainName[MAX_COMPUTERNAME_LENGTH +1]; // domain or workgroup to join
+   LPWSTR WorkGroupName;     // Workgroup to join
+   LPWSTR Password;          // machine acct. password necessary to join domain 
+   LPWSTR PrimaryDC=NULL;    // name of that domain's PDC
+   PSERVER_INFO_101 si101;
+   DWORD Type;
+   PUSER_MODALS_INFO_2 umi2;
+   NET_API_STATUS nas;
+   NTSTATUS Status;
+   BOOL bJoinDom;
+   PWKSTA_INFO_100  pwi100;
+
+   // Credentials for establishing a IPC$ session to DC
+   LPWSTR sessUserName = L"";
+   LPWSTR sessPassword = L"";
+
+   if(argc < 2) {
+       fprintf(stderr,
+           "Usage: %ls\t<Workgroup to join>\n"
+           "                 \t<Domain to join> <MachineAccountPassword> [UserName] [Password]\n",
+           argv[0]);
+       fprintf(stderr,"MachineAccountPassword is used only if joining a domain\n");
+       fprintf(stderr,"Supply UserName and Password of a domain user for joining Windows 2000 domain\n");
+       return RTN_USAGE;
+   }
+
+   if (argc == 2)
+   {
+      bJoinDom = FALSE; // were joining a workgroup
+      WorkGroupName = argv[1];
+      // Check if were a member of a domain
+      nas = NetWkstaGetInfo(NULL,100,&(PBYTE)pwi100);
+      if (nas != NERR_Success){
+        DisplayError("NetWkstaGetInfo", nas);
+        return RTN_ERROR;
+      }
+
+      lstrcpy(TrustedDomainName,pwi100->wki100_langroup);
+
+   }
+   else 
+   {
+      bJoinDom = TRUE;
+      lstrcpy(TrustedDomainName,argv[1]);
+      TrustedDomainName[MAX_COMPUTERNAME_LENGTH] = L'\0'; //truncate if necessary
+      Password = argv[2];
+      if (argc >= 4) sessUserName = argv[3];
+      if (argc >= 5) sessPassword = argv[4];
+   }
+
+   Workstation = (unsigned short *) LocalAlloc(LPTR,256);
+
+   // 
+   // insure the local machine is NOT a DC, as this operation is
+   // only appropriate against a workstation.
+   // 
+   nas = NetServerGetInfo(NULL, 101, (LPBYTE *)&si101);
+   if(nas != NERR_Success) {
+       DisplayError("NetServerGetInfo", nas);
+       return RTN_ERROR;
+   }
+
+   Type = si101->sv101_type;
+   NetApiBufferFree(si101);
+
+   if( (Type & SV_TYPE_DOMAIN_CTRL) ||
+       (Type & SV_TYPE_DOMAIN_BAKCTRL) ) {
+       wprintf(L"Operation is not valid on a domain controller.\n");
+       return RTN_ERROR;
+   }
+   // 
+   // obtain the local machine's name
+   // 
+   nas = NetUserModalsGet(NULL, 2, (LPBYTE *)&umi2);
+
+   if(nas != NERR_Success) {
+       DisplayError("NetUserModalsGet", nas);
+       return RTN_ERROR;
+   }
+
+   // 
+   // copy the machine name to new storage
+   // 
+   lstrcpy(Workstation, umi2->usrmod2_domain_name);
+
+   NetApiBufferFree(umi2); // free memory allocated by NetXxx
+
+   // 
+   // do not allow a workstation to trust itself
+   // 
+   if(lstrcmpiW(TrustedDomainName, Workstation) == 0) {
+       wprintf(L"Error:  Domain %ls cannot be a member of itself.\n",
+           TrustedDomainName);
+
+       return RTN_ERROR;
+   }
+
+   // 
+   // get the name of the domain DC
+   // 
+   if(!GetDomainDCName(TrustedDomainName,&PrimaryDC)) {
+      wprintf(L"Could not get DC Name\n");
+      return RTN_ERROR;
+   }
+
+   // 
+   // establish NULL session to domain PDC
+   // 
+   if(!EstablishSession(PrimaryDC, TRUE, bJoinDom ? TrustedDomainName : L"", sessUserName, sessPassword)) {
+      wprintf(L"Could not establish session with %ls\n",
+      PrimaryDC);
+      return RTN_ERROR;
+   }
+
+   wprintf(L"Session established to Domain Controller (%ls)\n",
+     PrimaryDC);
+
+   // 
+   // see if the computer account exists on the domain
+   // 
+   if(!DoesAccountExist(PrimaryDC, Workstation))
+      return RTN_ERROR;
+
+   // 
+   // fetch the DomainSid of the domain to trust
+   // 
+   if(!GetDomainSid(PrimaryDC, &DomainSid)) {
+     DisplayError("GetDomainSid", GetLastError());
+     return RTN_ERROR;
+   }
+
+   wprintf(L"Opening policy on %s\n", Workstation);
+
+   // 
+   // open the policy on this computer
+   // 
+   Status = OpenPolicy(
+            Workstation,
+            POLICY_CREATE_SECRET |  // for password set operation
+            POLICY_TRUST_ADMIN,     // for trust creation
+            &PolicyHandle
+            );
+
+   if(Status != STATUS_SUCCESS) {
+     DisplayNtStatus("OpenPolicy", Status);
+     return RTN_ERROR;
+   }
+
+   if (!bJoinDom)  // delete trust of dom were leaving
+   {
+      Status = LsaDeleteTrustedDomain(PolicyHandle, DomainSid);
+      if(Status != STATUS_SUCCESS) {
+        DisplayNtStatus("OpenPolicy", Status);
+        return RTN_ERROR;
+      } 
+   }
+
+   if (bJoinDom) // this stuff is not needed for workgroup joining.
+   {
+      wprintf(L"Setting Trusted Domain and account password\n");
+
+      Status = SetWorkstationTrustedDomainInfo(
+                                    PolicyHandle,
+                                    DomainSid, // Must be null for workgroup,
+                                    TrustedDomainName,
+                                    Password
+                                    );
+ 
+      if(Status != STATUS_SUCCESS) {
+         return RTN_ERROR;
+      }
+   } 
+
+   wprintf(L"Setting %ls\n", bJoinDom ? L"Primary Domain" : L"Workgroup");
+
+   // 
+   // Update the primary domain to match the specified trusted domain
+   // 
+   Status = SetPrimaryDomain(
+       PolicyHandle,
+       bJoinDom ? DomainSid : NULL, // Must be null for workgroup
+       bJoinDom ? TrustedDomainName : WorkGroupName
+       );
+
+   if(Status != STATUS_SUCCESS) {
+       DisplayNtStatus("SetPrimaryDomain", Status);
+       return RTN_ERROR;
+   }
+
+   wprintf(L"Workstation %ls is now a member of %ls %ls\n",
+                                Workstation,
+                                bJoinDom ? L"Domain" : L"Workgroup", 
+                                bJoinDom ? TrustedDomainName : WorkGroupName);
+
+   // 
+   // close the NULL session to PDC
+   // 
+   if(bJoinDom)
+      EstablishSession(PrimaryDC, FALSE, NULL, NULL, NULL);
+
+   // 
+   // free the buffer allocated for the PDC computer name
+   // 
+   if(PrimaryDC)
+       NetApiBufferFree(PrimaryDC);
+
+   LocalFree(Workstation);
+
+   // 
+   // free the Sid which was allocated for the TrustedDomain Sid
+   // 
+   if(DomainSid)
+       FreeSid(DomainSid);
+
+   // 
+   // close the policy handle
+   // 
+   LsaClose(PolicyHandle);
+
+   wprintf(L"Restart the computer for the changes to take effect\n");
+
+   return RTN_OK;
+}
+
+
+BOOL
+GetDomainDCName(
+   LPWSTR Domain,
+   LPWSTR *pPrimaryDC
+   )
+{
+   NET_API_STATUS nas;
+
+   // 
+   // get the name of the Primary Domain Controller
+   // 
+   nas = NetGetDCName(NULL, Domain, (LPBYTE *)pPrimaryDC);
+
+   if(nas != NERR_Success) {
+       DisplayError("NetGetDCName", nas);
+       return FALSE;
+   }
+
+   return TRUE;
+}
+
+
+BOOL
+EstablishSession(
+   LPCWSTR Server,
+   BOOL bEstablish,
+   LPWSTR DomainName,
+   LPWSTR UserName,
+   LPWSTR Password
+   )
+{
+   LPCWSTR szIpc = L"\\IPC$";
+   WCHAR RemoteResource[UNCLEN + 5 + 1]; // UNC len + \IPC$ + NULL
+   DWORD cchServer;
+
+   NET_API_STATUS nas;
+
+   // 
+   // do not allow NULL or empty server name
+   // 
+   if(Server == NULL || *Server == L'\0') {
+       SetLastError(ERROR_INVALID_COMPUTERNAME);
+       return FALSE;
+   }
+
+   cchServer = lstrlenW( Server );
+
+   if(Server[0] != L'\\' && Server[1] != L'\\') {
+
+       // 
+       // prepend slashes and NULL terminate
+       // 
+       RemoteResource[0] = L'\\';
+       RemoteResource[1] = L'\\';
+       RemoteResource[2] = L'\0';
+   }
+   else {
+       cchServer -= 2; // drop slashes from count
+
+       RemoteResource[0] = L'\0';
+   }
+
+   if(cchServer > CNLEN) {
+       SetLastError(ERROR_INVALID_COMPUTERNAME);
+       return FALSE;
+   }
+
+   if(lstrcatW(RemoteResource, Server) == NULL) return FALSE;
+   if(lstrcatW(RemoteResource, szIpc) == NULL) return FALSE;
+
+   // 
+   // disconnect or connect to the resource, based on bEstablish
+   // 
+   if(bEstablish) {
+       USE_INFO_2 ui2;
+
+       ZeroMemory(&ui2, sizeof(ui2));
+
+       ui2.ui2_local = NULL;
+       ui2.ui2_remote = RemoteResource;
+       ui2.ui2_asg_type = USE_IPC;
+       if (lstrlenW(UserName) > 0) {
+            ui2.ui2_domainname = DomainName;
+            ui2.ui2_username = UserName;
+            ui2.ui2_password = Password;
+       }
+       else {
+            ui2.ui2_domainname = L"";
+            ui2.ui2_username = L"";
+            ui2.ui2_password = L"";
+       }
+
+       nas = NetUseAdd(NULL, 2, (LPBYTE)&ui2, NULL);
+       if (nas != NERR_Success )
+          wprintf(L"NetUseAdd failed error %u\n",nas);
+   }
+   else {
+       nas = NetUseDel(NULL, RemoteResource, USE_LOTS_OF_FORCE);
+       if (nas != NERR_Success )
+          wprintf(L"NetUseDel failed error %u\n",nas);
+   }
+
+   if( nas == NERR_Success ) return TRUE; // indicate success
+
+   return FALSE;
+}
+
+
+BOOL
+DoesAccountExist(
+   LPWSTR PrimaryDC,
+   LPWSTR Account
+   )
+{
+   LPWSTR NetAccountName=NULL;
+   PUSER_INFO_1 pUI_1=NULL;
+   DWORD  cbLength;
+   BOOL   fReturn=FALSE;
+   NET_API_STATUS nas;
+
+   NetAccountName = (unsigned short *) LocalAlloc(
+       LPTR, (lstrlenW(Account) + 2) * sizeof(WCHAR));
+
+   lstrcpyW(NetAccountName, Account);
+
+   cbLength = lstrlenW(NetAccountName);
+
+   // 
+   // computer account names have a trailing Unicode '$'
+   // 
+   NetAccountName[cbLength] = L'$';
+   NetAccountName[cbLength + 1] = L'\0'; // terminate the string
+
+   // 
+   // verify that the account for this machine exists in domain
+   // 
+   nas = NetUserGetInfo(
+             PrimaryDC,
+             NetAccountName,
+             1,
+             (LPBYTE *)&pUI_1
+             );
+
+   // 
+   // free the allocated buffer for machine name
+   // 
+   if(NetAccountName)
+       LocalFree(NetAccountName);
+
+   if(nas != NO_ERROR) {
+       DisplayError("NetUserGetInfo", nas);
+       return FALSE;
+   }
+
+   if(pUI_1->usri1_flags & UF_WORKSTATION_TRUST_ACCOUNT)
+       fReturn = TRUE;
+   else
+       wprintf(L"Account on PDC wrong type (%lu)\n",
+           pUI_1->usri1_flags);
+
+   // 
+   // free buffer for user information
+   // 
+   if(pUI_1)
+       NetApiBufferFree(pUI_1);
+
+   return fReturn;
+
+}
+
+void
+InitLsaString(
+   PLSA_UNICODE_STRING LsaString,
+   LPWSTR String
+   )
+{
+   DWORD StringLength;
+
+   if(String == NULL) {
+       LsaString->Buffer = NULL;
+       LsaString->Length = 0;
+       LsaString->MaximumLength = 0;
+
+       return;
+   }
+
+   StringLength = lstrlenW(String);
+   LsaString->Buffer = String;
+   LsaString->Length = (USHORT) StringLength * sizeof(WCHAR);
+   LsaString->MaximumLength = (USHORT) (StringLength + 1) *
+                              sizeof(WCHAR);
+}
+
+BOOL
+GetDomainSid(
+   LPWSTR PrimaryDC,   // domain controller of domain to acquire Sid
+   PSID *pDomainSid    // points to allocated Sid on success
+   )
+{
+   NET_API_STATUS nas;
+   PUSER_MODALS_INFO_2 umi2 = NULL;
+   DWORD dwSidSize;
+   BOOL bSuccess = FALSE; // assume this function will fail
+   *pDomainSid = NULL;    // invalidate pointer
+
+   __try {
+
+   // 
+   // obtain the domain Sid from the PDC
+   // 
+   nas = NetUserModalsGet(PrimaryDC, 2, (LPBYTE *)&umi2);
+   if(nas != NERR_Success) __leave;
+
+   // 
+   // if the Sid is valid, obtain the size of the Sid
+   // 
+   if(!IsValidSid(umi2->usrmod2_domain_id)) __leave;
+   dwSidSize = GetLengthSid(umi2->usrmod2_domain_id);
+
+   // 
+   // allocate storage and copy the Sid
+   // 
+   *pDomainSid = LocalAlloc(LPTR, dwSidSize);
+   if(*pDomainSid == NULL) __leave;
+
+   if(!CopySid(dwSidSize, *pDomainSid, umi2->usrmod2_domain_id))
+       __leave;
+
+   bSuccess = TRUE; // indicate success
+
+   } // try
+   __finally {
+
+   if(umi2 != NULL)
+       NetApiBufferFree(umi2);
+
+   if(!bSuccess) {
+       // 
+       // if the function failed, free memory and indicate result code
+       // 
+
+       if(*pDomainSid != NULL) {
+           FreeSid(*pDomainSid);
+           *pDomainSid = NULL;
+       }
+
+       if(nas != NERR_Success) {
+           SetLastError(nas);
+       }
+   }
+
+   } // finally
+
+   return bSuccess;
+}
+
+NTSTATUS
+OpenPolicy(
+   LPWSTR ComputerName,
+   DWORD DesiredAccess,
+   PLSA_HANDLE PolicyHandle
+   )
+{
+   LSA_OBJECT_ATTRIBUTES ObjectAttributes;
+   LSA_UNICODE_STRING ComputerString;
+   PLSA_UNICODE_STRING Computer = NULL;
+  LPWSTR NewComputerName;
+
+  NewComputerName = (unsigned short *) LocalAlloc(LPTR,
+       (MAX_COMPUTERNAME_LENGTH+3)*sizeof(WCHAR));
+
+   // 
+   // Prepend some backslashes to the computer name so that
+   // this will work on NT 3.51
+   // 
+   lstrcpy(NewComputerName,L"\\\\");
+  lstrcat(NewComputerName,ComputerName);
+
+   lstrcpy(NewComputerName,ComputerName);
+
+   // 
+   // Always initialize the object attributes to all zeroes
+   // 
+   ZeroMemory(&ObjectAttributes, sizeof(ObjectAttributes));
+
+   if(ComputerName != NULL) {
+       // 
+       // Make a LSA_UNICODE_STRING out of the LPWSTR passed in
+       // 
+       InitLsaString(&ComputerString, NewComputerName);
+
+       Computer = &ComputerString;
+   }
+
+   // 
+   // Attempt to open the policy
+   // 
+   return LsaOpenPolicy(
+               Computer,
+               &ObjectAttributes,
+               DesiredAccess,
+               PolicyHandle
+               );
+}
+
+/*++
+This function sets the Primary Domain for the workstation.
+
+To join the workstation to a Workgroup, ppdi.Name should be the name of
+the Workgroup and ppdi.Sid should be NULL.
+
+--*/ 
+NTSTATUS
+SetPrimaryDomain(
+   LSA_HANDLE PolicyHandle,
+   PSID DomainSid,
+   LPWSTR TrustedDomainName
+   )
+{
+   POLICY_PRIMARY_DOMAIN_INFO ppdi;
+
+   InitLsaString(&ppdi.Name, TrustedDomainName);
+   ppdi.Sid = DomainSid;
+
+   return LsaSetInformationPolicy(
+       PolicyHandle,
+       PolicyPrimaryDomainInformation,
+       &ppdi
+       );
+}
+
+/*++
+This function manipulates the trust associated with the supplied
+DomainSid.
+
+If the domain trust does not exist, it is created with the
+specified password.  In this case, the supplied PolicyHandle must
+have been opened with POLICY_TRUST_ADMIN and POLICY_CREATE_SECRET
+access to the policy object.
+
+--*/ 
+NTSTATUS
+SetWorkstationTrustedDomainInfo(
+   LSA_HANDLE PolicyHandle,
+   PSID DomainSid,             // Sid of domain to manipulate
+   LPWSTR TrustedDomainName,   // trusted domain name to add/update
+   LPWSTR Password             // new trust password for trusted domain
+   )
+{
+   LSA_UNICODE_STRING LsaPassword;
+   LSA_UNICODE_STRING KeyName;
+   LSA_UNICODE_STRING LsaDomainName;
+   DWORD cchDomainName; // number of chars in TrustedDomainName
+   NTSTATUS Status;
+
+   InitLsaString(&LsaDomainName, TrustedDomainName);
+
+   // 
+   // ...convert TrustedDomainName to uppercase...
+   // 
+   cchDomainName = LsaDomainName.Length / sizeof(WCHAR);
+   while(cchDomainName--) {
+       LsaDomainName.Buffer[cchDomainName] =
+        towupper(LsaDomainName.Buffer[cchDomainName]);
+   }
+
+   InitLsaString(&KeyName, L"$MACHINE.ACC");
+   InitLsaString(&LsaPassword, Password);
+
+   // 
+   // Set the machine password
+   // 
+   Status = LsaStorePrivateData(
+       PolicyHandle,
+       &KeyName,
+       &LsaPassword
+       );
+
+   if(Status != STATUS_SUCCESS) {
+       DisplayNtStatus("LsaStorePrivateData", Status);
+       return RTN_ERROR;
+   }
+
+   return STATUS_SUCCESS;
+
+}
+
+void
+DisplayNtStatus(
+   LPSTR szAPI,    // ansi string containing API name
+   NTSTATUS Status
+   )
+{
+   printf("erro=%lx\n", Status);
+   // 
+   // convert the NTSTATUS to Winerror and display the result
+   // 
+   DisplayError(szAPI, LsaNtStatusToWinError(Status));
+}
+
+void
+DisplayError(
+   LPSTR szAPI, // pointer to failed API name
+   DWORD dwLastError
+   )
+{
+   HMODULE hModule;
+   LPSTR MessageBuffer;
+   DWORD dwBufferLength;
+
+
+   DWORD dwFormatFlags = FORMAT_MESSAGE_ALLOCATE_BUFFER |
+       FORMAT_MESSAGE_IGNORE_INSERTS |
+       FORMAT_MESSAGE_FROM_SYSTEM ;
+
+   fprintf(stderr,"%s error! (rc=%lu)\n", szAPI, dwLastError);
+
+   // 
+   // if dwLastError is in the network range, load the message source
+   // 
+   if(dwLastError >= NERR_BASE && dwLastError <= MAX_NERR) {
+       hModule = LoadLibraryEx(
+           TEXT("netmsg.dll"),
+           NULL,
+           LOAD_LIBRARY_AS_DATAFILE
+           );
+
+       if(hModule != NULL)
+           dwFormatFlags |= FORMAT_MESSAGE_FROM_HMODULE;
+   } else {
+       hModule = NULL; // default to system message source
+   }
+
+
+   if(dwBufferLength=FormatMessageA(
+       dwFormatFlags,
+       hModule,
+       dwLastError,
+       MAKELANGID(LANG_NEUTRAL, SUBLANG_DEFAULT), // default language
+       (LPSTR) &MessageBuffer,
+       0,
+       NULL
+       ))
+   {
+       printf(MessageBuffer);
+
+       LocalFree(MessageBuffer);
+   }
+   else
+       printf("FormatMessageA failed - %lu\n", GetLastError());
+
+   // 
+   // if we loaded a message source, unload it
+   // 
+   if(hModule != NULL)
+       FreeLibrary(hModule);
+} 
