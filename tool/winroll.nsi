@@ -21,7 +21,7 @@
 !addplugindir ".\nsis-plugin"
 ;!include LogicLib.nsh
 !include MUI2.nsh
-; UAV Version: 0.2.4c (20150526)
+; UAV Version: not 0.2.4c (20150526)
 ; Ref:http://nsis.sourceforge.net/UAC_plug-in
 !include ".\nsis-plugin\UAC.nsh"
 
