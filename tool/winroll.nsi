@@ -21,6 +21,8 @@
 !addplugindir ".\nsis-plugin"
 ;!include LogicLib.nsh
 !include MUI2.nsh
+; UAV Version: 0.2.4c (20150526)
+; Ref:http://nsis.sourceforge.net/UAC_plug-in
 !include ".\nsis-plugin\UAC.nsh"
 
 RequestExecutionLevel user ; << Required, you cannot use admin!
@@ -125,7 +127,11 @@ Section "Main" SEC01
 SectionEnd
 ;安裝程式過程到此結束
 
-; 開啟 TCP 22 for sshd at personal firewall
+;  開啟 TCP 22 for sshd at personal firewall
+; NSIS_Simple_Firewall_Plugin_1.20.zip
+; SimpleFC::AddPort [port] [name] [protocol] [scope] [ip_version] [remote_addresses] [status]
+; http://nsis.sourceforge.net/NSIS_Simple_Firewall_Plugin
+
 Section "Add ssh exception at firewall" SEC02
 	SimpleFC::AddPort 22 "Cygwin sshd" 6 0 2 "" 1
 	Pop $0 ; return error(1)/success(0)
