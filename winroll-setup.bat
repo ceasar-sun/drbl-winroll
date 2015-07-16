@@ -246,18 +246,18 @@ goto :EOF
 	  echo %ERR_DIR_DONT_EXIST% %LOCAL_REPOSITORY%\cygwin_mirror\
 	  exit /B 1
 	)
-	IF NOT EXIST "%LOCAL_REPOSITORY%\cygwin_mirror\release" (
-	  echo %ERR_DIR_DONT_EXIST% %LOCAL_REPOSITORY%\cygwin_mirror\release\
+	IF NOT EXIST "%LOCAL_REPOSITORY%\cygwin_mirror\x86\release" (
+	  echo %ERR_DIR_DONT_EXIST% %LOCAL_REPOSITORY%\cygwin_mirror\x86\release\
 	  exit /B 1
 	)
-	IF NOT EXIST "%LOCAL_REPOSITORY%\cygwin_mirror\setup.ini" (
-	  echo %ERR_FIL_DONT_EXIST% %LOCAL_REPOSITORY%\cygwin_mirror\setup.ini
+	IF NOT EXIST "%LOCAL_REPOSITORY%\cygwin_mirror\x86\setup.ini" (
+	  echo %ERR_FIL_DONT_EXIST% %LOCAL_REPOSITORY%\cygwin_mirror\x86\setup.ini
 	  exit /B 1
 	)
 	REM Find Cygwin's setup.exe
 	set CYGWIN_SETUP=%LOCAL_REPOSITORY%\cygwin_mirror\cyg-setup.exe
-	IF NOT EXIST "%LOCAL_REPOSITORY%\cygwin_mirror\cyg-setup.exe" (
-		echo %ERR_CYGWIN_SETUP_DONT_EXIST% %LOCAL_REPOSITORY%\cygwin_mirror\
+	IF NOT EXIST "%CYGWIN_SETUP%" (
+		echo %ERR_CYGWIN_SETUP_DONT_EXIST% %CYGWIN_SETUP%
 	    exit /B 1
 	)
 
@@ -266,6 +266,7 @@ goto :EOF
 	REM - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - -
 	IF NOT EXIST "%CYGWIN_ROOT%" (
 	  mkdir "%CYGWIN_ROOT%"
+
 	)
 
 	REM - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - -
@@ -713,10 +714,14 @@ goto :EOF
 	)
 	rem del /Q /S SSHD_SERVER_PW.txt
 
-	%CYGWIN_ROOT%\bin\chmod.exe +r /etc/passwd  /etc/group
-	%CYGWIN_ROOT%\bin\chmod.exe u+w /etc/passwd  /etc/group
-	%CYGWIN_ROOT%\bin\chmod.exe 755 /var
-	%CYGWIN_ROOT%\bin\touch.exe /var/log/sshd.log
+	REM sync accout, group from OS
+	%CYGWIN_ROOT%\bin\bash.exe --login -c "mkpasswd --local >/etc/passwd"
+	%CYGWIN_ROOT%\bin\bash.exe --login -c "mkgroup --local >/etc/group"
+
+	rem %CYGWIN_ROOT%\bin\chmod.exe +r /etc/passwd  /etc/group
+	rem %CYGWIN_ROOT%\bin\chmod.exe u+w /etc/passwd  /etc/group
+	rem %CYGWIN_ROOT%\bin\chmod.exe 755 /var
+	rem %CYGWIN_ROOT%\bin\touch.exe /var/log/sshd.log
 
 	echo To run  %CYGWIN_ROOT%\bin\bash.exe --login -c "ssh-host-config -y -c ntsec %SSHD_SERVER_PW_OPT%"
 	pause
@@ -758,8 +763,6 @@ goto :EOF
 
 	if EXIST "%WINROLL_LOCAL_BACKUP%\.ssh\authorized_keys"  (
 		call :IMPORT_SSH_KEY
-	)else (
-		echo SETUP_SSH_PUBLIC_KEY ...
 	)
 
 	:END_OF_SSHD_SETUP
