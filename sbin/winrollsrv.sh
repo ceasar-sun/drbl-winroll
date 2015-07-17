@@ -269,6 +269,21 @@ EOF
 }
 do_autohostname(){
 
+	# get netmask , ip address, dns-suffix string
+	MAC=$(awk -F "\t" "{print \$1}" $_NIC_INFO | head -n 1)
+	NM=$(awk -F "\t" "\$3 !~/^169.254/ && \$4 !~/^255.255.0.0,64$/  {print \$4}" $_NIC_INFO | awk -F ","  '{print $1}' | head -n 1)
+	IP=$(awk -F "\t" "\$3 !~/^169.254/ && \$4 !~/^255.255.0.0,64$/  {print \$3}" $_NIC_INFO | awk -F ","  '{print $1}' | head -n 1)
+	# refine_IP like: 192.168.001.021  or 010-000-002-015 
+	refine_IP=$(echo $IP |awk -F. '{print $1+1000"-"$2+1000"-"$3+1000"-"$4+1000 }' | sed -e 's/^1//' -e 's/\-1/-/g')
+
+	_DNS_SUFFIX_REGISTRY_KeyList="HKEY_LOCAL_MACHINE/SYSTEM/CurrentControlSet/Services/Tcpip/Parameters/DhcpDomain HKEY_LOCAL_MACHINE/SYSTEM/CurrentControlSet/Services/Tcpip/Parameters/SearchList"
+	_DNS_SUFFIX_REGISTRY_Value=
+
+	for key in $_DNS_SUFFIX_REGISTRY_KeyList ; do 
+		[ -n "$(cat /proc/registry/$key 2>/dev/null)" ] && _DNS_SUFFIX_REGISTRY_Value="$(cat /proc/registry/$key |cut -d "," -f 1)" && break;
+	done
+
+
 	# wsname.exe 的 log file 不能改，不然無法取得 return code
 	export WSNAME_LOG="$TEMP/wsname.log"
 	NEED_TO_CHANGE=0
@@ -308,6 +323,20 @@ do_autohostname(){
 	echo "" > $WSNAME_LOG		# Clean advanced log
 	echo "'$HN_WSNAME_DEF_PARAM','$WSNAME_LOG','$HN_WSNAME_PARAM','$HNAME'" #| tee -a  $WINROLL_LOG
 	#read
+
+	if [ -n "$(echo $HN_WSNAME_PARAM | grep -e '$MAC\[.*\]')" ] ; then 
+			
+
+	fi
+	
+	if [ -n "$(echo $HN_WSNAME_PARAM | grep -e '/DFK:$MAC')" ] ; then
+		_RDF_cyg_path="$(echo $HN_WSNAME_PARAM | awk  '{print $1}' | sed -e 's/^\/RDF://' -e 's/\\/\\\\/' | xargs cygpath -u)"
+		_hostname_via_rdf="$(grep -i $MAC $_RDF_cyg_path | awk -F '=' '{print $2}' | tr -d [[:blank:]]))"
+		[ -n "$_hostname_via_rdf" ] && HN_WSNAME_PARAM="$_hostname_via_rdf" || HN_WSNAME_PARAM="$MAC"
+
+	fi
+
+
 	wsname.exe $HN_WSNAME_PARAM	# use /TEST to pre-test the hostname assigned by wsname
 
 	#2006/4/14 上午 12:21:32 : Could not determine local IP address. - Rename request aborted!
@@ -370,19 +399,7 @@ do_autohostname(){
 	echo WG_WSNAME_PARAM="$WG_WSNAME_PARAM"
 
 	if [ -n "$WG_WSNAME_PARAM" ] ;then
-		#NM="$(ipconfig | dos2unix | awk -F ":" "\$2 ~/ [0-9]+.[0-9]+.[0-9]+.[0-9]+$/ {print \$2}" | sed -e 's/\s//g' | awk -F "." "\$1 == 255 {print \$0}"  | head -n 1 )"
-		NM=$(awk -F "\t" "\$3 !~/^169.254/ && \$4 !~/^255.255.0.0,64$/  {print \$4}" $_NIC_INFO | awk -F ","  '{print $1}' | head -n 1)
-		#IP="$(get_ip_str |awk -F. '{print $1+1000"-"$2+1000"-"$3+1000"-"$4+1000 }' | sed -e 's/^1//' -e 's/\-1/-/g' )"
-		IP=$(awk -F "\t" "\$3 !~/^169.254/ && \$4 !~/^255.255.0.0,64$/  {print \$3}" $_NIC_INFO | awk -F ","  '{print $1}' | head -n 1)
-		refine_IP=$(echo $IP |awk -F. '{print $1+1000"-"$2+1000"-"$3+1000"-"$4+1000 }' | sed -e 's/^1//' -e 's/\-1/-/g')
 
-		#DNS_SUFF="$(ipconfig /all | grep "$_DNS_SEARCH_SUFFIX_KEYWORD" 2>/dev/null |head -n 1 | cut -d ":" -f 2 | cut -d "." -f 1,2 |sed -e "s/\./-/g" -e "s/\s*//g" )"
-		_DNS_SUFFIX_REGISTRY_KeyList="HKEY_LOCAL_MACHINE/SYSTEM/CurrentControlSet/Services/Tcpip/Parameters/DhcpDomain HKEY_LOCAL_MACHINE/SYSTEM/CurrentControlSet/Services/Tcpip/Parameters/SearchList"
-		_DNS_SUFFIX_REGISTRY_Value=
-		
-		for key in $_DNS_SUFFIX_REGISTRY_KeyList ; do 
-			[ -n "$(cat /proc/registry/$key 2>/dev/null)" ] && _DNS_SUFFIX_REGISTRY_Value="$(cat /proc/registry/$key |cut -d "," -f 1)" && break;
-		done
 		# use first 2 strings as dns suffix name
 		[ -n "$_DNS_SUFFIX_REGISTRY_Value" ] && DNS_SUFF="$(echo $_DNS_SUFFIX_REGISTRY_Value | awk -F '.' '{ printf "%s.%s",$1,$2}' )"
 		
