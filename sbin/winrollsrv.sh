@@ -320,54 +320,57 @@ do_autohostname(){
 	
 	rm -f $WINROLL_CONF_ROOT/hosts.rem.conf	
 	[ ! -f "$WSNAME_LOG" ] && touch $WSNAME_LOG;
-	if [ -z "$HN_WSNAME_PARAM" ] ; then	HN_WSNAME_PARAM=$HN_WSNAME_DEF_PARAM; fi
 
+	# deal with $MAC
 	if [ -n "$(echo $HN_WSNAME_PARAM | grep -e '/DFK:$MAC')" ] ; then
 		# via RDF
 		_RDF_cyg_path="$(echo $HN_WSNAME_PARAM | awk  '{print $1}' | sed -e 's/^\/RDF://' -e 's/\\/\\\\/g' | xargs cygpath -u)"
 		_hostname_via_rdf="$(grep -i $MAC $_RDF_cyg_path | awk -F '=' '{print $2}' | sed -e 's/\(.*\)#.*/\1/'| tr -d [[:blank:]])"
-		[ -n "$_hostname_via_rdf" ] && HN_WSNAME_PARAM="$_hostname_via_rdf" || HN_WSNAME_PARAM="$MAC"
-	
-	elif [ -n "$(echo $HN_WSNAME_PARAM | grep -e '$MAC\[.*+\]')" ] ; then 
-		# last n character
-		_str_nums="$(echo $HN_WSNAME_PARAM | sed -e "s/\(.*\)\(\$MAC\[.*\]\)\(.*\)/\1\$_sub_mac\2/" -e "s/[^0-9]//g")"
+		[ -n "$_hostname_via_rdf" ] && HN_WSNAME_PARAM="$_hostname_via_rdf" || HN_WSNAME_PARAM=''
+	elif [ -n "$(echo $HN_WSNAME_PARAM | grep -e '$MAC\[[0-9]\++\{0,1\}\]')" ] ; then 
+		# $MAC[n+] = $MAC[n] : last n character
+		_str_nums="$(echo $HN_WSNAME_PARAM | sed -e "s/.*\$MAC\[\([0-9]\+\)+\{0,1\}\].*/\1/")"
 		_sub_mac="${refine_MAC:(-$_str_nums)}"
 		_REAL_HN_WSNAME_PARAM="$(echo $HN_WSNAME_PARAM| sed "s/\(.*\)\$MAC\[.*\]\(.*\)/\1$_sub_mac\2/" )"
 		HN_WSNAME_PARAM=$_REAL_HN_WSNAME_PARAM
-
-	elif [ -n "$(echo $HN_WSNAME_PARAM | grep -e '$MAC\[+.*\]')" ] ; then 
-		# first n character
-		_str_nums="$(echo $HN_WSNAME_PARAM | sed -e "s/\(.*\)\(\$MAC\[.*\]\)\(.*\)/\1\$_sub_mac\2/" -e "s/[^0-9]//g")"
+	elif [ -n "$(echo $HN_WSNAME_PARAM | grep -e '$MAC\[+[0-9]\+\]')" ] ; then 
+		# $MAC[+n] : first n character
+		_str_nums="$(echo $HN_WSNAME_PARAM | sed -e "s/.*\$MAC\[+\([0-9]\+\)\].*/\1/")"
 		_sub_mac="${refine_MAC:0:($_str_nums)}"
 		_REAL_HN_WSNAME_PARAM="$(echo $HN_WSNAME_PARAM| sed "s/\(.*\)\$MAC\[.*\]\(.*\)/\1$_sub_mac\2/" )"
 		HN_WSNAME_PARAM=$_REAL_HN_WSNAME_PARAM
-	elif [ -n "$(echo $HN_WSNAME_PARAM | | grep -e '$MAC$' -o -e '$MAC-' )" ] ; then 
+	elif [ -n "$(echo $HN_WSNAME_PARAM | grep -e '$MAC$' -o -e '$MAC-' )" ] ; then 
 		# only $MAC
 		_REAL_HN_WSNAME_PARAM="$(echo $HN_WSNAME_PARAM| sed "s/\(.*\)\$MAC\(.*\)/\1$refine_MAC\2/" )"
 		HN_WSNAME_PARAM=$_REAL_HN_WSNAME_PARAM
+	elif [ -n "$(echo $HN_WSNAME_PARAM | grep -e '$MAC\[.*\]' )" ] ; then 
+		# should not be here ; it means wrong format for $MAC
+		HN_WSNAME_PARAM=''
 	fi
 
-	if [ -n "$(echo $HN_WSNAME_PARAM | grep -e '$ZFIP\[.*+\]')" ] ; then 
-		# last n character
-		_str_nums="$(echo $HN_WSNAME_PARAM | sed -e "s/\(.*\)\(\$ZFIP\[.*\]\)\(.*\)/\1\$_sub_mac\2/" -e "s/[^0-9]//g")"
-		_sub_mac="${refine_MAC:(-$_str_nums)}"
-		_REAL_HN_WSNAME_PARAM="$(echo $HN_WSNAME_PARAM| sed "s/\(.*\)\$ZFIP\[.*\]\(.*\)/\1$_sub_mac\2/" )"
+	# deal with $ZFIP : zero-full IP
+	if [ -n "$(echo $HN_WSNAME_PARAM | grep -e '$ZFIP\[[0-9]\++\{0,1\}\]' )" ] ; then 
+		# # $ZFIP[n+] = $ZFIP[n] : last n character
+		_str_nums="$(echo $HN_WSNAME_PARAM | sed -e "s/.*\$ZFIP\[\([0-9]\+\)+\{0,1\}\].*/\1/")"
+		_sub_ip="${refine_IP:(-$_str_nums)}"
+		_REAL_HN_WSNAME_PARAM="$(echo $HN_WSNAME_PARAM| sed "s/\(.*\)\$ZFIP\[.*\]\(.*\)/\1$_sub_ip\2/" )"
 		HN_WSNAME_PARAM=$_REAL_HN_WSNAME_PARAM
-
-	elif [ -n "$(echo $HN_WSNAME_PARAM | grep -e '$MAC\[+.*\]')" ] ; then 
-		# first n character
-		_str_nums="$(echo $HN_WSNAME_PARAM | sed -e "s/\(.*\)\(\$ZFIP\[.*\]\)\(.*\)/\1\$_sub_mac\2/" -e "s/[^0-9]//g")"
-		_sub_mac="${refine_MAC:0:($_str_nums)}"
-		_REAL_HN_WSNAME_PARAM="$(echo $HN_WSNAME_PARAM| sed "s/\(.*\)\$ZFIP\[.*\]\(.*\)/\1$_sub_mac\2/" )"
+	elif [ -n "$(echo $HN_WSNAME_PARAM | grep -e '$ZFIP\[+[0-9]\+\]')" ] ; then 
+		# $ZFIP[+n] : first n character
+		_str_nums="$(echo $HN_WSNAME_PARAM | sed -e "s/.*\$ZFIP\[+\([0-9]\+\)\].*/\1/")"
+		_sub_ip="${refine_IP:0:($_str_nums)}"
+		_REAL_HN_WSNAME_PARAM="$(echo $HN_WSNAME_PARAM| sed "s/\(.*\)\$ZFIP\[.*\]\(.*\)/\1$_sub_ip\2/" )"
 		HN_WSNAME_PARAM=$_REAL_HN_WSNAME_PARAM
-	elif [ -n "$(echo $HN_WSNAME_PARAM | | grep -e '$MAC$' -o -e '$MAC-' )" ] ; then 
-		# only $MAC
-		_REAL_HN_WSNAME_PARAM="$(echo $HN_WSNAME_PARAM| sed "s/\(.*\)\$ZFIP\(.*\)/\1$refine_MAC\2/" )"
+	elif [ -n "$(echo $HN_WSNAME_PARAM | grep -e '$ZFIP$' -o -e '$ZFIP-' )" ] ; then 
+		# only $ZFIP
+		_REAL_HN_WSNAME_PARAM="$(echo $HN_WSNAME_PARAM| sed "s/\(.*\)\$ZFIP\(.*\)/\1$refine_IP\2/" )"
 		HN_WSNAME_PARAM=$_REAL_HN_WSNAME_PARAM
+	elif [ -n "$(echo $HN_WSNAME_PARAM | grep -e '$ZFIP\[.*\]' )" ] ; then 
+		# should not be here ; it means wrong format for $ZFIP
+		HN_WSNAME_PARAM=''
 	fi
 
-
-	
+	if [ -z "$HN_WSNAME_PARAM" ] ; then HN_WSNAME_PARAM=$HN_WSNAME_DEF_PARAM; fi	
 	echo "" > $WSNAME_LOG		# Clean advanced log
 	echo "'$HN_WSNAME_DEF_PARAM','$WSNAME_LOG','$HN_WSNAME_PARAM','$HNAME'" #| tee -a  $WINROLL_LOG
 	#read
