@@ -273,7 +273,9 @@ do_autohostname(){
 	MAC=$(awk -F "\t" "{print \$1}" $_NIC_INFO | head -n 1)
 	NM=$(awk -F "\t" "\$3 !~/^169.254/ && \$4 !~/^255.255.0.0,64$/  {print \$4}" $_NIC_INFO | awk -F ","  '{print $1}' | head -n 1)
 	IP=$(awk -F "\t" "\$3 !~/^169.254/ && \$4 !~/^255.255.0.0,64$/  {print \$3}" $_NIC_INFO | awk -F ","  '{print $1}' | head -n 1)
-	# refine_IP like: 192.168.001.021  or 010-000-002-015 
+	# refine_MAC like: 0022CF251ECA
+	refine_MAC=$(echo $MAC | sed -e 's|-||g' -e 's|.*|\U&|')
+	# refine_IP like: 192-168-001-021  or 010-000-002-015 
 	refine_IP=$(echo $IP |awk -F. '{print $1+1000"-"$2+1000"-"$3+1000"-"$4+1000 }' | sed -e 's/^1//' -e 's/\-1/-/g')
 
 	_DNS_SUFFIX_REGISTRY_KeyList="HKEY_LOCAL_MACHINE/SYSTEM/CurrentControlSet/Services/Tcpip/Parameters/DhcpDomain HKEY_LOCAL_MACHINE/SYSTEM/CurrentControlSet/Services/Tcpip/Parameters/SearchList"
@@ -283,7 +285,6 @@ do_autohostname(){
 		[ -n "$(cat /proc/registry/$key 2>/dev/null)" ] && _DNS_SUFFIX_REGISTRY_Value="$(cat /proc/registry/$key |cut -d "," -f 1)" && break;
 	done
 
-
 	# wsname.exe 的 log file 不能改，不然無法取得 return code
 	export WSNAME_LOG="$TEMP/wsname.log"
 	NEED_TO_CHANGE=0
@@ -291,7 +292,8 @@ do_autohostname(){
 
 	# get necessary parameters form winroll.conf
 	HNAME=$(hostname | sed -e "s/\s//g")
-	HN_WSNAME_DEF_PARAM=$(sed -e "s/\s*=\s*/=/g" $WINROLL_CONFIG | grep -e "^HN_WSNAME_DEF_PARAM=" | sed -e "s/^HN_WSNAME_DEF_PARAM=//" -e "s/\s//g")
+	#HN_WSNAME_DEF_PARAM=$(sed -e "s/\s*=\s*/=/g" $WINROLL_CONFIG | grep -e "^HN_WSNAME_DEF_PARAM=" | sed -e "s/^HN_WSNAME_DEF_PARAM=//" -e "s/\s//g")
+	HN_WSNAME_DEF_PARAM="/N:$refine_MAC"
 	HN_WSNAME_PARAM=$(sed -e "s/\s*=\s*/=/g" $WINROLL_CONFIG | grep -e "^HN_WSNAME_PARAM=" | sed -e "s/^HN_WSNAME_PARAM=//" -e "s/(\s! )//g")
 	
 	# deal with http/tftp remote conf
@@ -316,26 +318,59 @@ do_autohostname(){
 		HN_WSNAME_PARAM=$(echo $HN_WSNAME_PARAM | sed -e "s/$HN_WSNAME_REMOTE_RDF/$HN_WSNAME_LOCAL_RDF/")
 	fi
 	
-	rm -f $WINROLL_CONF_ROOT/hosts.rem.conf
-	
+	rm -f $WINROLL_CONF_ROOT/hosts.rem.conf	
 	[ ! -f "$WSNAME_LOG" ] && touch $WSNAME_LOG;
 	if [ -z "$HN_WSNAME_PARAM" ] ; then	HN_WSNAME_PARAM=$HN_WSNAME_DEF_PARAM; fi
+
+	if [ -n "$(echo $HN_WSNAME_PARAM | grep -e '/DFK:$MAC')" ] ; then
+		# via RDF
+		_RDF_cyg_path="$(echo $HN_WSNAME_PARAM | awk  '{print $1}' | sed -e 's/^\/RDF://' -e 's/\\/\\\\/g' | xargs cygpath -u)"
+		_hostname_via_rdf="$(grep -i $MAC $_RDF_cyg_path | awk -F '=' '{print $2}' | sed -e 's/\(.*\)#.*/\1/'| tr -d [[:blank:]])"
+		[ -n "$_hostname_via_rdf" ] && HN_WSNAME_PARAM="$_hostname_via_rdf" || HN_WSNAME_PARAM="$MAC"
+	
+	elif [ -n "$(echo $HN_WSNAME_PARAM | grep -e '$MAC\[.*+\]')" ] ; then 
+		# last n character
+		_str_nums="$(echo $HN_WSNAME_PARAM | sed -e "s/\(.*\)\(\$MAC\[.*\]\)\(.*\)/\1\$_sub_mac\2/" -e "s/[^0-9]//g")"
+		_sub_mac="${refine_MAC:(-$_str_nums)}"
+		_REAL_HN_WSNAME_PARAM="$(echo $HN_WSNAME_PARAM| sed "s/\(.*\)\$MAC\[.*\]\(.*\)/\1$_sub_mac\2/" )"
+		HN_WSNAME_PARAM=$_REAL_HN_WSNAME_PARAM
+
+	elif [ -n "$(echo $HN_WSNAME_PARAM | grep -e '$MAC\[+.*\]')" ] ; then 
+		# first n character
+		_str_nums="$(echo $HN_WSNAME_PARAM | sed -e "s/\(.*\)\(\$MAC\[.*\]\)\(.*\)/\1\$_sub_mac\2/" -e "s/[^0-9]//g")"
+		_sub_mac="${refine_MAC:0:($_str_nums)}"
+		_REAL_HN_WSNAME_PARAM="$(echo $HN_WSNAME_PARAM| sed "s/\(.*\)\$MAC\[.*\]\(.*\)/\1$_sub_mac\2/" )"
+		HN_WSNAME_PARAM=$_REAL_HN_WSNAME_PARAM
+	elif [ -n "$(echo $HN_WSNAME_PARAM | | grep -e '$MAC$' -o -e '$MAC-' )" ] ; then 
+		# only $MAC
+		_REAL_HN_WSNAME_PARAM="$(echo $HN_WSNAME_PARAM| sed "s/\(.*\)\$MAC\(.*\)/\1$refine_MAC\2/" )"
+		HN_WSNAME_PARAM=$_REAL_HN_WSNAME_PARAM
+	fi
+
+	if [ -n "$(echo $HN_WSNAME_PARAM | grep -e '$ZFIP\[.*+\]')" ] ; then 
+		# last n character
+		_str_nums="$(echo $HN_WSNAME_PARAM | sed -e "s/\(.*\)\(\$ZFIP\[.*\]\)\(.*\)/\1\$_sub_mac\2/" -e "s/[^0-9]//g")"
+		_sub_mac="${refine_MAC:(-$_str_nums)}"
+		_REAL_HN_WSNAME_PARAM="$(echo $HN_WSNAME_PARAM| sed "s/\(.*\)\$ZFIP\[.*\]\(.*\)/\1$_sub_mac\2/" )"
+		HN_WSNAME_PARAM=$_REAL_HN_WSNAME_PARAM
+
+	elif [ -n "$(echo $HN_WSNAME_PARAM | grep -e '$MAC\[+.*\]')" ] ; then 
+		# first n character
+		_str_nums="$(echo $HN_WSNAME_PARAM | sed -e "s/\(.*\)\(\$ZFIP\[.*\]\)\(.*\)/\1\$_sub_mac\2/" -e "s/[^0-9]//g")"
+		_sub_mac="${refine_MAC:0:($_str_nums)}"
+		_REAL_HN_WSNAME_PARAM="$(echo $HN_WSNAME_PARAM| sed "s/\(.*\)\$ZFIP\[.*\]\(.*\)/\1$_sub_mac\2/" )"
+		HN_WSNAME_PARAM=$_REAL_HN_WSNAME_PARAM
+	elif [ -n "$(echo $HN_WSNAME_PARAM | | grep -e '$MAC$' -o -e '$MAC-' )" ] ; then 
+		# only $MAC
+		_REAL_HN_WSNAME_PARAM="$(echo $HN_WSNAME_PARAM| sed "s/\(.*\)\$ZFIP\(.*\)/\1$refine_MAC\2/" )"
+		HN_WSNAME_PARAM=$_REAL_HN_WSNAME_PARAM
+	fi
+
+
+	
 	echo "" > $WSNAME_LOG		# Clean advanced log
 	echo "'$HN_WSNAME_DEF_PARAM','$WSNAME_LOG','$HN_WSNAME_PARAM','$HNAME'" #| tee -a  $WINROLL_LOG
 	#read
-
-	if [ -n "$(echo $HN_WSNAME_PARAM | grep -e '$MAC\[.*\]')" ] ; then 
-			
-
-	fi
-	
-	if [ -n "$(echo $HN_WSNAME_PARAM | grep -e '/DFK:$MAC')" ] ; then
-		_RDF_cyg_path="$(echo $HN_WSNAME_PARAM | awk  '{print $1}' | sed -e 's/^\/RDF://' -e 's/\\/\\\\/' | xargs cygpath -u)"
-		_hostname_via_rdf="$(grep -i $MAC $_RDF_cyg_path | awk -F '=' '{print $2}' | tr -d [[:blank:]]))"
-		[ -n "$_hostname_via_rdf" ] && HN_WSNAME_PARAM="$_hostname_via_rdf" || HN_WSNAME_PARAM="$MAC"
-
-	fi
-
 
 	wsname.exe $HN_WSNAME_PARAM	# use /TEST to pre-test the hostname assigned by wsname
 
