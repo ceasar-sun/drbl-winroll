@@ -348,7 +348,7 @@ do_autohostname(){
 		HN_WSNAME_PARAM=''
 	fi
 
-	# deal with $ZFIP : zero-full IP
+	# deal with $ZFIP : zero-filling IP
 	if [ -n "$(echo $HN_WSNAME_PARAM | grep -e '$ZFIP\[[0-9]\++\{0,1\}\]' )" ] ; then 
 		# # $ZFIP[n+] = $ZFIP[n] : last n character
 		_str_nums="$(echo $HN_WSNAME_PARAM | sed -e "s/.*\$ZFIP\[\([0-9]\+\)+\{0,1\}\].*/\1/")"
