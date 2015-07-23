@@ -1,13 +1,13 @@
 ******* DRBL-winroll Translation - How To Document ********
 
     NCHC Free Software Labs, NCHC ,Taiwan
-    Date	:	2012/1/17
+    Date	:	2015/7/23
     License	:	GPL      
     Author	:	Ceasar Sun  <ceasar dot sun at gmail dot com>
 
 *********************************************************
 
-The guide is for how to translate drbl-winroll (for version 1.3.2 or later) to suit for your language and how to test. Please let me know if any problem and thanks in advanced for your great contribution !!!
+The guide is for how to translate drbl-winroll (for version 2.0.0 or later) to suit for your language and how to test. Please let me know if any problem and thanks in advanced for your great contribution !!!
 
 --------------------------------------------------------------------------------------------------------------------------------------------
 Please read the follow FAQ first :
@@ -40,7 +40,7 @@ S2. Run ~drbl-winroll/winroll-setup.bat. It will show as Q1 mentioned message if
 **********************
 ** How to TRANSLATE **
 **********************
-* Please edit ~drbl-winroll/lang/0404.cmd
+* Please edit ~drbl-winroll/lang/default.cmd
 *
 * Let me know if any problem or new translation file.
 * Email :ceasar@nchc.org.tw !!

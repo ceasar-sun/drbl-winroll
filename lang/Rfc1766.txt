@@ -1,125 +1,127 @@
 # RFC1766 ,ISO639 
-HKEY_CLASSES_ROOT\MIME\Database\Rfc1766 
-0001 ar
-0004 zh
-0009 en
-0401 ar-sa
-0402 bg
-0403 ca
-0404 zh-tw
-0405 cs
-0406 da
-0407 de
-0408 el
-0409 en-us
-040A es
-040B fi
-040C fr
-040D he
-040E hu
-040F is
-0410 it
-0411 ja
-0412 ko
-0413 nl
-0414 no
-0415 pl
-0416 pt-br
-0417 rm
-0418 ro
-0419 ru
-041A hr
-041B sk
-041C sq
-041D sv
-041E th
-041F tr
-0420 ur
-0421 in
-0422 uk
-0423 be
-0424 sl
-0425 et
-0426 lv
-0427 lt
-0429 fa
-042A vi
-042D eu
-042E sb
-042F mk
-0430 sx
-0431 ts
-0432 tn
-0434 xh
-0435 zu
-0436 af
-0438 fo
-0439 hi
-043A mt
-043C gd
-043D ji
-043E ms
-0801 ar-iq
-0804 zh-cn
-0807 de-ch
-0809 en-gb
-080A es-mx
-080C fr-be
-0810 it-ch
-0813 nl-be
-0814 no
-0816 pt
-0818 ro-mo
-0819 ru-mo
-081A sr
-081D sv-fi
-0C01 ar-eg
-0C04 zh-hk
-0C07 de-at
-0C09 en-au
-0C0A es
-0C0C fr-ca
-0C1A sr
-1001 ar-ly
-1004 zh-sg
-1007 de-lu
-1009 en-ca
-100A es-gt
-100C fr-ch
-1401 ar-dz
-1407 de-li
-1409 en-nz
-140A es-cr
-140C fr-lu
-1801 ar-ma
-1809 en-ie
-180A es-pa
-1C01 ar-tn
-1C09 en-za
-1C0A es-do
-2001 ar-om
-2009 en-jm
-200A es-ve
-2401 ar-ye
-240A es-co
-2801 ar-sy
-2809 en-bz
-280A es-pe
-2C01 ar-jo
-2C09 en-tt
-2C0A es-ar
-3001 ar-lb
-300A es-ec
-3401 ar-kw
-340A es-cl
-3801 ar-ae
-380A es-uy
-3C01 ar-bh
-3C0A es-py
-4001 ar-qa
-400A es-bo
-440A es-sv
-480A es-hn
-4C0A es-ni
-500A es-pr
- 
+HKEY_CLASSES_ROOT\MIME\Database\Rfc1766
+HEX - lang - DEC
+0001	ar	1
+0004	zh	4
+0009	en	9
+0401	ar-sa	1025
+0402	bg	1026
+0403	ca	1027
+0404	zh-tw	1028
+0405	cs	1029
+0406	da	1030
+0407	de	1031
+0408	el	1032
+0409	en-us	1033
+040A	es	1034
+040B	fi	1035
+040C	fr	1036
+040D	he	1037
+040E	hu	1038
+040F	is	1039
+0410	it	1040
+0411	ja	1041
+0412	ko	1042
+0413	nl	1043
+0414	no	1044
+0415	pl	1045
+0416	pt-br	1046
+0417	rm	1047
+0418	ro	1048
+0419	ru	1049
+041A	hr	1050
+041B	sk	1051
+041C	sq	1052
+041D	sv	1053
+041E	th	1054
+041F	tr	1055
+0420	ur	1056
+0421	in	1057
+0422	uk	1058
+0423	be	1059
+0424	sl	1060
+0425	et	1061
+0426	lv	1062
+0427	lt	1063
+0429	fa	1065
+042A	vi	1066
+042D	eu	1069
+042E	sb	1070
+042F	mk	1071
+0430	sx	1072
+0431	ts	1073
+0432	tn	1074
+0434	xh	1076
+0435	zu	1077
+0436	af	1078
+0438	fo	1080
+0439	hi	1081
+043A	mt	1082
+043C	gd	1084
+043D	ji	1085
+043E	ms	1086
+0801	ar-iq	2049
+0804	zh-cn	2052
+0807	de-ch	2055
+0809	en-gb	2057
+080A	es-mx	2058
+080C	fr-be	2060
+0810	it-ch	2064
+0813	nl-be	2067
+0814	no	2068
+0816	pt	2070
+0818	ro-mo	2072
+0819	ru-mo	2073
+081A	sr	2074
+081D	sv-fi	2077
+0C01	ar-eg	3073
+0C04	zh-hk	3076
+0C07	de-at	3079
+0C09	en-au	3081
+0C0A	es	3082
+0C0C	fr-ca	3084
+0C1A	sr	3098
+1001	ar-ly	4097
+1004	zh-sg	4100
+1007	de-lu	4103
+1009	en-ca	4105
+100A	es-gt	4106
+100C	fr-ch	4108
+1401	ar-dz	5121
+1407	de-li	5127
+1409	en-nz	5129
+140A	es-cr	5130
+140C	fr-lu	5132
+1801	ar-ma	6145
+1809	en-ie	6153
+180A	es-pa	6154
+1C01	ar-tn	7169
+1C09	en-za	7177
+1C0A	es-do	7178
+2001	ar-om	8193
+2009	en-jm	8201
+200A	es-ve	8202
+2401	ar-ye	9217
+240A	es-co	9226
+2801	ar-sy	10241
+2809	en-bz	10249
+280A	es-pe	10250
+2C01	ar-jo	11265
+2C09	en-tt	11273
+2C0A	es-ar	11274
+3001	ar-lb	12289
+300A	es-ec	12298
+3401	ar-kw	13313
+340A	es-cl	13322
+3801	ar-ae	14337
+380A	es-uy	14346
+3C01	ar-bh	15361
+3C0A	es-py	15370
+4001	ar-qa	16385
+400A	es-bo	16394
+440A	es-sv	17418
+480A	es-hn	18442
+4C0A	es-ni	19466
+500A	es-pr	20490
+
+

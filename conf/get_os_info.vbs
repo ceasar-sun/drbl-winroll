@@ -89,12 +89,16 @@ Function Print_System_Information()
 			OS_VERSION = "WIN8"
 		elseif ( Instr( objOperatingSystem.Caption, "Windows 8") > 0 ) then
 			OS_VERSION = "WIN8"
+		elseif ( Instr( objOperatingSystem.Caption, "Windows 10") > 0 ) then
+			OS_VERSION = "WIN10"
 		else
 			OS_VERSION = "NONE"
 		End If		
-		Wscript.Echo  "set LOCALE_CODE=" & objOperatingSystem.Locale
+		Wscript.Echo  "set LOCALE_CODE=" & objOperatingSystem.OSLanguage
 		Wscript.Echo  "set OS_VERSION=" & OS_VERSION
 
+		Wscript.Echo "REM Caption: " & objOperatingSystem.Caption	
+		Wscript.Echo "REM LOCALE=" & objOperatingSystem.Locale	
 		Wscript.Echo "REM Code Set: " & objOperatingSystem.CodeSet
 		Wscript.Echo "REM OS Language: " & objOperatingSystem.OSLanguage
 		Wscript.Echo "REM Version: " & objOperatingSystem.Version
