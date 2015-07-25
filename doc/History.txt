@@ -4,6 +4,13 @@ See also http://drbl-winroll.nchc.org.tw/doc/History.txt
 ---------------------------------------------------------------------------------------------------
 Change log:
 
+version 2.0.0
+	* Upgrade cygwin to 2.1.0
+	* Fix OS language detection and definition file : HEX to DEC
+	* Fix NIC mac-address detection to $MAC parameter for wsname.exe /N: in hostname usage  
+	* Add $ZFIP parameter for hostname function : 
+	* Support : Winodws 10 (x86, x64 both), Windows 8 ((x86, x64 both)
+
 version 1.6.1
 	* Add AS_TEMPLETE_MODE function : 
 		* To Define what action during winrollsrv running when pc be setup as templete mode
