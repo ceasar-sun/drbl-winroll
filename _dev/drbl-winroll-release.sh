@@ -14,6 +14,8 @@ CURRENT_PATH=`pwd`
 WORKDIR=`mktemp -d /tmp/pack.tmp.XXXXXX`
 PACKNAME=drbl-winroll
 REPOS_URL="free:/home/gitpool/drbl-winroll.git"
+SF_NET_RSYNC_ROOT="/home/mirror/drbl-winrll"
+FRS_SF_RSYNC_PATH="ceasar-sun,drbl-winroll@frs.sourceforge.net:/home/frs/project/d/dr/drbl-winroll"
 
 [ -z "$(which git 2/dev/null)" ] && echo 'Need git command installed !!' && exit 1;
 
@@ -67,6 +69,19 @@ md5sum $PACKNAME-*-setup.* > MD5SUMS
 
 if [ -d ../../doc/ ] && [ -w ../../doc/ ] ; then
 	rsync -a $WORKDIR/$PACKNAME/doc/ ../../doc/
+fi
+
+if [ -d "$SF_NET_RSYNC_ROOT"] ; then
+	echo "Generate MD5SUMS and rsync+ssh : ${SF_NET_RSYNC_ROOT}/ -> ${FRS_SF_RSYNC_PATH}/"
+	cp -a $CURRENT_PATH/$PACKNAME-$RELVER-$PACKVER-setup.* $SF_NET_RSYNC_ROOT/testing
+	pushd $SF_NET_RSYNC_ROOT/testing
+	md4sum $PACKNAME-$RELVER-$PACKVER-setup.* >> MD5SUMS
+	
+	# rsync+ssh ro sourceforge , synn :rsync -avlP -e ssh ${SF_NET_RSYNC_ROOT}/ ${FRS_SF_RSYNC_PATH}/
+	echo "Run: 'rsync -avlP -e ssh ${SF_NET_RSYNC_ROOT}/ ${FRS_SF_RSYNC_PATH}/' "
+	rsync -avlP -e ssh ${SF_NET_RSYNC_ROOT}/ ${FRS_SF_RSYNC_PATH}/
+	popd
+
 fi
 
 [ -d "$WORKDIR" -a -z "$_KEEP" ] && rm -rf $WORKDIR
