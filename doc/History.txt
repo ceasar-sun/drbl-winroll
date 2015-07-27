@@ -4,7 +4,7 @@ See also http://drbl-winroll.nchc.org.tw/doc/History.txt
 ---------------------------------------------------------------------------------------------------
 Change log:
 
-version 2.0.0
+version 1.7.0
 	* Upgrade cygwin to 2.1.0
 	* Fix OS language detection and definition file : HEX to DEC
 	* Fix NIC mac-address detection to $MAC parameter for wsname.exe /N: in hostname usage  

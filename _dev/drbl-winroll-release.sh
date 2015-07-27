@@ -30,8 +30,8 @@ usage(){
 # Parse command-line options
 while [ $# -gt 0 ]; do
 	case "$1" in
-		-l|--localdb) shift; REPOS_URL=$CURRENT_PATH/$1;
-			[ ! -d "$REPOS_URL" ] && echo "Local path error: $REPOS_URL , exit !!" && exit ;
+		-l|--localdb) shift; 
+			[ -d "$1/.git" ] && REPOS_URL="$(cd $1 ; pwd)" || (echo "Local path error: $REPOS_URL , exit !!" && exit ;)
 			 shift ;;
 		-d|--debug) shift ; _DEBUG=y ;;
 		-k|--keep) shift ; _KEEP="y" ;;
