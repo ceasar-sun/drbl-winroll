@@ -42,17 +42,19 @@
 	WriteRegDWORD HKLM "SOFTWARE\Microsoft\Windows NT\CurrentVersion\Winlogon\SpecialAccounts\UserList" "cyg_server" 0
 
 *************
-	History
+	Web hoster
 *************
-2015/7/15 :
-	* 測試只有 setup-x86 v2.831 以 unattended mode 可行, v 2.844 會有問題
-	* wsname 在 Windows 8 (x32, x64) 無法使用 $MAC 變數
+* Sourceforge:
+	# backup from frs.sf.net
+ssh free; 
+rsync -avrlP  -e ssh --delete  ceasar-sun,drbl-winroll@frs.sourceforge.net:/home/frs/project/d/dr/drbl-winroll/ /home/ceasar/tmp/frs.drbl-winrll/
 
+	# release to frs.sf.net
+ssh free; 
+rsync -avrlP -e ssh --delete /home/mirror/drbl-winroll/ ceasar-sun,drbl-winroll@frs.sourceforge.net:/home/frs/project/d/dr/drbl-winroll/ 
 
-
-2014/3/12 :
-	* 測試只有 setup-x86 v2.831 以 unattended mode 可行, v 2.844 會有問題
-	* wsname 在 Windows 8 (x32, x64) 無法使用 $MAC 變數
-
+*  Webmonster
+	# How to update http://www.drbl-winroll.org/ web content
+	~$ cd ~/www/drbl-winroll.web.en/ && rsync -avP --delete -e ssh --exclude=CVS/ --exclude=.svn/ --exclude=.htaccess --exclude=count.txt ./* diskless@www.drbl-winroll.org:/home/diskless/drbl-winroll
 
 
