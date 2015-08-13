@@ -1,0 +1,149 @@
+******** Bienvenue dans la FAQ de drbl-winroll **********
+
+    NCHC Free Software Labs, NCHC ,Taiwan
+    Licence	:	GPL      
+    Auteur	:	ceasar@nchc.org.tw, steven@nchc.org.tw
+    Traduction	: 	Joël Gondouin <joel@gondouin.net>
+
+*********************************************************
+
+FAQ:
+1 A quoi sert drbl-winroll
+- 1.1 Permettre au clients Windows de recevoir les commandes d'un serveur DRBL
+- 1.2 Résoudre le problème du nommage des postes lors d'un clonage de systèmes windows sur un réseau local
+- 1.3 Renommer automatiquement le groupe de travail suivant l'adressage réseau ou domaine
+- 1.4 Renouveller le SID windows
+
+2. Que fait l'installeur drbl-winroll et quelles étapes sont suivies ?
+- 2.1 Installation automatique de cygwin
+- 2.2 Installation du service de renouvellemnt de nom de machine, de groupe de travail et activation de DHCP
+- 2.3 Installation du service de vérification du SID
+- 2.4 Configuration du service sshd et ouverture du port 22 si besoin est (pour XP et versions ultérieures) 
+
+3. Quelles sont les fonctions utilisées par drbl-winroll ?
+- 3.1 Service sshd fourni par cygwin
+- 3.2 Configuration de MS windows : modification de la base de registre, net, netsh, regedit, etc...
+- 3.3 Vérification et modification des noms (machine, groupe de travail) : autohostname.sh, wsname.exe, installés comme services par cygwin.
+- 3.4 Vérification et renouvellement du SID : autonewsid.sh, newsid.exe, installés comme services par cygwin.
+
+4. Comment les noms de machines sont-ils attribués par drbl-winroll ?
+
+Par défaut, il attribue le nom de machine en utilisant les 6 dernier chiffres de l'adresse IP et les ajoute au préfixe "PC".
+Par exemple : avec une IP : 192.168.1.52, le nom de machine sera : PC-001.052
+
+Vous pouvez changer ceci en modifiant le fichier winroll.txt :
+Pour y accéder à partir du bureau windows (sous XP) : Démarrer->Programmes->Cygwin->drbl_winroll-config
+
+Ensuite, vous devez trouver la ligne : HN_WSNAME_PARAM = xxxx
+
+Cette ligne doit suivre ce format :
+
+HN_WSNAME_PARAM = /N:PC-$MAC			PC-"Adresse MAC" ; Ce qui donne  : PC-000C294EEF53
+HN_WSNAME_PARAM = /N:PC-$MAC[+8]		PC-"Les 8 derniers caractères de l'adresse MAC" ; Ce qui donne : PC-000C294E
+HN_WSNAME_PARAM = /N:PC-$IP			PC-"Adresse IP" ; Ce qui donne : PC-192-168-001-052
+HN_WSNAME_PARAM = /N:PC-$IP[3+]			PC-"3 premiers caractères de l'adresse IP" ; Ce qui donne : PC-192
+
+Ce nommage peut également être attribué à partir du fichier "hosts.txt" il faut alors éditer cette ligne comme suit :
+
+HN_WSNAME_PARAM = /RDF:C:\cygwin\drbl_winroll-config\hosts.txt /DFK:$MAC
+
+où /RDF définit le chemin du fichier de configuration des noms de machines
+et /DFK définit le type de configuration (IP ou MAC)
+
+Exemples :
+- pour /DFK=:$MAC : 000C294EEF53 = Etudiant-01		(Attribue le nom de machine "Etudiant-01" pour une adresse MAC 000C294EEF53)
+- pour /DFK=:$IP  : 192-168-001-012 = Etudiant-02	(Attribue le nom de machine "Etudiant-02" pour une adresse IP 192.168.1.12 )
+
+Dans ce dernier cas, il est préférable de réunir les adresses MAC ou IP dans le fichier "hosts.txt" de l'image du parc de machines à déployer.
+Vous pouvez également mettre à jour au préalable ce fichier qui se trouve dans le répertoire /conf (installation par fichier ".bat").
+
+PS : drbl_winroll se base sur le programme wsname aussi le format est-il dépendant de celui-ci. 
+
+
+5. Comment attribuer le nom du groupe de travail ?
+
+il peût être attribué via trois paramètres :
+	
+	- 1 : par Lettres prédéfinies, ex : WG
+	- 2 : Par IP/Masque de sous-réseau, ex : GROUP-$NM
+		ip:192.168.20.2	NM:255.255.255.0 => Groupe de travail : GROUP-020
+		ip:172.18.1.5	NM:255.255.0.0 => Groupe de travail: GROUP-018-001
+	- 3 : Par suffixe DNS, ex :WG-$DNS_SUFFIX
+		DNS Suffix Search List. . . . . . : my..org.domain  => WG-my-org
+Par défaut, le premier paramètre est utilisé donc le groupe de travail est "WG".
+
+
+6. Comment est prise la décision de réattribution du SID ?
+ 
+Le programme vérifie si l'adresse MAC de la carte réseau s'est déjà connectée sur le système. Si ce n'est pas le cas, le programme réattribue un SID au lancement.
+Pour des raisons de sécurité, le SID doit être attibué aléatoirement, et l'enregistrement de l'adresse mac sera encodée avec md5sum.
+
+7. Que dois-je faire après l'installation ?
+
+Si vous voulez que vos clients windows acceptent des commandes de votre serveur DRBL, et ceci de manière sécurisé,
+suivez les étapes suivantes :
+
+	-0. Sur le serveur DRBL, vérifiez que les clés de cryptage ssh existent dans le répertoire /root/.ssh (id_rsa et id_rsa.pub)
+	Si c'est le cas, allez directement au point 5.3
+	-1. Générez les clés ssh publiques et privées par la commande suivante en laissant la passphrase vide lorsqu'on vous le demande
+
+	En tant que root : ssh-keygen (pour ubuntu : sudo ssh-keygen)
+
+	Appuyez sur [Entrée] à chaque question :
+ 	
+	Generating public/private rsa key pair.
+	Enter file in which to save the key (/root/.ssh/id_rsa):
+	Enter passphrase (empty for no passphrase):
+	Enter same passphrase again:
+	Your identification has been saved in /root/.ssh/id_rsa.
+	Your public key has been saved in /root/.ssh/id_rsa.pub.
+	The key fingerprint is:
+	fe:56:XX:XX:XX:XX:XX:XX:XX:XX:83:ff:42 root@drbl-client
+
+	-2. Vous avez généré la clé privée ssh 'id_rsa' et la clé publique ssh 'id_rsa.pub' du "root"
+	Vous pouvez le vérifier par la commande suivante :
+		$  ls -al /root/.ssh
+		$  id_rsa  id_rsa.pub
+
+	-3. Copiez le fichier "id_rsa.pub" et transférez le sur vos systèmes windows en le renommant "authorized_keys" dans ce répertoire :
+
+	 c:\cygwin\home\administrator\.ssh\
+
+	Exemple : copy [chemin du fichier id_rsa.pub] c:\cygwin\home\administrateur\.ssh\authorized_keys
+
+	-4. Après ça, pour tester, vous pouvez envoyer une commande aux clients à partir de votre serveur :
+	$ ssh  administrateur@[win-client-ip]  ipconfig
+
+	Si tout c'est bien passé, vous devriez avoir la réponse de la machine windows cliente dans votre terminal linux !
+
+8. Après avoir cloné mes clients windows, comment puis-je changer leurs numéros de serie et clés de sécurité
+ au redémarrage alors que le matériel a été reconfiguré automatiquement ?
+	Suivez, s'il vous plaît, les indications données sur cette page :
+		"COMMENT FAIRE : Utiliser l'outil Sysprep.exe pour automatiser le déploiement de Windows XP"
+		http://support.microsoft.com/default.aspx?scid=kb;fr-fr;302577&sd=tech
+		
+9. Est-il nécessaire d'utiliser drbl-winroll dans un environnement DRBL ?
+	Pas vraiment. Il peut permettre aux clients windows d'utiliser internet après déploiement (pas de conflits de noms).
+	Le serveur DRBL s'occupant évidemment des fonctions dhcp, de routage et de la gestion centralisée des clients. 
+
+10. drbl-winroll peut-il être couplé avec d'autres outils de clonage ?
+	Bien sûr, Il fonctionne avec n'importe quel outil de clonage pour résoudre les problèmes liés à celui-ci.
+	Par exemple : Clonezilla, Ghost, Acronis, True Image, Oscar, etc...
+	drbl_winroll n'a aucune participation aux licences des autres logiciels. Son développement est lié à une licence GPL.
+
+
+D'autres questions viendront...
+
+
+
+Ceasar Sun traduit et adapté par Joël Gondouin
+
+Contact with us if any problem.
+Email¡Gceasar at nchc.org.tw, steven at nchc.org.tw
+Pour des problèmes de traduction :
+Courriel : joel at gondouin dot net
+
+*********************************************************
+ 	NCHC Free Software Labs  , NCHC ,Taiwan
+	License: GPL
+*********************************************************

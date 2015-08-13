@@ -1,0 +1,3 @@
+Please refer ~/drbl-winroll/doc/How-to-translate.txt for detail !!
+
+	Ceasar Sun <ceasar@nchc.org.tw>

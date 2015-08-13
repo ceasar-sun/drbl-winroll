@@ -1,0 +1,60 @@
+﻿********  Welcome to drbl-winroll developement note  ******************
+     NCHC Free Software Lab, NCHC ,Taiwan
+     Author : Ceasar Sun <ceasar@nchc.org.tw> 
+*********************************************************
+
+*************
+	Note:
+*************
+
+* How to repack a cygwin auto-installation 
+	1. Download setup-x86.exe (or setup-x86_64.exe) from Cygwin web site, http://www.cygwin.com/
+	2. Run set-x86*.exe and chose "Download Without Installing" 
+	3. Chose appropriate mirror site and include the follow necessary packages:
+		* openssh
+		* ipcalc
+		* bc
+		* shutdown
+		* cygrunsrv
+		* zip
+		* dos2unix
+		* tftp
+		* wget
+		* openssl
+	4. Modify setup.ini via Linux 'sed' command:
+		~$ cp setup.ini setup.ini.bak && sed -i -e "s/[cC]ategory:.*/Category: Base/" setup.ini
+	5. Run the follow batch command in Windows CMD mode
+		set-x86*.exe -q -d -L -l "%LOCAL_REPOSITORY_INCLUDE_SETUP.INI%" -R "%CYGWIN_ROOT%"
+
+* How to packe as NSIS package in Linux :
+	1. sudo apt-get install nsis
+	2. cd ~/drbl-winroll/tool ; makensis ./winroll.nsi
+
+* How to update http://www.drbl-winroll.org/ web content
+	~$ cd ~/www/drbl-winroll.web.en/ && rsync -avP --delete -e ssh --exclude=CVS/ --exclude=.svn/ --exclude=.htaccess --exclude=count.txt ./* diskless@www.drbl-winroll.org:/home/diskless/drbl-winroll
+
+* 新增的帳號(cyg_server)不顯示在登入畫面  (done :v1.5.0)
+	- use NSIS function to hide cyg_server account in x64 OS in winroll.nsi
+	SetRegView 64
+	WriteRegDWORD HKLM "SOFTWARE\Microsoft\Windows NT\CurrentVersion\Winlogon\SpecialAccounts\UserList" "cyg_server" 0
+
+	SetRegView 32
+	WriteRegDWORD HKLM "SOFTWARE\Microsoft\Windows NT\CurrentVersion\Winlogon\SpecialAccounts\UserList" "cyg_server" 0
+
+*************
+	Web hoster
+*************
+* Sourceforge:
+	# backup from frs.sf.net
+ssh free; 
+rsync -avrlP  -e ssh --delete  ceasar-sun,drbl-winroll@frs.sourceforge.net:/home/frs/project/d/dr/drbl-winroll/ /home/ceasar/tmp/frs.drbl-winrll/
+
+	# release to frs.sf.net
+ssh free; 
+rsync -avrlP -e ssh --delete /home/mirror/drbl-winroll/ ceasar-sun,drbl-winroll@frs.sourceforge.net:/home/frs/project/d/dr/drbl-winroll/ 
+
+*  Webmonster
+	# How to update http://www.drbl-winroll.org/ web content
+	~$ cd ~/www/drbl-winroll.web.en/ && rsync -avP --delete -e ssh --exclude=CVS/ --exclude=.svn/ --exclude=.htaccess --exclude=count.txt ./* diskless@www.drbl-winroll.org:/home/diskless/drbl-winroll
+
+

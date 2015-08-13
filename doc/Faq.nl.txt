@@ -1,0 +1,139 @@
+******** Welkom bij de nederlandse drbl-winroll FAQ  ******************
+
+    NCHC Free Software Labs, NCHC ,Taiwan
+    License	:	GPL      
+    Author	:	ceasar@nchc.org.tw, steven@nchc.org.tw
+    Vertaling   :       Dave Haakenhout (Almere, Netherlands)
+*********************************************************
+
+FAQ:
+
+1. Wat kan drbl-winroll oplossen?
+
+- 1.1 Ondersteund windows clients en kan drbl (linux) commando's accepteren van een DRBL server
+- 1.2 Lost windows computer name duplicatie problemen op wanneer er gebruik gemaakt wordt van klone tools om uit te rollen met Win-OS in een lokaal netwerk. 
+- 1.3 Automatische benaming van  Windows "Werkgroep" via netmask en network domein
+- 1.4 Automatische verniewing van Windows SID ( NTFS )
+
+2. Welke stappen loopt drbl-winroll door voor de installatie ?
+
+Deze stappen bevatten de benodigde software en configureerd gerelateerde registry ingangen in windows, het gaat als volgt:
+- 2.1 Automatische cygwin ( linux onder windows ) installatie
+- 2.2 Installeren van computer-controleer service, werkgroep benaming controleer service en het instellen van de netwerkkaart voor DHCP
+- 2.3 Installeren van Windows SID controleer service.
+- 2.4 Installerenvan sshd service en een luisterende poort 22 instellen in de Windows Firewall (Voor XP en latere versies)
+
+3. Hoe wordt drbl-winroll geimplenteerd ?
+
+- 3.1 sshd service wordt aangeboden door cygwin ( linux onder windows ) 
+- 3.2 MS Windows configuratie: aanpassen van  windows register , net , netsh , regedit ..en diversen andere commando's
+- 3.3 Computernaam wordt gecontroleerd, werkgroep naam wordt gecontroleerd : autocomputername.sh, wsname.exe. Wordt ingesteld als service door cygwin en autocomputername.sh wordt gestart om veranderingen aan te brengen.
+- 3.4 Sid controle : autonewsid.sh ,newsid.exe. Wordt ingesteld als service door cygwin en autonewsid.sh wordt gestart om "sid" te vernieuwen
+
+4. Hoe wordt de windows computernaam ingesteld door drbl-winroll
+
+-Standaard zijn het de laatste 6 nummer voor het ipadres en dit wordt gecombineerd meten prefix "PC" als computernaam, voorbeeld:
+-Het ipadres is 192.168.1.52, dan zal de computernaam worden : PC-001-052
+-De Manager can de volgende stappen volgen om het computernaam formaat te krijgen zoals u wilt:
+-In C:\cygwin\drbl_winroll-config vind je het bestand  "winroll.txt" , zoek naar de regel : HN_WSNAME_PARAM = xxxx
+ 
+
+The guide is the follow:
+
+# 	HN_WSNAME_PARAM = /N:PC-$MAC			PC-"Mac Adres"PC-000C294EEF53
+# 	HN_WSNAME_PARAM = /N:PC-$MAC[+8]		PC-"Mac Adres the last 8  characters"¡Aex¡GPC-000C294E
+# 	HN_WSNAME_PARAM = /N:PC-$IP			PC-"IP  Addres"PC-192-168-001-052
+# 	HN_WSNAME_PARAM = /N:PC-$IP[3+]		        PC-" IP the first 3 characters"¡Aex¡G PC-192
+#       HN_WSNAME_PARAM = /N:$ASSETTAG                  Alleen pc's met Assettag functie in de bios, voorbeeld HP, DELL, ACER, enz, enz)
+
+Hoewel, de computernaam kan worden ingesteld door een lokaal bestand, edit "HN_WSNAME_PARAM = xxxx " als volgt:
+HN_WSNAME_PARAM = /RDF:C:\cygwin\drbl_winroll-config\computers.txt /DFK:$MAC
+/RDF defineert het pad van het lokale bestand ---> /DFK defineert het veld voor het zoeken van de sleutel
+
+Een voorbeeld als lokaal bestand  : "IP or MAc Addres" = "computernaam" 
+000C294EEF53    = Cursist-01	(Assign "Cursist-01" als computername if its MAC address is 000C294EEF53 )
+192-168-001-012 = Cursist-02	(Assign "Cursist-02" als computername if its IP address is 192.168.1.12 )
+
+if use /DFK:$MAC ¡Ait would be assigned as "Cursist-01"¡A/DFK:$IP it would be "Cursist-02"
+
+Via deze weg, kan de manager de computernaam vrijdefinieren, maar we adviseren om alle Mac Adressen te collecteren en op te schrijven of op te slaanop de template machine. 
+De andere gekloonde machines zullen een computernaam toegewezen krijgen door hun eigen attributen. 
+
+PS drbl-winroll gebruikt "wsname" tooling om de computernaam te veranderen. Ook ondersteunen wij de andere "wsname" parameters volledig
+
+5. Hoe de windows werkgroep toe te wijzen ?
+Het kan toegewezen worden door 3 parameters
+	-1. Vaste string      : voorbeeld: WG
+	-2. D.m.v IP/Netmask  : voorbeeld: GROUP-$NM
+		  Ip:192.168.20.2	NM:255.255.255.0 => Werkgroep: GROUP-020
+		  Ip:172.18.1.5	NM:255.255.0.0 => Werkgroep: GROUP-018-001
+	-3. D.m.v DNS suffix , ex :WG-$DNS_SUFFIX
+		  DNS Suffix zoek lijst. . . . . . : mijn..org.domein  => WG-mijn-org
+Het gebruikt een vaste string "WG" als standaard parameters.
+
+6. Hoe te beslissen om het macadres opnieuw toe te wijzen ? 
+Er zal worden gechecked of het mac adres al eerder is gelogd met het systeem, als het niet zo is, dan zal het programma een nieuw SID toewijzen.
+Voor beveilings redenen, windows SID moet willekeurig worden toegewezen, en het opgenomenmacadreszal worden gecodeerd met md5sum.
+
+7. Nog ander stappen te doorlopen na de installatie ?
+
+Als u de Windows clients DRBL commando's wilt laten accepteren, volg dan de volgende stap :
+	-0. Login als de "root" gebruiker , kij of er een id_rsa, id_rsa.pub in /root/.ssh map bestaat. Als die niet bestaat, ga dan naar de volgende stap. Als die wel bestaat, Ga dan naar stap 3 om de ssh sleutel te installeren.
+
+	-1. Creeer de root's ssh sleutels (key ) (persoonlijk en publike sleutel) , en druk op [Enter] gedurende de vraag "passphrase " in in dit procces.
+
+	$ ssh-keygen
+	Generating public/private rsa key pair.
+	Enter file in which to save the key (/root/.ssh/id_rsa):
+	Enter passphrase (empty for no passphrase):
+	Enter same passphrase again:
+	Your identification has been saved in /root/.ssh/id_rsa.
+	Your public key has been saved in /root/.ssh/id_rsa.pub.
+	The key fingerprint is:
+	fe:56:XX:XX:XX:XX:XX:XX:XX:XX:83:ff:42 root@drbl-client
+
+	-2. Het zal de volgende root' ssh sleutels creeeren :  id_rsa id_rsa.pub , als volgt:
+
+	$  ls -al /root/.ssh
+	$  id_rsa  id_rsa.pub
+
+	-3. Kopieer het bestand "id_rsa.pub" naar de map (c:\cygwin\home\administrator\.ssh) in windows en sla het bestand op als "authorized_keys"
+
+	copy [path of id_rsa.pub] c:\cygwin\home\administrator\.ssh\authorized_keys
+
+
+	-4. Als dit allemaal gedaan is, kan je een commando uitvoeren naar een van de  clients vanaf de DRBL server, voorbeeld:
+
+	$ ssh  administrator@[win-client-ip]  ipconfig
+
+8. Na het klonen (Imagen) van mijn MS Windows clients, hoe kan het zijn serila en security id verander bij de volgende herstart, zelfs als de hardware opnieuw wordt gededecteerd ?
+Kijk op de Microsoft web pagina voor het volgende:
+
+" Hoe de Sysprep tool te gebruiken om de automatische uitrol van windows goed te laten verlopen "
+
+http://support.microsoft.com/default.aspx?scid=kb;en-us;302577&sd=tech 
+
+of 
+
+http://support.microsoft.com/?scid=kb;zh-tw;302577
+
+9. Is het nodig om drbl-winroll te gebruiken in een DRBL omgeving ?
+
+Niet echt. Het zou nog steeds nodig zijn om NAT functionaliteit te gebruiken om Windows clients met internet te verbinden.
+Natuurlijk, DRBL server verleend NAT, DHCP functionaliteit, end clients kunnen centraal gemanaged worden.
+
+10. Kan drbl-winroll gebruikt worden met ander kloon tooling ?
+
+Tuurlijk, Het werkt met elke kloon tooling om het kloon probleem op te lossen , voorbeel: Clonezilla, BGcomputer, Acronis True Image... enz, enz.
+drbl-winroll geen verband met andere software licenties. De ontwikkeling van drbl-winroll gebruikt GPL om op te leveren.
+
+
+Ceasar Sun
+
+Neem contact met ons op als er problemen onstaan.
+Email : ceasar at nchc.org.tw, steven at nchc.org.tw
+
+*********************************************************
+ 	NCHC Free Software Labs  , NCHC ,Taiwan
+	License: GPL
+*********************************************************

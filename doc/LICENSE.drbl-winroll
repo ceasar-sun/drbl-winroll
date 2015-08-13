@@ -1,0 +1,16 @@
+DRBL-Winorll Licensing Terms
+
+This is a copy of LICENSE.drbl-winroll from the drbl-winroll sources
+------------------------------------
+DRBL-Winroll integrate cygwin, wsname and self-development program.
+
+This program is free software; you can redistribute it and/or modify it under the terms of the GNU General Public License (GPL) as published by the Free Software Foundation; either version 2 of the License, or (at your option) any later version.
+
+DRBL-Winroll integrate Cygwin and WSName project. Use Cygwin as a basic framework, WSName is used for Windows hostname/group-name modification. They keep their own license and agreement from original developer when they used in DRBL-Winroll.
+
+This program is distributed in the hope that it will be useful, but WITHOUT ANY WARRANTY; without even the implied warranty of MERCHANTABILITY or FITNESS FOR A PARTICULAR PURPOSE. See the GNU General Public License for more details.
+
+
+*** See also ***
+http://drbl-winroll.nchc.org.tw/#License
+

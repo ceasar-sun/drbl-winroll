@@ -1,0 +1,33 @@
+README for drbl-winroll
+
+********  歡迎使用 drbl-winroll 安裝程式  ******************
+
+     國網中心自由軟體實驗室  , NCHC ,Taiwan
+    License: GPL      
+
+*********************************************************
+
+說明：
+drbl-winroll 目的為支援 Windows 的客戶端在 drbl 的環境下，可接受 drbl 主機
+之遠端命令，並解決利用 clone image 工具來大量還原 win-like OS 時，主機名稱
+在區域網路中重複的問題。
+
+如何安裝：
+1. 下載最新版本之 drbl-winroll : http://drbl.nchc.org.tw/drbl-winroll/
+2. ZIP: 解壓縮後直接雙點執行 winroll-setup.bat，程式集會引導您完成安裝步驟
+   EXE: 直接執行 winroll-setup.exe
+
+注意事項：
+1. 本程式建議以 Administrator 身份執行,並確定網際網路連線沒問題
+2. 若您之前以安裝過 cygwin 於不同路徑(c:\cygwin)，請先移除
+3. 本程式僅適用於 Windows XP 系列/ Windows 2000 系列 之作業系統
+
+後續須知：
+如果您要讓您的 windows 能接受 drbl server 的命令，請參考 ~/doc/Faq.*.txt。
+
+*********************************************************
+     
+    Email：ceasar at nchc org tw, steven at nchc org tw
+    NCHC Free Software Labs  , NCHC ,Taiwan
+
+*********************************************************

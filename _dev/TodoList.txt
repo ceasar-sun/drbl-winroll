@@ -1,0 +1,8 @@
+
+To-do-list:
+
+* Uninstall 功能
+* 用 NSIS 盡量取代 bat 進行安裝
+* 主從式架構設定檔讀取 (via http or tftp client)
+* $MAC 參數不能用在 Windows 8 系列, wsname.exe 問題
+

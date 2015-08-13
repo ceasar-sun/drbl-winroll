@@ -1,0 +1,28 @@
+# This a domain-mix sample
+
+_DEFAULT_NETWORK	= 192.168.100.254/24
+_DEFAULT_GATEWAY	= 192.168.100.254
+_DEFAULT_DNS		= 168.95.1.1, 140.110.16.1	# use comma symbol (,) as separator
+_DEFAULT_WINS		= 192.168.100.11, 192.168.100.12
+_DEFAULT_DNS_SUFFIX = winroll.org
+
+subnet 10.0.2.0/8 {
+	THIS_GATEWAY		= 10.0.2.2
+	THIS_DNS			= 10.0.1.1
+	THIS_WINS			= 	# it will unset wins information
+	# THIS_DNS_SUFFIX		= 	# it will inherit DNS stuffix information form  _DEFAULT_DNS_SUFFIX
+}
+
+subnet 192.168.0.0/24 {
+	THIS_GATEWAY		= 192.168.0.2
+	THIS_DNS			= 192.168.0.1
+	#THIS _WINS			# it will inherit wins information form  _DEFAULT_WINS
+}
+
+
+[IP Address]
+00-0D-9D-9F-0E-6A = 192.168.100.2
+00-0D-9D-9F-0E-6E = 10.0.3.17
+08-00-27-CB-FF-2E = 192.168.0.3
+
+

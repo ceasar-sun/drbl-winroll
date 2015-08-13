@@ -1,0 +1,10 @@
+The Cygwin Contract
+
+A Cygwin Contract provides customers with:
+
+    * The ability to distribute customer's applications without being bound by the GPL. Therefore, customers are not required to provide their applications in open source code form.
+    * A license to distribute unlimited quantities of Cygwin libraries with customer's applications.
+    * A robust set of tools for easily migrating applications from UNIX/Linux to Windows.
+    * The latest Pentium optimized compiler tools.
+
+http://www.redhat.com/software/cygwin/

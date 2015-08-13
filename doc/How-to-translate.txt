@@ -1,0 +1,67 @@
+******* DRBL-winroll Translation - How To Document ********
+
+    NCHC Free Software Labs, NCHC ,Taiwan
+    Date	:	2015/7/23
+    License	:	GPL      
+    Author	:	Ceasar Sun  <ceasar dot sun at gmail dot com>
+
+*********************************************************
+
+The guide is for how to translate drbl-winroll (for version 2.0.0 or later) to suit for your language and how to test. Please let me know if any problem and thanks in advanced for your great contribution !!!
+
+--------------------------------------------------------------------------------------------------------------------------------------------
+Please read the follow FAQ first :
+
+Q1: How to know if the language of my locale is prepared ?
+A: When you try to install drbl-winroll then it shows the follow :
+**********************
+**       Note       **
+**********************
+* The used language of installation is not be translated perfectly yet,
+* But you still can install and make it work via this.
+*
+**********************
+It means DRBL-winroll don't have the translation for your environemnt.
+
+Q2: Can I install and work well if DRBL-winroll doesn't have translation for my current environment ?
+A: Yes, it would use English for installation as default. Furthermore, DRBL-winroll workd as daemon , so it is locale independence.  
+
+Q3: So, which part of translation be needed and used in DRBL-winroll ?
+A: DRBL-winroll only use the translation file for installation because it's locale independenc for work as daemon.
+
+--------------------------------------------------------------------------------------------------------------------------------------------
+
+*** Here to start ***
+
+S1. Prepare:
+Download the latest version with zip format then extract the zip file. You can download drbl-winroll form https://sourceforge.net/projects/drbl-winroll/files/ 
+
+S2. Run ~drbl-winroll/winroll-setup.bat. It will show as Q1 mentioned message if DRBL-winroll doesn't have the correct translation for your system environemnt. DRBL-winroll would create a default translation file for you automatically and locate as the follow message :
+**********************
+** How to TRANSLATE **
+**********************
+* Please edit ~drbl-winroll/lang/default.cmd
+*
+* Let me know if any problem or new translation file.
+* Email :ceasar@nchc.org.tw !!
+**********************
+Please interrupt installation via [Ctrl]+[C].
+(Note: ~/lana/xxxx.cmd , the number in file name would depend on your system locale )
+
+S3. Translate the file to your phrasal and save it (Don't modify the file name)
+	Note: Make sure to use Windows new line character in your translation file
+
+S4. Test it: To run ~drbl-winroll/winroll-setup.bat again and you should get a translated-done installation.
+
+S5. Translate FAQ (Optional)
+	Translate ~/drbl-winroll/doc/Faq.en.txt to ~/drbl-winroll/doc/Faq.[your-language].txt
+
+S6. Please sned the translation file back to us <ceasar.sun@gmail.com> if you want to share. We appreciate a lot about that in advanced.
+--------------------------------------------------------------------------------------------------------------------------------------------
+
+
+*********************************************************
+ 	NCHC Free Software Labs  , NCHC ,Taiwan
+	License: GPL
+*********************************************************
+
