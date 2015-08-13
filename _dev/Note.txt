@@ -53,8 +53,21 @@ rsync -avrlP  -e ssh --delete  ceasar-sun,drbl-winroll@frs.sourceforge.net:/home
 ssh free; 
 rsync -avrlP -e ssh --delete /home/mirror/drbl-winroll/ ceasar-sun,drbl-winroll@frs.sourceforge.net:/home/frs/project/d/dr/drbl-winroll/ 
 
+* Github:
+	# git clone from github
+$ git clone git@github.com:ceasar-sun/drbl-winroll.git
+
 *  Webmonster
 	# How to update http://www.drbl-winroll.org/ web content
 	~$ cd ~/www/drbl-winroll.web.en/ && rsync -avP --delete -e ssh --exclude=CVS/ --exclude=.svn/ --exclude=.htaccess --exclude=count.txt ./* diskless@www.drbl-winroll.org:/home/diskless/drbl-winroll
+
+*************
+To-do-list:
+*************
+
+* Uninstall 功能
+* 用 NSIS 盡量取代 bat 進行安裝
+* 主從式架構設定檔讀取 (via http or tftp client)
+* $MAC 參數不能用在 Windows 8 系列, wsname.exe 問題
 
 
