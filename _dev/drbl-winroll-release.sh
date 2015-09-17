@@ -52,11 +52,10 @@ pushd $PACKNAME
 #PACKVER="$(svn info $REPOS_URL | grep 'Last Changed Rev'| awk -F ": " '{print $2}' )"
 PACKVER="$(git log | grep -E '^commit' | wc -l)"
 RELVER="$(grep 'drbl-winroll.VERSION' ./conf/winroll.conf | awk -F '=' '{print $2}' | sed -e 's/\s//g')"
-echo "Packaging $PACKNAME version: $PACKVER-$RELVER ..."
+echo "Packaging $PACKNAME version: $RELVER-$PACKVER ..."
 echo "write version information into config file:  $PACKNAME/conf/winroll.conf"
 sed -i -e "s/^rc.VERSION\s*=\s*.*/rc.VERSION = $PACKVER/g" ./conf/winroll.conf
-sed -i -e "s/^set RELEASE_VERSION\s*=.*/set RELEASE_VERSION=$PACKVER-$RELVER/g" ./winroll-setup.bat
-set RELEASE_VERSION=
+sed -i -e "s/^set RELEASE_VERSION\s*=.*/set RELEASE_VERSION=$RELVER-$PACKVER/g" ./winroll-setup.bat
 sed -i -e "s/^\!define PRODUCT_VERSION\s*.*/!define PRODUCT_VERSION \"$RELVER-$PACKVER\"/g" ./tool/winroll.nsi
 rm -rf .git _dev
 popd
