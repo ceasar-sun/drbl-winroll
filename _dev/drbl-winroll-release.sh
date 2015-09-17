@@ -13,7 +13,8 @@ RELVER=
 CURRENT_PATH=`pwd`
 WORKDIR=`mktemp -d /tmp/pack.tmp.XXXXXX`
 PACKNAME=drbl-winroll
-REPOS_URL="free:/home/gitpool/drbl-winroll.git"
+#REPOS_URL="free:/home/gitpool/drbl-winroll.git"
+REPOS_URL="git@github.com:ceasar-sun/drbl-winroll.git"
 SF_NET_RSYNC_ROOT="/home/mirror/drbl-winrll"
 FRS_SF_RSYNC_PATH="ceasar-sun,drbl-winroll@frs.sourceforge.net:/home/frs/project/d/dr/drbl-winroll"
 
@@ -54,6 +55,8 @@ RELVER="$(grep 'drbl-winroll.VERSION' ./conf/winroll.conf | awk -F '=' '{print $
 echo "Packaging $PACKNAME version: $PACKVER-$RELVER ..."
 echo "write version information into config file:  $PACKNAME/conf/winroll.conf"
 sed -i -e "s/^rc.VERSION\s*=\s*.*/rc.VERSION = $PACKVER/g" ./conf/winroll.conf
+sed -i -e "s/^set RELEASE_VERSION\s*=.*/set RELEASE_VERSION=$PACKVER-$RELVER/g" ./winroll-setup.bat
+set RELEASE_VERSION=
 sed -i -e "s/^\!define PRODUCT_VERSION\s*.*/!define PRODUCT_VERSION \"$RELVER-$PACKVER\"/g" ./tool/winroll.nsi
 rm -rf .git _dev
 popd
@@ -71,7 +74,8 @@ if [ -d ../../doc/ ] && [ -w ../../doc/ ] ; then
 	rsync -a $WORKDIR/$PACKNAME/doc/ ../../doc/
 fi
 
-if [ -d "$SF_NET_RSYNC_ROOT"] ; then
+if [ -d "$SF_NET_RSYNC_ROOT" -a  1 = 0 ] ; then
+# don't do  this
 	echo "Generate MD5SUMS and rsync+ssh : ${SF_NET_RSYNC_ROOT}/ -> ${FRS_SF_RSYNC_PATH}/"
 	cp -a $CURRENT_PATH/$PACKNAME-$RELVER-$PACKVER-setup.* $SF_NET_RSYNC_ROOT/testing
 	pushd $SF_NET_RSYNC_ROOT/testing

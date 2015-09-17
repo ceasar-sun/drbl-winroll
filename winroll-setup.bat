@@ -20,7 +20,7 @@ REM ####################################################################
 
 REM # Global parameter
 set LANG=
-set OS_VERSION=
+set RELEASE_VERSION=
 set SOURCE_DIR=%cd%
 set ACTION=i
 set CYGWIN_ROOT=
@@ -266,6 +266,8 @@ goto :EOF
 	REM - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - -
 	IF NOT EXIST "%CYGWIN_ROOT%" (
 	  mkdir "%CYGWIN_ROOT%"
+
+
 
 	)
 
@@ -832,6 +834,8 @@ goto :EOF
 	goto :SLEEP_TIME
 	:END_OF_SLEEP_TIME
 	pause
+
+
 
 	:END_OF_STARTUP_AUTONEWSID
 goto :EOF
