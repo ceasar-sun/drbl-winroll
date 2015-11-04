@@ -1,0 +1,16 @@
+*************
+To-do-list:
+*************
+20151104:
+* Windows 啟用功能
+  宋狄勇<ntnqfntqd@gmail.com>
+  * slmgr -skms mskms.yzu.edu.tw ; slmgr -ato
+  https://sourceforge.net/p/drbl-winroll/discussion/567597/thread/ca8e9cc8/
+  * slmgr.vbs -ipk (product key) ; slmgr.vbs -ato
+
+
+20150917:
+* Uninstall 功能
+* 用 NSIS 盡量取代 bat 進行安裝
+* 主從式架構設定檔讀取 (via http or tftp client)
+* $MAC 參數不能用在 Windows 8 系列, wsname.exe 問題
