@@ -4,6 +4,9 @@ See also http://drbl-winroll.nchc.org.tw/doc/History.txt
 ---------------------------------------------------------------------------------------------------
 Change log:
 
+version 1.7.1
+	* Fix folder of "/home/*/.ssh" owner-ship for ssh-auto-login : winrollsrv.sh
+
 version 1.7.0
 	* Upgrade cygwin to 2.1.0
 	* Fix OS language detection and definition file : HEX to DEC

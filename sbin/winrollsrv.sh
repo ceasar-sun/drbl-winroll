@@ -490,9 +490,8 @@ fix_usersid_restart_sshd(){
 		chmod 750 /etc/ssh_config
 
 		# fix folder "/home/*/.ssh" owner-ship for ssh-auto-login
-		for _dir_name in `ls /home` ; do 
-			chown $_dir_name /home/${_dir_name}
-			[ -d "/home/${_dir_name}/.ssh" ] && chown -R /home/${_dir_name}/.ssh
+		for _user_id in `ls /home` ; do 
+			[ -d "/home/${_user_id}/.ssh" ] && chown -R ${_user_id} /home/${_user_id}
 		done
 
 		echo "Restart sshd service ..."
