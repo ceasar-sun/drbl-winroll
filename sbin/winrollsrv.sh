@@ -488,6 +488,13 @@ fix_usersid_restart_sshd(){
 		chmod 644 /var/log/sshd.log /etc/ssh_host*_key.pub /etc/sshd_config
 		chmod 600 /etc/ssh_host*_key
 		chmod 750 /etc/ssh_config
+
+		# fix folder "/home/*/.ssh" owner-ship for ssh-auto-login
+		for _dir_name in `ls /home` ; do 
+			chown $_dir_name /home/${_dir_name}
+			[ -d "/home/${_dir_name}/.ssh" ] && chown -R /home/${_dir_name}/.ssh
+		done
+
 		echo "Restart sshd service ..."
 		cygrunsrv -S sshd
 	fi
