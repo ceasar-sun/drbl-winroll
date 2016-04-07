@@ -326,23 +326,23 @@ do_autohostname(){
 		# via RDF
 		_RDF_cyg_path="$(echo $HN_WSNAME_PARAM | awk  '{print $1}' | sed -e 's/^\/RDF://' -e 's/\\/\\\\/g' | xargs cygpath -u)"
 		_hostname_via_rdf="$(grep -i $MAC $_RDF_cyg_path | awk -F '=' '{print $2}' | sed -e 's/\(.*\)#.*/\1/'| tr -d [[:blank:]])"
-		[ -n "$_hostname_via_rdf" ] && HN_WSNAME_PARAM="$_hostname_via_rdf" || HN_WSNAME_PARAM=''
+		[ -n "$_hostname_via_rdf" ] && HN_WSNAME_PARAM="/N:$_hostname_via_rdf" || HN_WSNAME_PARAM=''
 	elif [ -n "$(echo $HN_WSNAME_PARAM | grep -e '$MAC\[[0-9]\++\{0,1\}\]')" ] ; then 
 		# $MAC[n+] = $MAC[n] : last n character
 		_str_nums="$(echo $HN_WSNAME_PARAM | sed -e "s/.*\$MAC\[\([0-9]\+\)+\{0,1\}\].*/\1/")"
 		_sub_mac="${refine_MAC:(-$_str_nums)}"
 		_REAL_HN_WSNAME_PARAM="$(echo $HN_WSNAME_PARAM| sed "s/\(.*\)\$MAC\[.*\]\(.*\)/\1$_sub_mac\2/" )"
-		HN_WSNAME_PARAM=$_REAL_HN_WSNAME_PARAM
+		HN_WSNAME_PARAM="/N:$_REAL_HN_WSNAME_PARAM"
 	elif [ -n "$(echo $HN_WSNAME_PARAM | grep -e '$MAC\[+[0-9]\+\]')" ] ; then 
 		# $MAC[+n] : first n character
 		_str_nums="$(echo $HN_WSNAME_PARAM | sed -e "s/.*\$MAC\[+\([0-9]\+\)\].*/\1/")"
 		_sub_mac="${refine_MAC:0:($_str_nums)}"
 		_REAL_HN_WSNAME_PARAM="$(echo $HN_WSNAME_PARAM| sed "s/\(.*\)\$MAC\[.*\]\(.*\)/\1$_sub_mac\2/" )"
-		HN_WSNAME_PARAM=$_REAL_HN_WSNAME_PARAM
+		HN_WSNAME_PARAM="/N:$_REAL_HN_WSNAME_PARAM"
 	elif [ -n "$(echo $HN_WSNAME_PARAM | grep -e '$MAC$' -o -e '$MAC-' )" ] ; then 
 		# only $MAC
 		_REAL_HN_WSNAME_PARAM="$(echo $HN_WSNAME_PARAM| sed "s/\(.*\)\$MAC\(.*\)/\1$refine_MAC\2/" )"
-		HN_WSNAME_PARAM=$_REAL_HN_WSNAME_PARAM
+		HN_WSNAME_PARAM="/N:$_REAL_HN_WSNAME_PARAM"
 	elif [ -n "$(echo $HN_WSNAME_PARAM | grep -e '$MAC\[.*\]' )" ] ; then 
 		# should not be here ; it means wrong format for $MAC
 		HN_WSNAME_PARAM=''
