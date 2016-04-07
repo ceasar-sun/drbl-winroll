@@ -273,8 +273,9 @@ do_autohostname(){
 	MAC=$(awk -F "\t" "{print \$1}" $_NIC_INFO | head -n 1)
 	NM=$(awk -F "\t" "\$3 !~/^169.254/ && \$4 !~/^255.255.0.0,64$/  {print \$4}" $_NIC_INFO | awk -F ","  '{print $1}' | head -n 1)
 	IP=$(awk -F "\t" "\$3 !~/^169.254/ && \$4 !~/^255.255.0.0,64$/  {print \$3}" $_NIC_INFO | awk -F ","  '{print $1}' | head -n 1)
-	# refine_MAC like: 0022CF251ECA
-	refine_MAC=$(echo $MAC | sed -e 's|-||g' -e 's|.*|\U&|')
+	# refine_MAC like: S0022CF251ECA
+	# Put 'S' in first character to avoid to all digital format (not allowed in Win7 or later)
+	refine_MAC="S"$(echo $MAC | sed -e 's|-||g' -e 's|.*|\U&|')
 	# refine_IP like: 192-168-001-021  or 010-000-002-015 
 	refine_IP=$(echo $IP |awk -F. '{print $1+1000"-"$2+1000"-"$3+1000"-"$4+1000 }' | sed -e 's/^1//' -e 's/\-1/-/g')
 
