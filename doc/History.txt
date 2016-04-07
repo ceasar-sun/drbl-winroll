@@ -4,6 +4,10 @@ See also http://drbl-winroll.nchc.org.tw/doc/History.txt
 ---------------------------------------------------------------------------------------------------
 Change log:
 
+version 1.7.2
+	* Fix $MAC  in HN_WSNAME_PARAM bug: winrollsrv.sh . Thanks to ComBasa <combasviit@users.sf.net>
+	* Add  'S' character in HN_WSNAME_DEF_PARAM to avoid to all digital format (not allowed in Win7 or later)
+
 version 1.7.1
 	* Fix folder of "/home/*/.ssh" owner-ship for ssh-auto-login : winrollsrv.sh
 
