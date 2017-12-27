@@ -45,7 +45,7 @@ get_remote_master_conf(){
 	if [ -n "$(echo $WINROLL_REMOTE_CONF | grep -ie '^http://' 2> /dev/null )" ] ; then
 		echo "get WINROLL_REMOTE_CONF via $WINROLL_REMOTE_CONF:"
 		wget -t 5 -T 3 "$WINROLL_REMOTE_CONF" -O  $WINROLL_TMP/winroll_remote_master.conf 2> /dev/null
-		[ "$?" = 0 ] && sed -e "s/^\s*//g" -e "s/^#.*//g" -e "s/\s*$//g"  -e "s/^.*\s*\=\s*$//g" -e "s/\s*=\s*/=/g"  -e "/^$/d" -i $WINROLL_TMP/winroll_remote_master.conf
+		[ "$?" = 0 ] && sed -e "s/^\s*//g" -e "s/^#.*//g" -e "s/\s*$//g"  -e "s/^.*\s*\=\s*$//g" -e "s/\s*=\s*/=/g"  -e "/^$/d" -i $WINROLL_TMP/winroll_remote_master.conf || echo "wget $WINROLL_REMOTE_CONF failed !!" 
 	elif [ -n "$(echo $WINROLL_REMOTE_CONF | grep -ie '^tftp://' 2> /dev/null )" ] ; then
 		# use tftp client
 		echo "get WINROLL_REMOTE_CONF via $WINROLL_REMOTE_CONF:"
@@ -297,6 +297,8 @@ do_autohostname(){
 	HN_WSNAME_DEF_PARAM="/N:$refine_MAC"
 	HN_WSNAME_PARAM=$(sed -e "s/\s*=\s*/=/g" $WINROLL_CONFIG | grep -e "^HN_WSNAME_PARAM=" | sed -e "s/^HN_WSNAME_PARAM=//" -e "s/(\s! )//g")
 	
+	echo "Pre-Info: '$NM','$refine_MAC','$refine_IP','$WSNAME_LOG','$HN_WSNAME_DEF_PARAM','$HN_WSNAME_PARAM','$HNAME'" #| tee -a  $WINROLL_LOG
+	
 	# deal with http/tftp remote conf
 	if [ -n "$(echo $HN_WSNAME_PARAM | grep -ie '^/RDF:http://' 2> /dev/null )" ] ; then
 		HN_WSNAME_REMOTE_RDF=$(echo $HN_WSNAME_PARAM | awk -F " " '{print $1}'| sed -e "s/^\/RDF://g")
@@ -373,7 +375,8 @@ do_autohostname(){
 
 	if [ -z "$HN_WSNAME_PARAM" ] ; then HN_WSNAME_PARAM=$HN_WSNAME_DEF_PARAM; fi	
 	echo "" > $WSNAME_LOG		# Clean advanced log
-	echo "'$HN_WSNAME_DEF_PARAM','$WSNAME_LOG','$HN_WSNAME_PARAM','$HNAME'" #| tee -a  $WINROLL_LOG
+	echo "Post-Info: '$NM','$refine_MAC','$refine_IP','$WSNAME_LOG','$HN_WSNAME_DEF_PARAM','$HN_WSNAME_PARAM','$HNAME'" #| tee -a  $WINROLL_LOG
+
 	#read
 
 	wsname.exe $HN_WSNAME_PARAM	# use /TEST to pre-test the hostname assigned by wsname
