@@ -144,4 +144,17 @@ Section "Add ssh exception at firewall" SEC02
 	${EndIf}
 SectionEnd
 
+Section "Add ssh exception at firewall" SEC02
+	liteFirewall::AddRule "C:\cygwin\bin\cygrunsrv.exe" "liteFirewall Test" 
+	Pop $0
+	Pop $0 ; return error(1)/success(0)
+	${If} $0 == "0"
+		MessageBox MB_OK "Add the port 22/TCP to the firewall exception list , Success: '$0'"
+	${ElseIF} $0 == "1"
+		MessageBox MB_OK "Add the port 22/TCP to the firewall exception list , Error: '$0'"
+	${Else}
+		MessageBox MB_OK "Shloud not be here :'$0'"
+	${EndIf}
+SectionEnd
+
 ; EOF

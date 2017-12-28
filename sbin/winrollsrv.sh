@@ -304,16 +304,17 @@ do_autohostname(){
 		HN_WSNAME_REMOTE_RDF=$(echo $HN_WSNAME_PARAM | awk -F " " '{print $1}'| sed -e "s/^\/RDF://g")
 		wget -t 5 -T 3 "$HN_WSNAME_REMOTE_RDF" -O  $WINROLL_CONF_ROOT/hosts.rem.conf 2> /dev/null
 		
-		[ "$?" = 0 ] && mv $WINROLL_CONF_ROOT/hosts.rem.conf $WINROLL_CONF_ROOT/hosts.conf
+		[ "$?" = 0 ] && mv $WINROLL_CONF_ROOT/hosts.rem.conf $WINROLL_CONF_ROOT/hosts.conf || echo "wget $HN_WSNAME_REMOTE_RDF failed !!" 
 		# system would use hosts.conf that be left last time if failed to get remote config file
 		
 		# convert  to Winodws format
 		HN_WSNAME_LOCAL_RDF="$(cygpath -w $WINROLL_CONF_ROOT/hosts.conf)"
 		HN_WSNAME_PARAM=$(echo $HN_WSNAME_PARAM | sed -e "s|$(echo ${HN_WSNAME_REMOTE_RDF})|$(echo ${HN_WSNAME_LOCAL_RDF} | sed 's|\\|\\\\|g')|")
-	elif [  -n "$(echo $CONFIG_NETWORK_MODE | grep -ie '^/RDF:tftp://' 2> /dev/null )" ] ; then
-		tftp get "$CLIENT_MAC_NETWORK_Winpath" 2> /dev/null
+	elif [  -n "$(echo $HN_WSNAME_PARAM | grep -ie '^/RDF:tftp://' 2> /dev/null )" ] ; then
+		HN_WSNAME_REMOTE_RDF=$(echo $HN_WSNAME_PARAM | awk -F " " '{print $1}'| sed -e "s/^\/RDF://g")
+		tftp get "$HN_WSNAME_REMOTE_RDF" 2> /dev/null
 		
-		[ "$?" = 0 ] && mv $WINROLL_CONF_ROOT/hosts.rem.conf $WINROLL_CONF_ROOT/hosts.conf
+		[ "$?" = 0 ] && mv $WINROLL_CONF_ROOT/hosts.rem.conf $WINROLL_CONF_ROOT/hosts.conf || echo "tftp get $HN_WSNAME_REMOTE_RDF failed !!" 
 		# system would use hosts.conf that be left last time if failed to get remote config file
 		
 		# convert to Winodws format
